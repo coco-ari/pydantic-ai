@@ -1,16 +1,16 @@
-# Dependencies
+# 依赖
 
-Pydantic AI uses a dependency injection system to provide data and services to your agent's [system prompts](agent.md#system-prompts), [tools](tools.md) and [output validators](output.md#output-validator-functions).
+Pydantic AI 使用依赖注入系统，向智能体的 [system prompts](agent.md#system-prompts)、[工具](tools.md)和[输出校验器](output.md#output-validator-functions)提供数据和服务。
 
-Matching Pydantic AI's design philosophy, our dependency system tries to use existing best practice in Python development rather than inventing esoteric "magic", this should make dependencies type-safe, understandable, easier to test, and ultimately easier to deploy in production.
+与 Pydantic AI 的设计理念一致，我们的依赖系统尽量使用 Python 开发中的既有最佳实践，而不是发明晦涩的“魔法”。这应该能让依赖具备类型安全、易理解、更易测试，并最终更易部署到生产环境。
 
-## Defining Dependencies
+## 定义依赖
 
-Dependencies can be any python type. While in simple cases you might be able to pass a single object as a dependency (e.g. an HTTP connection), [dataclasses][] are generally a convenient container when your dependencies included multiple objects.
+依赖可以是任何 Python 类型。在简单情况下，你也许可以传入单个对象作为依赖（例如 HTTP 连接），但当依赖包含多个对象时，[dataclasses][] 通常是一个方便的容器。
 
-Here's an example of defining an agent that requires dependencies.
+下面是定义一个需要依赖的智能体示例。
 
-(**Note:** dependencies aren't actually used in this example, see [Accessing Dependencies](#accessing-dependencies) below)
+（**注意：** 这个示例实际上没有使用依赖，请参见下面的[访问依赖](#访问依赖)。）
 
 ```python {title="unused_dependencies.py"}
 from dataclasses import dataclass
@@ -43,15 +43,15 @@ async def main():
         #> Did you hear about the toothpaste scandal? They called it Colgate.
 ```
 
-1. Define a dataclass to hold dependencies.
-2. Pass the dataclass type to the `deps_type` argument of the [`Agent` constructor][pydantic_ai.agent.Agent.__init__]. **Note**: we're passing the type here, NOT an instance, this parameter is not actually used at runtime, it's here so we can get full type checking of the agent.
-3. When running the agent, pass an instance of the dataclass to the `deps` parameter.
+1. 定义一个 dataclass 来保存依赖。
+2. 将 dataclass 类型传给 [`Agent` 构造函数][pydantic_ai.agent.Agent.__init__]的 `deps_type` 参数。**注意**：这里传入的是类型，不是实例；这个参数在运行时实际上不会被使用，它存在的目的是让我们能对智能体进行完整类型检查。
+3. 运行智能体时，将 dataclass 的实例传给 `deps` 参数。
 
-_(This example is complete, it can be run "as is" — you'll need to add `asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以“原样”运行；你需要添加 `asyncio.run(main())` 来运行 `main`。）_
 
-## Accessing Dependencies
+## 访问依赖
 
-Dependencies are accessed through the [`RunContext`][pydantic_ai.tools.RunContext] type, this should be the first parameter of system prompt functions etc.
+依赖通过 [`RunContext`][pydantic_ai.tools.RunContext] 类型访问；它应该是 system prompt 函数等的第一个参数。
 
 ```python {title="system_prompt_dependencies.py" hl_lines="20-27"}
 from dataclasses import dataclass
@@ -91,29 +91,27 @@ async def main():
         #> Did you hear about the toothpaste scandal? They called it Colgate.
 ```
 
-1. [`RunContext`][pydantic_ai.tools.RunContext] may optionally be passed to a [`system_prompt`][pydantic_ai.agent.Agent.system_prompt] function as the only argument.
-2. [`RunContext`][pydantic_ai.tools.RunContext] is parameterized with the type of the dependencies, if this type is incorrect, static type checkers will raise an error.
-3. Access dependencies through the [`.deps`][pydantic_ai.tools.RunContext.deps] attribute.
-4. Access dependencies through the [`.deps`][pydantic_ai.tools.RunContext.deps] attribute.
+1. [`RunContext`][pydantic_ai.tools.RunContext] 可以作为唯一参数可选地传给 [`system_prompt`][pydantic_ai.agent.Agent.system_prompt] 函数。
+2. [`RunContext`][pydantic_ai.tools.RunContext] 会用依赖类型参数化；如果该类型不正确，静态类型检查器会报错。
+3. 通过 [`.deps`][pydantic_ai.tools.RunContext.deps] 属性访问依赖。
+4. 通过 [`.deps`][pydantic_ai.tools.RunContext.deps] 属性访问依赖。
 
-_(This example is complete, it can be run "as is" — you'll need to add `asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以“原样”运行；你需要添加 `asyncio.run(main())` 来运行 `main`。）_
 
-In addition to [`.deps`][pydantic_ai.tools.RunContext.deps], [`RunContext`][pydantic_ai.tools.RunContext] provides access to the running agent via [`.agent`][pydantic_ai.tools.RunContext.agent], which is useful when [tools](tools.md), [hooks](hooks.md), or [capabilities](capabilities.md) need to read agent properties like [`name`][pydantic_ai.agent.Agent.name] or [`output_type`][pydantic_ai.agent.Agent.output_type].
+除了 [`.deps`][pydantic_ai.tools.RunContext.deps] 之外，[`RunContext`][pydantic_ai.tools.RunContext] 还可以通过 [`.agent`][pydantic_ai.tools.RunContext.agent] 访问正在运行的智能体。当[工具](tools.md)、[hooks](hooks.md) 或 [capabilities](capabilities.md) 需要读取智能体属性（如 [`name`][pydantic_ai.agent.Agent.name] 或 [`output_type`][pydantic_ai.agent.Agent.output_type]）时，这很有用。
 
-Dependency fields can also be referenced in instructions and descriptions via [template strings](agent-spec.md#template-strings) — for example, `TemplateStr('Hello {{name}}')` renders `name` from the deps object at runtime. This is especially useful in [agent specs](agent-spec.md) where callables aren't available.
+依赖字段也可以通过 [template strings](agent-spec.md#template-strings) 在 instructions 和 descriptions 中引用。例如，`TemplateStr('Hello {{name}}')` 会在运行时从 deps 对象渲染 `name`。这在无法使用 callables 的 [agent specs](agent-spec.md) 中尤其有用。
 
-### Asynchronous vs. Synchronous dependencies
+### 异步依赖 vs. 同步依赖
 
-[System prompt functions](agent.md#system-prompts), [function tools](tools.md) and [output validators](output.md#output-validator-functions) are all run in the async context of an agent run.
+[System prompt 函数](agent.md#system-prompts)、[function tools](tools.md) 和[输出校验器](output.md#output-validator-functions)都会在智能体运行的 async context 中执行。
 
-If these functions are not coroutines (e.g. `async def`) they are called with
-[`run_in_executor`][asyncio.loop.run_in_executor] in a thread pool. It's therefore marginally preferable
-to use `async` methods where dependencies perform IO, although synchronous dependencies should work fine too.
+如果这些函数不是协程（例如 `async def`），它们会通过线程池中的 [`run_in_executor`][asyncio.loop.run_in_executor] 调用。因此，当依赖执行 IO 时，使用 `async` 方法会略好一些，不过同步依赖也应能正常工作。
 
-!!! note "`run` vs. `run_sync` and Asynchronous vs. Synchronous dependencies"
-    Whether you use synchronous or asynchronous dependencies is completely independent of whether you use `run` or `run_sync` — `run_sync` is just a wrapper around `run` and agents are always run in an async context.
+!!! note "`run` vs. `run_sync` 以及异步依赖 vs. 同步依赖"
+    你使用同步依赖还是异步依赖，与使用 `run` 还是 `run_sync` 完全无关。`run_sync` 只是 `run` 的包装器，智能体始终在 async context 中运行。
 
-Here's the same example as above, but with a synchronous dependency:
+下面是与上面相同的示例，但使用同步依赖：
 
 ```python {title="sync_dependencies.py"}
 from dataclasses import dataclass
@@ -154,14 +152,14 @@ async def main():
     #> Did you hear about the toothpaste scandal? They called it Colgate.
 ```
 
-1. Here we use a synchronous `httpx.Client` instead of an asynchronous `httpx.AsyncClient`.
-2. To match the synchronous dependency, the system prompt function is now a plain function, not a coroutine.
+1. 这里我们使用同步的 `httpx.Client`，而不是异步的 `httpx.AsyncClient`。
+2. 为了匹配同步依赖，system prompt 函数现在是普通函数，而不是协程。
 
-_(This example is complete, it can be run "as is" — you'll need to add `asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以“原样”运行；你需要添加 `asyncio.run(main())` 来运行 `main`。）_
 
-## Full Example
+## 完整示例
 
-As well as system prompts, dependencies can be used in [tools](tools.md) and [output validators](output.md#output-validator-functions).
+除了 system prompts，依赖还可以在[工具](tools.md)和[输出校验器](output.md#output-validator-functions)中使用。
 
 ```python {title="full_example.py" hl_lines="27-35 38-48"}
 from dataclasses import dataclass
@@ -222,19 +220,18 @@ async def main():
         #> Did you hear about the toothpaste scandal? They called it Colgate.
 ```
 
-1. To pass `RunContext` to a tool, use the [`tool`][pydantic_ai.agent.Agent.tool] decorator.
-2. `RunContext` may optionally be passed to a [`output_validator`][pydantic_ai.agent.Agent.output_validator] function as the first argument.
+1. 要将 `RunContext` 传给工具，请使用 [`tool`][pydantic_ai.agent.Agent.tool] 装饰器。
+2. `RunContext` 可以作为第一个参数可选地传给 [`output_validator`][pydantic_ai.agent.Agent.output_validator] 函数。
 
-_(This example is complete, it can be run "as is" — you'll need to add `asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以“原样”运行；你需要添加 `asyncio.run(main())` 来运行 `main`。）_
 
-## Overriding Dependencies
+## 覆盖依赖
 
-When testing agents, it's useful to be able to customise dependencies.
+测试智能体时，能够自定义依赖很有用。
 
-While this can sometimes be done by calling the agent directly within unit tests, we can also override dependencies
-while calling application code which in turn calls the agent.
+虽然有时可以在单元测试中直接调用智能体来实现这一点，但我们也可以在调用应用代码时覆盖依赖，而应用代码内部再调用智能体。
 
-This is done via the [`override`][pydantic_ai.agent.Agent.override] method on the agent.
+这是通过智能体上的 [`override`][pydantic_ai.agent.Agent.override] 方法完成的。
 
 ```python {title="joke_app.py"}
 from dataclasses import dataclass
@@ -273,12 +270,12 @@ async def application_code(prompt: str) -> str:  # (3)!
     return result.output
 ```
 
-1. Define a method on the dependency to make the system prompt easier to customise.
-2. Call the system prompt factory from within the system prompt function.
-3. Application code that calls the agent, in a real application this might be an API endpoint.
-4. Call the agent from within the application code, in a real application this call might be deep within a call stack. Note `app_deps` here will NOT be used when deps are overridden.
+1. 在依赖上定义一个方法，让 system prompt 更容易自定义。
+2. 从 system prompt 函数中调用 system prompt factory。
+3. 调用智能体的应用代码；在真实应用中，这可能是一个 API endpoint。
+4. 从应用代码内部调用智能体；在真实应用中，这个调用可能位于很深的调用栈中。注意，当 deps 被覆盖时，这里的 `app_deps` 不会被使用。
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以“原样”运行。）_
 
 ```python {title="test_joke_app.py" hl_lines="10-12" call_name="test_application_code" requires="joke_app.py"}
 from joke_app import MyDeps, application_code, joke_agent
@@ -296,14 +293,14 @@ async def test_application_code():
     assert joke.startswith('Did you hear about the toothpaste scandal?')
 ```
 
-1. Define a subclass of `MyDeps` in tests to customise the system prompt factory.
-2. Create an instance of the test dependency, we don't need to pass an `http_client` here as it's not used.
-3. Override the dependencies of the agent for the duration of the `with` block, `test_deps` will be used when the agent is run.
-4. Now we can safely call our application code, the agent will use the overridden dependencies.
+1. 在测试中定义 `MyDeps` 的子类，以自定义 system prompt factory。
+2. 创建测试依赖实例；这里不需要传入 `http_client`，因为它不会被使用。
+3. 在 `with` 块持续期间覆盖智能体依赖；智能体运行时会使用 `test_deps`。
+4. 现在可以安全调用应用代码，智能体会使用被覆盖的依赖。
 
-## Examples
+## 示例
 
-The following examples demonstrate how to use dependencies in Pydantic AI:
+以下示例展示如何在 Pydantic AI 中使用依赖：
 
 - [Weather Agent](examples/weather-agent.md)
 - [SQL Generation](examples/sql-gen.md)

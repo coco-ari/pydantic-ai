@@ -1,24 +1,23 @@
-# HTTP Request Retries
+# HTTP 请求重试
 
-Pydantic AI provides retry functionality for HTTP requests made by model providers through custom HTTP transports.
-This is particularly useful for handling transient failures like rate limits, network timeouts, or temporary server errors.
+Pydantic AI 通过自定义 HTTP transports 为模型提供商发起的 HTTP 请求提供重试功能。
+这对于处理限流、网络超时或临时服务器错误等瞬时故障特别有用。
 
-## Overview
+## 概览
 
-The retry functionality is built on top of the [tenacity](https://github.com/jd/tenacity) library and integrates
-seamlessly with httpx clients. You can configure retry behavior for any provider that accepts a custom HTTP client.
+重试功能构建在 [tenacity](https://github.com/jd/tenacity) 库之上，并与 httpx clients 无缝集成。你可以为任何接受自定义 HTTP client 的 provider 配置重试行为。
 
-## Installation
+## 安装
 
-To use the retry transports, you need to install `tenacity`, which you can do via the `retries` dependency group:
+要使用 retry transports，需要安装 `tenacity`，可以通过 `retries` 依赖组安装：
 
 ```bash
 pip/uv-add 'pydantic-ai-slim[retries]'
 ```
 
-## Usage Example
+## 使用示例
 
-Here's an example of adding retry functionality with smart retry handling:
+下面是一个添加重试功能并使用智能重试处理的示例：
 
 ```python {title="smart_retry_example.py"}
 from httpx import AsyncClient, HTTPStatusError
@@ -62,11 +61,11 @@ model = OpenAIChatModel('gpt-5.2', provider=OpenAIProvider(http_client=client))
 agent = Agent(model)
 ```
 
-## Wait Strategies
+## 等待策略
 
 ### wait_retry_after
 
-The `wait_retry_after` function is a smart wait strategy that automatically respects HTTP `Retry-After` headers:
+`wait_retry_after` 函数是一种智能等待策略，会自动遵守 HTTP `Retry-After` headers：
 
 ```python {title="wait_strategy_example.py"}
 from tenacity import wait_exponential
@@ -83,18 +82,18 @@ wait_strategy_2 = wait_retry_after(
 )
 ```
 
-This wait strategy:
+这个等待策略会：
 
-- Automatically parses `Retry-After` headers from HTTP 429 responses
-- Supports both seconds format (`"30"`) and HTTP date format (`"Wed, 21 Oct 2015 07:28:00 GMT"`)
-- Falls back to your chosen strategy when no header is present
-- Respects the `max_wait` limit to prevent excessive delays
+- 自动解析 HTTP 429 响应中的 `Retry-After` headers
+- 同时支持秒数格式（`"30"`）和 HTTP 日期格式（`"Wed, 21 Oct 2015 07:28:00 GMT"`）
+- 当 header 不存在时，fallback 到你选择的策略
+- 遵守 `max_wait` 限制，防止过长延迟
 
-## Transport Classes
+## Transport 类
 
 ### AsyncTenacityTransport
 
-For asynchronous HTTP clients (recommended for most use cases):
+用于异步 HTTP clients（推荐用于大多数用例）：
 
 ```python {title="async_transport_example.py"}
 from httpx import AsyncClient
@@ -121,7 +120,7 @@ client = AsyncClient(transport=transport)
 
 ### TenacityTransport
 
-For synchronous HTTP clients:
+用于同步 HTTP clients：
 
 ```python {title="sync_transport_example.py"}
 from httpx import Client
@@ -146,9 +145,9 @@ transport = TenacityTransport(
 client = Client(transport=transport)
 ```
 
-## Common Retry Patterns
+## 常见重试模式
 
-### Rate Limit Handling with Retry-After Support
+### 使用 Retry-After 支持处理限流
 
 ```python {title="rate_limit_handling.py"}
 from httpx import AsyncClient, HTTPStatusError
@@ -178,9 +177,9 @@ client = create_rate_limit_client()
 # Client is now ready to use with any HTTP requests and will respect Retry-After headers
 ```
 
-The `wait_retry_after` function automatically detects `Retry-After` headers in 429 (rate limit) responses and waits for the specified time. If no header is present, it falls back to exponential backoff.
+`wait_retry_after` 函数会自动检测 429（rate limit）响应中的 `Retry-After` headers，并等待指定时间。如果不存在 header，则 fallback 到 exponential backoff。
 
-### Network Error Handling
+### 网络错误处理
 
 ```python {title="network_error_handling.py"}
 import httpx
@@ -210,7 +209,7 @@ client = create_network_resilient_client()
 # Client will now retry on timeout, connection, and read errors
 ```
 
-### Custom Retry Logic
+### 自定义重试逻辑
 
 ```python {title="custom_retry_logic.py"}
 import httpx
@@ -248,9 +247,9 @@ client = create_custom_retry_client()
 # Client will retry server errors (5xx) and network errors, but not client errors (4xx)
 ```
 
-## Using with Different Providers
+## 与不同 Providers 一起使用
 
-The retry transports work with any provider that accepts a custom HTTP client:
+Retry transports 可用于任何接受自定义 HTTP client 的 provider：
 
 ### OpenAI
 
@@ -280,7 +279,7 @@ model = AnthropicModel('claude-sonnet-4-5-20250929', provider=AnthropicProvider(
 agent = Agent(model)
 ```
 
-### Any OpenAI-Compatible Provider
+### 任何 OpenAI 兼容 Provider
 
 ```python {title="openai_compatible_with_retries.py" requires="smart_retry_example.py"}
 from pydantic_ai import Agent
@@ -301,33 +300,33 @@ model = OpenAIChatModel(
 agent = Agent(model)
 ```
 
-## Best Practices
+## 最佳实践
 
-1. **Start Conservative**: Begin with a small number of retries (3-5) and reasonable wait times.
+1. **保守起步**：从较少的重试次数（3-5 次）和合理等待时间开始。
 
-2. **Use Exponential Backoff**: This helps avoid overwhelming servers during outages.
+2. **使用 Exponential Backoff**：这有助于在服务故障期间避免压垮服务器。
 
-3. **Set Maximum Wait Times**: Prevent indefinite delays with reasonable maximum wait times.
+3. **设置最大等待时间**：通过合理的最大等待时间防止无限延迟。
 
-4. **Handle Rate Limits Properly**: Respect `Retry-After` headers when possible.
+4. **正确处理 Rate Limits**：尽可能遵守 `Retry-After` headers。
 
-5. **Log Retry Attempts**: Add logging to monitor retry behavior in production. (This will be picked up by Logfire automatically if you instrument httpx.)
+5. **记录重试尝试**：添加日志以在生产环境监控重试行为。（如果你对 httpx 进行了插桩，Logfire 会自动捕获这些信息。）
 
-6. **Consider Circuit Breakers**: For high-traffic applications, consider implementing circuit breaker patterns.
+6. **考虑 Circuit Breakers**：对于高流量应用，可以考虑实现 circuit breaker 模式。
 
-!!! tip "Monitoring Retries in Production"
-    Excessive retries can indicate underlying issues and increase costs. [Logfire](logfire.md) helps you track retry patterns:
+!!! tip "在生产环境监控重试"
+    过多重试可能表明存在底层问题并增加成本。[Logfire](logfire.md) 可以帮助你跟踪重试模式：
 
-    - See which requests triggered retries
-    - Understand retry causes (rate limits, server errors, timeouts)
-    - Monitor retry frequency over time
-    - Identify opportunities to reduce retries
+    - 查看哪些请求触发了重试
+    - 理解重试原因（rate limits、server errors、timeouts）
+    - 随时间监控重试频率
+    - 识别减少重试的机会
 
-    With [HTTPX instrumentation](logfire.md#monitoring-http-requests) enabled, retry attempts are automatically captured in your traces.
+    启用 [HTTPX instrumentation](logfire.md#monitoring-http-requests) 后，重试尝试会自动捕获到你的 traces 中。
 
-## Error Handling
+## 错误处理
 
-The retry transports will re-raise the last exception if all retry attempts fail. Make sure to handle these appropriately in your application:
+如果所有重试尝试都失败，retry transports 会重新抛出最后一个异常。请确保在应用中适当处理这些异常：
 
 ```python {title="error_handling_example.py" requires="smart_retry_example.py"}
 from pydantic_ai import Agent
@@ -341,20 +340,20 @@ model = OpenAIChatModel('gpt-5.2', provider=OpenAIProvider(http_client=client))
 agent = Agent(model)
 ```
 
-## Performance Considerations
+## 性能考虑
 
-- Retries add latency to requests, especially with exponential backoff
-- Consider the total timeout for your application when configuring retry behavior
-- Monitor retry rates to detect systemic issues
-- Use async transports for better concurrency when handling multiple requests
+- 重试会增加请求延迟，尤其是在使用 exponential backoff 时
+- 配置重试行为时，要考虑应用的总超时时间
+- 监控重试率以检测系统性问题
+- 处理多个请求时，使用 async transports 可获得更好的并发能力
 
-For more advanced retry configurations, refer to the [tenacity documentation](https://tenacity.readthedocs.io/).
+关于更高级的重试配置，请参阅 [tenacity 文档](https://tenacity.readthedocs.io/)。
 
-## Provider-Specific Retry Behavior
+## Provider-Specific 重试行为
 
 ### AWS Bedrock
 
-The AWS Bedrock provider uses boto3's built-in retry mechanisms instead of httpx. To configure retries for Bedrock, use boto3's `Config`:
+AWS Bedrock provider 使用 boto3 的内置重试机制，而不是 httpx。要为 Bedrock 配置重试，请使用 boto3 的 `Config`：
 
 ```python
 from botocore.config import Config
@@ -362,4 +361,4 @@ from botocore.config import Config
 config = Config(retries={'max_attempts': 5, 'mode': 'adaptive'})
 ```
 
-See [Bedrock: Configuring Retries](models/bedrock.md#configuring-retries) for complete examples.
+完整示例见 [Bedrock: Configuring Retries](models/bedrock.md#configuring-retries)。

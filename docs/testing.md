@@ -1,37 +1,36 @@
-# Unit testing
+# 单元测试
 
-Writing unit tests for Pydantic AI code is just like unit tests for any other Python code.
+为 Pydantic AI 代码编写单元测试，就像为其他 Python 代码编写单元测试一样。
 
-Because for the most part they're nothing new, we have pretty well established tools and patterns for writing and running these kinds of tests.
+因为它们大体上并没有什么新东西，所以我们已经有非常成熟的工具和模式来编写和运行这类测试。
 
-Unless you're really sure you know better, you'll probably want to follow roughly this strategy:
+除非你非常确定自己有更好的办法，否则大致应遵循以下策略：
 
-- Use [`pytest`](https://docs.pytest.org/en/stable/) as your test harness
-- If you find yourself typing out long assertions, use [inline-snapshot](https://15r10nk.github.io/inline-snapshot/latest/)
-- Similarly, [dirty-equals](https://dirty-equals.helpmanual.io/latest/) can be useful for comparing large data structures
-- Use [`TestModel`][pydantic_ai.models.test.TestModel] or [`FunctionModel`][pydantic_ai.models.function.FunctionModel] in place of your actual model to avoid the usage, latency and variability of real LLM calls
-- Use [`Agent.override`][pydantic_ai.agent.Agent.override] to replace an agent's model, dependencies, or toolsets inside your application logic
-- Set [`ALLOW_MODEL_REQUESTS=False`][pydantic_ai.models.ALLOW_MODEL_REQUESTS] globally to block any requests from being made to non-test models accidentally
+- 使用 [`pytest`](https://docs.pytest.org/en/stable/) 作为测试框架
+- 如果发现自己在写很长的断言，使用 [inline-snapshot](https://15r10nk.github.io/inline-snapshot/latest/)
+- 类似地，[dirty-equals](https://dirty-equals.helpmanual.io/latest/) 对比较大型数据结构很有用
+- 使用 [`TestModel`][pydantic_ai.models.test.TestModel] 或 [`FunctionModel`][pydantic_ai.models.function.FunctionModel] 代替真实模型，以避免真实 LLM 调用的使用成本、延迟和可变性
+- 使用 [`Agent.override`][pydantic_ai.agent.Agent.override] 在应用逻辑中替换智能体的模型、依赖或 toolsets
+- 全局设置 [`ALLOW_MODEL_REQUESTS=False`][pydantic_ai.models.ALLOW_MODEL_REQUESTS]，阻止测试中意外向非测试模型发起请求
 
-### Unit testing with `TestModel`
+### 使用 `TestModel` 进行单元测试
 
-The simplest and fastest way to exercise most of your application code is using [`TestModel`][pydantic_ai.models.test.TestModel], this will (by default) call all tools in the agent, then return either plain text or a structured response depending on the return type of the agent.
+执行大多数应用代码的最简单、最快方式是使用 [`TestModel`][pydantic_ai.models.test.TestModel]。默认情况下，它会调用智能体中的所有工具，然后根据智能体返回类型返回纯文本或结构化响应。
 
-!!! note "`TestModel` is not magic"
-    The "clever" (but not too clever) part of `TestModel` is that it will attempt to generate valid structured data for [function tools](tools.md) and [output types](output.md#structured-output) based on the schema of the registered tools.
+!!! note "`TestModel` 不是魔法"
+    `TestModel` 中“聪明”（但没有过度聪明）的部分是：它会尝试基于已注册工具的 schema，为 [function tools](tools.md) 和[输出类型](output.md#structured-output)生成有效的结构化数据。
 
-    There's no ML or AI in `TestModel`, it's just plain old procedural Python code that tries to generate data that satisfies the JSON schema of a tool.
+    `TestModel` 中没有 ML 或 AI，它只是普通的过程式 Python 代码，尝试生成满足工具 JSON schema 的数据。
 
-    The resulting data won't look pretty or relevant, but it should pass Pydantic's validation in most cases.
-    If you want something more sophisticated, use [`FunctionModel`][pydantic_ai.models.function.FunctionModel] and write your own data generation logic.
+    生成的数据不会漂亮或相关，但多数情况下应该能通过 Pydantic 校验。
+    如果你想要更复杂的能力，请使用 [`FunctionModel`][pydantic_ai.models.function.FunctionModel] 并编写自己的数据生成逻辑。
 
-!!! note "Testing agents with native tools"
-    [`TestModel`][pydantic_ai.models.test.TestModel] cannot emulate provider-executed [native tools](native-tools.md).
-    If your production agent is configured with native tools via `capabilities`, override them in tests with
-    `agent.override(model=TestModel(), native_tools=[])` unless the test is specifically checking that native
-    tools are passed to the model.
+!!! note "测试带原生工具的智能体"
+    [`TestModel`][pydantic_ai.models.test.TestModel] 无法模拟由 provider 执行的[原生工具](native-tools.md)。
+    如果你的生产智能体通过 `capabilities` 配置了原生工具，请在测试中使用
+    `agent.override(model=TestModel(), native_tools=[])` 覆盖它们，除非测试专门检查原生工具是否传给模型。
 
-Let's write unit tests for the following application code:
+我们来为以下应用代码编写单元测试：
 
 ```python {title="weather_app.py"}
 import asyncio
@@ -75,16 +74,16 @@ async def run_weather_forecast(  # (4)!
         )
 ```
 
-1. `DatabaseConn` is a class that holds a database connection
-2. `WeatherService` has methods to get weather forecasts and historic data about the weather
-3. We need to call a different endpoint depending on whether the date is in the past or the future, you'll see why this nuance is important below
-4. This function is the code we want to test, together with the agent it uses
+1. `DatabaseConn` 是一个保存数据库连接的类
+2. `WeatherService` 有获取天气预报和历史天气数据的方法
+3. 我们需要根据日期是过去还是未来调用不同 endpoint；下面会看到为什么这个细节很重要
+4. 这是我们想要测试的函数，以及它使用的智能体
 
-Here we have a function that takes a list of `#!python (user_prompt, user_id)` tuples, gets a weather forecast for each prompt, and stores the result in the database.
+这里有一个函数，它接受 `#!python (user_prompt, user_id)` 元组列表，为每个 prompt 获取天气预报，并将结果存储到数据库中。
 
-**We want to test this code without having to mock certain objects or modify our code so we can pass test objects in.**
+**我们想测试这段代码，但不想 mock 某些对象，也不想修改代码来传入测试对象。**
 
-Here's how we would write tests using [`TestModel`][pydantic_ai.models.test.TestModel]:
+下面是使用 [`TestModel`][pydantic_ai.models.test.TestModel] 编写测试的方式：
 
 ```python {title="test_weather_app.py" call_name="test_forecast" requires="weather_app.py"}
 from datetime import timezone
@@ -186,22 +185,22 @@ async def test_forecast():
     ]
 ```
 
-1. We're using [anyio](https://anyio.readthedocs.io/en/stable/) to run async tests.
-2. This is a safety measure to make sure we don't accidentally make real requests to the LLM while testing, see [`ALLOW_MODEL_REQUESTS`][pydantic_ai.models.ALLOW_MODEL_REQUESTS] for more details.
-3. We're using [`Agent.override`][pydantic_ai.agent.Agent.override] to replace the agent's model with [`TestModel`][pydantic_ai.models.test.TestModel], the nice thing about `override` is that we can replace the model inside agent without needing access to the agent `run*` methods call site.
-4. Now we call the function we want to test inside the `override` context manager.
-5. But default, `TestModel` will return a JSON string summarising the tools calls made, and what was returned. If you wanted to customise the response to something more closely aligned with the domain, you could add [`custom_output_text='Sunny'`][pydantic_ai.models.test.TestModel.custom_output_text] when defining `TestModel`.
-6. So far we don't actually know which tools were called and with which values, we can use [`capture_run_messages`][pydantic_ai.capture_run_messages] to inspect messages from the most recent run and assert the exchange between the agent and the model occurred as expected.
-7. The [`IsNow`][dirty_equals.IsNow] helper allows us to use declarative asserts even with data which will contain timestamps that change over time.
-8. `TestModel` isn't doing anything clever to extract values from the prompt, so these values are hardcoded.
+1. 我们使用 [anyio](https://anyio.readthedocs.io/en/stable/) 运行 async tests。
+2. 这是安全措施，确保测试时不会意外向 LLM 发起真实请求；更多细节见 [`ALLOW_MODEL_REQUESTS`][pydantic_ai.models.ALLOW_MODEL_REQUESTS]。
+3. 我们使用 [`Agent.override`][pydantic_ai.agent.Agent.override] 将智能体模型替换为 [`TestModel`][pydantic_ai.models.test.TestModel]。`override` 的好处是可以在 agent 内部替换模型，而不需要访问调用 agent `run*` 方法的位置。
+4. 现在我们在 `override` context manager 中调用想测试的函数。
+5. 默认情况下，`TestModel` 会返回一个 JSON 字符串，总结调用了哪些工具以及返回了什么。如果你想自定义更贴近领域的响应，可以在定义 `TestModel` 时添加 [`custom_output_text='Sunny'`][pydantic_ai.models.test.TestModel.custom_output_text]。
+6. 到目前为止，我们其实还不知道调用了哪些工具以及使用了哪些值。可以使用 [`capture_run_messages`][pydantic_ai.capture_run_messages] 检查最近一次 run 的 messages，并断言智能体与模型之间的交互如预期发生。
+7. [`IsNow`][dirty_equals.IsNow] helper 允许我们对包含随时间变化 timestamp 的数据使用声明式断言。
+8. `TestModel` 并没有聪明到能从 prompt 中提取值，所以这些值是硬编码的。
 
-### Unit testing with `FunctionModel`
+### 使用 `FunctionModel` 进行单元测试
 
-The above tests are a great start, but careful readers will notice that the `WeatherService.get_forecast` is never called since `TestModel` calls `weather_forecast` with a date in the past.
+上面的测试是一个很好的开始，但仔细的读者会注意到，`WeatherService.get_forecast` 从未被调用，因为 `TestModel` 使用过去的日期调用了 `weather_forecast`。
 
-To fully exercise `weather_forecast`, we need to use [`FunctionModel`][pydantic_ai.models.function.FunctionModel] to customise how the tools is called.
+为了完整执行 `weather_forecast`，我们需要使用 [`FunctionModel`][pydantic_ai.models.function.FunctionModel] 自定义工具调用方式。
 
-Here's an example of using `FunctionModel` to test the `weather_forecast` tool with custom inputs
+下面是使用 `FunctionModel` 以自定义输入测试 `weather_forecast` 工具的示例：
 
 ```python {title="test_weather_app2.py" call_name="test_forecast_future" requires="weather_app.py"}
 import re
@@ -252,15 +251,15 @@ async def test_forecast_future():
     assert forecast == 'The forecast is: Rainy with a chance of sun'
 ```
 
-1. We define a function `call_weather_forecast` that will be called by `FunctionModel` in place of the LLM, this function has access to the list of [`ModelMessage`][pydantic_ai.messages.ModelMessage]s that make up the run, and [`AgentInfo`][pydantic_ai.models.function.AgentInfo] which contains information about the agent and the function tools and return tools.
-2. Our function is slightly intelligent in that it tries to extract a date from the prompt, but just hard codes the location.
-3. We use [`FunctionModel`][pydantic_ai.models.function.FunctionModel] to replace the agent's model with our custom function.
+1. 我们定义 `call_weather_forecast` 函数，它会被 `FunctionModel` 调用来代替 LLM。这个函数可以访问组成 run 的 [`ModelMessage`][pydantic_ai.messages.ModelMessage] 列表，以及包含 agent、function tools 和 return tools 信息的 [`AgentInfo`][pydantic_ai.models.function.AgentInfo]。
+2. 我们的函数稍微有点智能，会尝试从 prompt 中提取日期，但 location 仍是硬编码。
+3. 我们使用 [`FunctionModel`][pydantic_ai.models.function.FunctionModel] 将智能体模型替换为自定义函数。
 
-### Overriding model via pytest fixtures
+### 通过 pytest fixtures 覆盖模型
 
-If you're writing lots of tests that all require model to be overridden, you can use [pytest fixtures](https://docs.pytest.org/en/6.2.x/fixture.html) to override the model with [`TestModel`][pydantic_ai.models.test.TestModel] or [`FunctionModel`][pydantic_ai.models.function.FunctionModel] in a reusable way.
+如果你要编写大量都需要覆盖模型的测试，可以使用 [pytest fixtures](https://docs.pytest.org/en/6.2.x/fixture.html)，以可复用方式用 [`TestModel`][pydantic_ai.models.test.TestModel] 或 [`FunctionModel`][pydantic_ai.models.function.FunctionModel] 覆盖模型。
 
-Here's an example of a fixture that overrides the model with `TestModel`:
+下面是一个用 `TestModel` 覆盖模型的 fixture 示例：
 
 ```python {title="test_agent.py" requires="weather_app.py"}
 import pytest
