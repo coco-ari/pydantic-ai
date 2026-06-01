@@ -6,50 +6,50 @@ title: Pydantic AI
 
 --8<-- "docs/.partials/index-header.html"
 
-FastAPI revolutionized web development by offering an innovative and ergonomic design, built on the foundation of [Pydantic Validation](https://docs.pydantic.dev) and modern Python features like type hints.
+FastAPI 基于 [Pydantic Validation](https://docs.pydantic.dev) 和类型提示等现代 Python 特性，以创新且符合人体工程学的设计革新了 Web 开发。
 
-Yet despite virtually every Python agent framework and LLM library using Pydantic Validation, when we began to use LLMs in [Pydantic Logfire](https://pydantic.dev/logfire), we couldn't find anything that gave us the same feeling.
+然而，尽管几乎每个 Python 智能体框架和 LLM 库都在使用 Pydantic Validation，当我们开始在 [Pydantic Logfire](https://pydantic.dev/logfire) 中使用 LLM 时，却找不到任何一个能带来同样体验的工具。
 
-We built Pydantic AI with one simple aim: to bring that FastAPI feeling to GenAI app and agent development.
+我们构建 Pydantic AI 的目标很简单：把那种 FastAPI 式的体验带到 GenAI 应用和智能体开发中。
 
-## Why use Pydantic AI
+## 为什么使用 Pydantic AI
 
-1. **Built by the Pydantic Team**:
-[Pydantic Validation](https://docs.pydantic.dev/latest/) is the validation layer of the OpenAI SDK, the Google ADK, the Anthropic SDK, LangChain, LlamaIndex, AutoGPT, Transformers, CrewAI, Instructor and many more. _Why use the derivative when you can go straight to the source?_ :smiley:
+1. **由 Pydantic 团队构建**：
+[Pydantic Validation](https://docs.pydantic.dev/latest/) 是 OpenAI SDK、Google ADK、Anthropic SDK、LangChain、LlamaIndex、AutoGPT、Transformers、CrewAI、Instructor 以及更多项目的校验层。_既然可以直达源头，为什么还要用衍生品呢？_ :smiley:
 
-2. **Model-agnostic**:
-Supports virtually every [model](models/overview.md) and provider: OpenAI, Anthropic, Gemini, DeepSeek, Grok, Cohere, Mistral, and Perplexity; Azure AI Foundry, Amazon Bedrock, Google Cloud, Ollama, LiteLLM, Groq, OpenRouter, Together AI, Fireworks AI, Cerebras, Hugging Face, GitHub, Heroku, Vercel, Nebius, OVHcloud, Alibaba Cloud, and SambaNova. If your favorite model or provider is not listed, you can easily implement a [custom model](models/overview.md#custom-models).
+2. **模型无关**：
+支持几乎所有[模型](models/overview.md)和提供商：OpenAI、Anthropic、Gemini、DeepSeek、Grok、Cohere、Mistral 和 Perplexity；Azure AI Foundry、Amazon Bedrock、Google Cloud、Ollama、LiteLLM、Groq、OpenRouter、Together AI、Fireworks AI、Cerebras、Hugging Face、GitHub、Heroku、Vercel、Nebius、OVHcloud、Alibaba Cloud 和 SambaNova。如果你喜欢的模型或提供商不在列表中，也可以轻松实现[自定义模型](models/overview.md#custom-models)。
 
-3. **Seamless Observability**:
-Tightly [integrates](logfire.md) with [Pydantic Logfire](https://pydantic.dev/logfire), our general-purpose OpenTelemetry observability platform, for real-time debugging, evals-based performance monitoring, and behavior, tracing, and cost tracking. If you already have an observability platform that supports OTel, you can [use that too](logfire.md#alternative-observability-backends).
+3. **无缝可观测性**：
+与我们的通用 OpenTelemetry 可观测性平台 [Pydantic Logfire](https://pydantic.dev/logfire) 深度[集成](logfire.md)，支持实时调试、基于评估的性能监控，以及行为、追踪和成本跟踪。如果你已经有支持 OTel 的可观测性平台，也可以[继续使用它](logfire.md#alternative-observability-backends)。
 
-4. **Fully Type-safe**:
-Designed to give your IDE or AI coding agent as much context as possible for auto-completion and [type checking](agent.md#static-type-checking), moving entire classes of errors from runtime to write-time for a bit of that Rust "if it compiles, it works" feel.
+4. **完全类型安全**：
+设计目标是尽可能为你的 IDE 或 AI 编码智能体提供上下文，用于自动补全和[类型检查](agent.md#static-type-checking)，把整类错误从运行时提前到编写代码时发现，带来一点 Rust 中“能编译就能运行”的体验。
 
-5. **Powerful Evals**:
-Enables you to systematically test and [evaluate](evals.md) the performance and accuracy of the agentic systems you build, and monitor the performance over time in Pydantic Logfire.
+5. **强大的评估能力**：
+让你能够系统地测试和[评估](evals.md)所构建智能体系统的性能和准确性，并在 Pydantic Logfire 中持续监控性能变化。
 
-6. **Extensible by Design**:
-Build agents from composable [capabilities](capabilities.md) that bundle tools, hooks, instructions, and model settings into reusable units. Use built-in capabilities for [web search](capabilities.md#provider-adaptive-tools), [thinking](capabilities.md#thinking), and [MCP](capabilities.md#provider-adaptive-tools), pick from the [Pydantic AI Harness](harness/overview.md) capability library, build your own, or install [third-party capability packages](extensibility.md). Define agents entirely in [YAML/JSON](agent-spec.md) — no code required.
+6. **为可扩展性而设计**：
+使用可组合的[能力](capabilities.md)构建智能体，这些能力会把工具、钩子、指令和模型设置打包成可复用单元。你可以使用内置的[网页搜索](capabilities.md#provider-adaptive-tools)、[思考](capabilities.md#thinking)和 [MCP](capabilities.md#provider-adaptive-tools) 能力，从 [Pydantic AI Harness](harness/overview.md) 能力库中选择，构建自己的能力，或安装[第三方能力包](extensibility.md)。还可以完全通过 [YAML/JSON](agent-spec.md) 定义智能体，不需要写代码。
 
-7. **MCP, A2A, and UI**:
-Integrates the [Model Context Protocol](mcp/overview.md), [Agent2Agent](a2a.md), and various [UI event stream](ui/overview.md) standards to give your agent access to external tools and data, let it interoperate with other agents, and build interactive applications with streaming event-based communication.
+7. **MCP、A2A 和 UI**：
+集成 [Model Context Protocol](mcp/overview.md)、[Agent2Agent](a2a.md) 和多种 [UI 事件流](ui/overview.md)标准，让你的智能体可以访问外部工具和数据，与其他智能体互操作，并通过基于事件的流式通信构建交互式应用。
 
-8. **Human-in-the-Loop Tool Approval**:
-Easily lets you flag that certain tool calls [require approval](deferred-tools.md#human-in-the-loop-tool-approval) before they can proceed, possibly depending on tool call arguments, conversation history, or user preferences.
+8. **人在回路中的工具审批**：
+可以轻松标记某些工具调用在继续执行前[需要审批](deferred-tools.md#human-in-the-loop-tool-approval)，审批条件还可以取决于工具调用参数、对话历史或用户偏好。
 
-9. **Durable Execution**:
-Enables you to build [durable agents](durable_execution/overview.md) that can preserve their progress across transient API failures and application errors or restarts, and handle long-running, asynchronous, and human-in-the-loop workflows with production-grade reliability.
+9. **持久化执行**：
+让你能够构建[持久化智能体](durable_execution/overview.md)，在短暂的 API 故障、应用错误或重启后保留执行进度，并以生产级可靠性处理长时间运行、异步以及人在回路中的工作流。
 
-10. **Streamed Outputs**:
-Provides the ability to [stream](output.md#streamed-results) structured output continuously, with immediate validation, ensuring real time access to generated data.
+10. **流式输出**：
+支持持续[流式传输](output.md#streamed-results)结构化输出，并立即进行校验，确保可以实时访问生成的数据。
 
-11. **Graph Support**:
-Provides a powerful way to define [graphs](graph.md) using type hints, for use in complex applications where standard control flow can degrade to spaghetti code.
+11. **图支持**：
+提供一种基于类型提示定义[图](graph.md)的强大方式，适用于标准控制流可能退化成意大利面代码的复杂应用。
 
-Realistically though, no list is going to be as convincing as [giving it a try](#next-steps) and seeing how it makes you feel!
+不过现实地说，再多列表也不如[亲自试一试](#下一步)，看看它带给你的感觉！
 
-**Sign up for our newsletter, *The Pydantic Stack*, with updates & tutorials on Pydantic AI, Logfire, and Pydantic:**
+**订阅我们的 newsletter _The Pydantic Stack_，获取 Pydantic AI、Logfire 和 Pydantic 的更新与教程：**
 
   <form method="POST" action="https://eu.customerioforms.com/forms/submit_action?site_id=53d2086c3c4214eaecaa&form_id=14b22611745b458&success_url=https://ai.pydantic.dev/" class="md-typeset" style="display: flex; align-items: center; gap: 0.5rem; width: 100%;">
       <input
@@ -69,9 +69,9 @@ Realistically though, no list is going to be as convincing as [giving it a try](
       <button type="submit" class="md-button md-button--primary">Subscribe</button>
   </form>
 
-## Hello World Example
+## Hello World 示例
 
-Here's a minimal example of Pydantic AI:
+下面是一个最小化的 Pydantic AI 示例：
 
 ```python {title="hello_world.py"}
 from pydantic_ai import Agent
@@ -88,17 +88,17 @@ The first known use of "hello, world" was in a 1974 textbook about the C program
 """
 ```
 
-1. We configure the agent to use [Anthropic's Claude Sonnet 4.6](api/models/anthropic.md) model, but you can also set the model when running the agent.
-2. Register static [instructions](agent.md#instructions) using a keyword argument to the agent.
-3. [Run the agent](agent.md#running-agents) synchronously, starting a conversation with the LLM.
+1. 我们将智能体配置为使用 [Anthropic 的 Claude Sonnet 4.6](api/models/anthropic.md) 模型，但你也可以在运行智能体时设置模型。
+2. 使用智能体的关键字参数注册静态[指令](agent.md#instructions)。
+3. 同步[运行智能体](agent.md#running-agents)，开始与 LLM 对话。
 
-_(This example is complete, it can be run "as is", assuming you've [installed the `pydantic_ai` package](install.md))_
+_（这个示例是完整的；假设你已经[安装了 `pydantic_ai` 包](install.md)，它可以“原样”运行。）_
 
-The exchange will be very short: Pydantic AI will send the instructions and the user prompt to the LLM, and the model will return a text response.
+这次交互会非常短：Pydantic AI 会把指令和用户提示发送给 LLM，模型会返回一段文本响应。
 
-Not very interesting yet, but we can easily add [tools](tools.md), [dynamic instructions](agent.md#instructions), [structured outputs](output.md), or composable [capabilities](capabilities.md) to build more powerful agents.
+目前还不算很有趣，但我们可以轻松添加[工具](tools.md)、[动态指令](agent.md#instructions)、[结构化输出](output.md)，或者可组合的[能力](capabilities.md)，来构建更强大的智能体。
 
-Here's the same agent with [thinking](capabilities.md#thinking) and [web search](capabilities.md#provider-adaptive-tools) capabilities:
+下面是同一个智能体，增加了[思考](capabilities.md#thinking)和[网页搜索](capabilities.md#provider-adaptive-tools)能力：
 
 ```python {title="hello_world_capabilities.py"}
 from pydantic_ai import Agent
@@ -117,9 +117,9 @@ The largest meteorite recovered this year weighed approximately 7.6 kg, found in
 """
 ```
 
-## Tools & Dependency Injection Example
+## 工具和依赖注入示例
 
-Here is a concise example using Pydantic AI to build a support agent for a bank:
+下面是一个使用 Pydantic AI 为银行构建支持智能体的简洁示例：
 
 ```python {title="bank_support.py"}
 from dataclasses import dataclass
@@ -188,29 +188,29 @@ async def main():
     """
 ```
 
-1. This [agent](agent.md) will act as first-tier support in a bank. Agents are generic in the type of dependencies they accept and the type of output they return. In this case, the support agent has type `#!python Agent[SupportDependencies, SupportOutput]`.
-2. Here we configure the agent to use [OpenAI's GPT-5 model](api/models/openai.md), you can also set the model when running the agent.
-3. The `SupportDependencies` dataclass is used to pass data, connections, and logic into the model that will be needed when running [instructions](agent.md#instructions) and [tool](tools.md) functions. Pydantic AI's system of dependency injection provides a [type-safe](agent.md#static-type-checking) way to customise the behavior of your agents, and can be especially useful when running [unit tests](testing.md) and evals.
-4. Static [instructions](agent.md#instructions) can be registered with the [`instructions` keyword argument][pydantic_ai.agent.Agent.__init__] to the agent.
-5. Dynamic [instructions](agent.md#instructions) can be registered with the [`@agent.instructions`][pydantic_ai.agent.Agent.instructions] decorator, and can make use of dependency injection. Dependencies are carried via the [`RunContext`][pydantic_ai.tools.RunContext] argument, which is parameterized with the `deps_type` from above. If the type annotation here is wrong, static type checkers will catch it.
-6. The [`@agent.tool`](tools.md) decorator let you register functions which the LLM may call while responding to a user. Again, dependencies are carried via [`RunContext`][pydantic_ai.tools.RunContext], any other arguments become the tool schema passed to the LLM. Pydantic is used to validate these arguments, and errors are passed back to the LLM so it can retry.
-7. The docstring of a tool is also passed to the LLM as the description of the tool. Parameter descriptions are [extracted](tools.md#function-tools-and-schema) from the docstring and added to the parameter schema sent to the LLM.
-8. [Run the agent](agent.md#running-agents) asynchronously, conducting a conversation with the LLM until a final response is reached. Even in this fairly simple case, the agent will exchange multiple messages with the LLM as tools are called to retrieve an output.
-9. The response from the agent will be guaranteed to be a `SupportOutput`. If validation fails [reflection](agent.md#reflection-and-self-correction), the agent is prompted to try again.
-10. The output will be validated with Pydantic to guarantee it is a `SupportOutput`, since the agent is generic, it'll also be typed as a `SupportOutput` to aid with static type checking.
-11. In a real use case, you'd add more tools and longer instructions to the agent to extend the context it's equipped with and support it can provide.
-12. This is a simple sketch of a database connection, used to keep the example short and readable. In reality, you'd be connecting to an external database (e.g. PostgreSQL) to get information about customers.
-13. This [Pydantic](https://docs.pydantic.dev) model is used to constrain the structured data returned by the agent. From this simple definition, Pydantic builds the JSON Schema that tells the LLM how to return the data, and performs validation to guarantee the data is correct at the end of the run.
+1. 这个[智能体](agent.md)会充当银行的一线支持。智能体会根据它接受的依赖类型和返回的输出类型进行泛型化。在这个例子中，支持智能体的类型是 `#!python Agent[SupportDependencies, SupportOutput]`。
+2. 这里我们将智能体配置为使用 [OpenAI 的 GPT-5 模型](api/models/openai.md)；你也可以在运行智能体时设置模型。
+3. `SupportDependencies` dataclass 用于把运行[指令](agent.md#instructions)和[工具](tools.md)函数时需要的数据、连接和逻辑传入模型。Pydantic AI 的依赖注入系统提供了一种[类型安全](agent.md#static-type-checking)的方式来自定义智能体行为，并且在运行[单元测试](testing.md)和 evals 时尤其有用。
+4. 静态[指令](agent.md#instructions)可以通过 [`instructions` 关键字参数][pydantic_ai.agent.Agent.__init__]注册到智能体。
+5. 动态[指令](agent.md#instructions)可以通过 [`@agent.instructions`][pydantic_ai.agent.Agent.instructions] 装饰器注册，并且可以使用依赖注入。依赖通过 [`RunContext`][pydantic_ai.tools.RunContext] 参数传递，该参数使用上面的 `deps_type` 进行参数化。如果这里的类型注解错误，静态类型检查器会捕获它。
+6. [`@agent.tool`](tools.md) 装饰器允许你注册 LLM 在响应用户时可以调用的函数。同样，依赖通过 [`RunContext`][pydantic_ai.tools.RunContext] 传递，其他参数会成为传给 LLM 的工具 schema。Pydantic 会校验这些参数，错误会被传回给 LLM，以便它重试。
+7. 工具的 docstring 也会作为工具描述传给 LLM。参数描述会从 docstring 中[提取](tools.md#function-tools-and-schema)，并添加到发送给 LLM 的参数 schema 中。
+8. 异步[运行智能体](agent.md#running-agents)，与 LLM 进行对话，直到得到最终响应。即使在这个相当简单的例子中，智能体也会随着工具调用交换多条 LLM 消息，以检索输出。
+9. 智能体的响应会被保证为 `SupportOutput`。如果[反思](agent.md#reflection-and-self-correction)校验失败，智能体会被提示再次尝试。
+10. 输出会通过 Pydantic 校验，以保证它是 `SupportOutput`；因为智能体是泛型的，所以它也会被标注为 `SupportOutput`，以帮助静态类型检查。
+11. 在真实用例中，你会向智能体添加更多工具和更长的指令，以扩展它具备的上下文和可以提供的支持。
+12. 这是数据库连接的简化草图，用于让示例保持简短可读。现实中，你会连接到外部数据库（例如 PostgreSQL）来获取客户信息。
+13. 这个 [Pydantic](https://docs.pydantic.dev) 模型用于约束智能体返回的结构化数据。基于这个简单定义，Pydantic 会构建 JSON Schema，告诉 LLM 如何返回数据，并在运行结束时执行校验以保证数据正确。
 
-!!! tip "Complete `bank_support.py` example"
-    The code included here is incomplete for the sake of brevity (the definition of `DatabaseConn` is missing); you can find the complete `bank_support.py` example [here](examples/bank-support.md).
+!!! tip "完整的 `bank_support.py` 示例"
+    为了简洁，这里的代码并不完整（缺少 `DatabaseConn` 的定义）；你可以在[这里](examples/bank-support.md)找到完整的 `bank_support.py` 示例。
 
-## Instrumentation with Pydantic Logfire
+## 使用 Pydantic Logfire 进行插桩
 
-Even a simple agent with just a handful of tools can result in a lot of back-and-forth with the LLM, making it nearly impossible to be confident of what's going on just from reading the code.
-To understand the flow of the above runs, we can watch the agent in action using Pydantic Logfire.
+即使一个简单智能体只有少量工具，也可能与 LLM 发生大量来回交互，让人几乎无法仅靠阅读代码就确信发生了什么。
+为了理解上述运行流程，我们可以使用 Pydantic Logfire 观察智能体的实际行为。
 
-To do this, we need to [set up Logfire](logfire.md#using-logfire), and add the following to our code:
+为此，我们需要[设置 Logfire](logfire.md#using-logfire)，并在代码中添加以下内容：
 
 ```python {title="bank_support_with_logfire.py" hl_lines="6-10" test="skip" lint="skip"}
 ...
@@ -237,41 +237,37 @@ support_agent = Agent(
 )
 ```
 
-1. Configure the Logfire SDK, this will fail if project is not set up.
-2. This will instrument all Pydantic AI agents used from here on out. To instrument only a specific agent, add an [`Instrumentation`][pydantic_ai.capabilities.Instrumentation] entry to the agent's `capabilities=[...]`.
-3. In our demo, `DatabaseConn` uses [`sqlite3`][] to connect to a PostgreSQL database, so [`logfire.instrument_sqlite3()`](https://logfire.pydantic.dev/docs/integrations/databases/sqlite3/)
-   is used to log the database queries.
+1. 配置 Logfire SDK；如果项目尚未设置，这会失败。
+2. 这会对从此处开始使用的所有 Pydantic AI agents 进行插桩。若只想对特定 agent 插桩，请向该 agent 的 `capabilities=[...]` 添加 [`Instrumentation`][pydantic_ai.capabilities.Instrumentation] 条目。
+3. 在我们的演示中，`DatabaseConn` 使用 [`sqlite3`][] 连接到 PostgreSQL 数据库，因此使用 [`logfire.instrument_sqlite3()`](https://logfire.pydantic.dev/docs/integrations/databases/sqlite3/) 记录数据库查询。
 
-That's enough to get the following view of your agent in action:
+这足以让你看到如下智能体运行视图：
 
 /// public-trace | https://logfire-eu.pydantic.dev/public-trace/a2957caa-b7b7-4883-a529-777742649004?spanId=31aade41ab896144
     title: 'Logfire instrumentation for the bank agent'
 ///
 
-See [Monitoring and Performance](logfire.md) to learn more.
+参见[监控和性能](logfire.md)了解更多信息。
 
 ## `llms.txt`
 
-The Pydantic AI documentation is available in the [llms.txt](https://llmstxt.org/) format.
-This format is defined in Markdown and suited for LLMs and AI coding assistants and agents.
+Pydantic AI 文档以 [llms.txt](https://llmstxt.org/) 格式提供。
+该格式以 Markdown 定义，适合 LLM、AI 编码助手和智能体使用。
 
-Two formats are available:
+提供两种格式：
 
-- [`llms.txt`](https://ai.pydantic.dev/llms.txt): a file containing a brief description
-  of the project, along with links to the different sections of the documentation. The structure
-  of this file is described in details [here](https://llmstxt.org/#format).
-- [`llms-full.txt`](https://ai.pydantic.dev/llms-full.txt): Similar to the `llms.txt` file,
-  but every link content is included. Note that this file may be too large for some LLMs.
+- [`llms.txt`](https://ai.pydantic.dev/llms.txt)：包含项目简要描述以及文档各章节链接的文件。该文件结构在[这里](https://llmstxt.org/#format)有详细说明。
+- [`llms-full.txt`](https://ai.pydantic.dev/llms-full.txt)：与 `llms.txt` 文件类似，但包含每个链接的内容。请注意，该文件对某些 LLM 来说可能太大。
 
-As of today, these files are not automatically leveraged by IDEs or coding agents, but they will use it if you provide a link or the full text.
+截至目前，这些文件尚不会被 IDE 或编码智能体自动利用，但如果你提供链接或全文，它们会使用。
 
 
-## Next Steps
+## 下一步
 
-To try Pydantic AI for yourself, [install it](install.md) and follow the instructions [in the examples](examples/setup.md).
+要亲自尝试 Pydantic AI，请先[安装它](install.md)，然后按照[示例中的说明](examples/setup.md)操作。
 
-Read the [docs](agent.md) to learn more about building applications with Pydantic AI.
+阅读[文档](agent.md)，了解更多关于使用 Pydantic AI 构建应用的信息。
 
-Read the [API Reference](api/agent.md) to understand Pydantic AI's interface.
+阅读 [API 参考](api/agent.md)，了解 Pydantic AI 的接口。
 
-Join [Slack](https://logfire.pydantic.dev/docs/join-slack/) or file an issue on [:simple-github: GitHub](https://github.com/pydantic/pydantic-ai/issues) if you have any questions.
+如果你有任何问题，可以加入 [Slack](https://logfire.pydantic.dev/docs/join-slack/) 或在 [:simple-github: GitHub](https://github.com/pydantic/pydantic-ai/issues) 上提交 issue。
