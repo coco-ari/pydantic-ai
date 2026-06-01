@@ -1,16 +1,16 @@
-# Command Line Interface (CLI)
+# 命令行界面（CLI）
 
-**Pydantic AI** comes with a CLI, `clai` (pronounced "clay"). You can use it to chat with various LLMs and quickly get answers, right from the command line, or spin up a uvicorn server to chat with your Pydantic AI agents from your browser.
+**Pydantic AI** 附带一个 CLI：`clai`（发音为 "clay"）。你可以直接从命令行用它与各种 LLM 聊天并快速获得答案，也可以启动 uvicorn server，通过浏览器与你的 Pydantic AI agents 聊天。
 
-## Installation
+## 安装
 
-You can run the `clai` using [`uvx`](https://docs.astral.sh/uv/guides/tools/):
+你可以使用 [`uvx`](https://docs.astral.sh/uv/guides/tools/) 运行 `clai`：
 
 ```bash
 uvx clai
 ```
 
-Or install `clai` globally [with `uv`](https://docs.astral.sh/uv/guides/tools/#installing-tools):
+或者[使用 `uv`](https://docs.astral.sh/uv/guides/tools/#installing-tools) 全局安装 `clai`：
 
 ```bash
 uv tool install clai
@@ -18,7 +18,7 @@ uv tool install clai
 clai
 ```
 
-Or with `pip`:
+或者使用 `pip`：
 
 ```bash
 pip install clai
@@ -26,50 +26,50 @@ pip install clai
 clai
 ```
 
-## CLI Usage
+## CLI 用法
 
 <!-- clai/README.md links here for full docs -->
 
-You'll need to set an environment variable depending on the provider you intend to use.
+你需要根据打算使用的 provider 设置一个环境变量。
 
-E.g. if you're using OpenAI, set the `OPENAI_API_KEY` environment variable:
+例如，如果你使用 OpenAI，请设置 `OPENAI_API_KEY` 环境变量：
 
 ```bash
 export OPENAI_API_KEY='your-api-key-here'
 ```
 
-Then running `clai` will start an interactive session where you can chat with the AI model. Special commands available in interactive mode:
+然后运行 `clai` 会启动一个交互式会话，你可以在其中与 AI 模型聊天。交互模式中可用的特殊命令：
 
-- `/exit`: Exit the session
-- `/markdown`: Show the last response in markdown format
-- `/multiline`: Toggle multiline input mode (use Ctrl+D to submit)
-- `/cp`: Copy the last response to clipboard
+- `/exit`：退出会话
+- `/markdown`：以 Markdown 格式显示上一条响应
+- `/multiline`：切换多行输入模式（使用 Ctrl+D 提交）
+- `/cp`：将上一条响应复制到剪贴板
 
-### CLI Options
+### CLI 选项
 
 | Option | Description |
 |--------|-------------|
-| `prompt` | AI prompt for one-shot mode (positional). If omitted, starts interactive mode. |
-| `-m`, `--model` | Model to use in `provider:model` format (e.g., `openai:gpt-5.2`) |
-| `-a`, `--agent` | Custom agent in `module:variable` format |
-| `-t`, `--code-theme` | Syntax highlighting theme (`dark`, `light`, or [pygments theme](https://pygments.org/styles/)) |
-| `--no-stream` | Disable streaming from the model |
-| `-l`, `--list-models` | List all available models and exit |
-| `--version` | Show version and exit |
+| `prompt` | one-shot 模式的 AI prompt（位置参数）。省略时启动交互模式。 |
+| `-m`, `--model` | 要使用的模型，格式为 `provider:model`（例如 `openai:gpt-5.2`） |
+| `-a`, `--agent` | `module:variable` 格式的自定义 agent |
+| `-t`, `--code-theme` | 语法高亮主题（`dark`、`light` 或 [pygments theme](https://pygments.org/styles/)） |
+| `--no-stream` | 禁用模型流式输出 |
+| `-l`, `--list-models` | 列出所有可用模型并退出 |
+| `--version` | 显示版本并退出 |
 
-### Choose a model
+### 选择模型
 
-You can specify which model to use with the `--model` flag:
+你可以用 `--model` 标志指定要使用的模型：
 
 ```bash
 clai --model anthropic:claude-sonnet-4-6
 ```
 
-(a full list of models available can be printed with `clai --list-models`)
+（可用模型的完整列表可以通过 `clai --list-models` 打印。）
 
-### Custom Agents
+### 自定义 Agents
 
-You can specify a custom agent using the `--agent` flag with a module path and variable name:
+你可以使用 `--agent` 标志，通过模块路径和变量名指定自定义 agent：
 
 ```python {title="custom_agent.py" test="skip"}
 from pydantic_ai import Agent
@@ -77,18 +77,18 @@ from pydantic_ai import Agent
 agent = Agent('openai:gpt-5.2', instructions='You always respond in Italian.')
 ```
 
-Then run:
+然后运行：
 
 ```bash
 clai --agent custom_agent:agent "What's the weather today?"
 ```
 
-The format must be `module:variable` where:
+格式必须是 `module:variable`，其中：
 
-- `module` is the importable Python module path
-- `variable` is the name of the Agent instance in that module
+- `module` 是可导入的 Python module path
+- `variable` 是该模块中 Agent 实例的名称
 
-Additionally, you can directly launch CLI mode from an `Agent` instance using `Agent.to_cli_sync()`:
+此外，你可以使用 `Agent.to_cli_sync()` 从 `Agent` 实例直接启动 CLI 模式：
 
 ```python {title="agent_to_cli_sync.py" test="skip" hl_lines=4}
 from pydantic_ai import Agent
@@ -97,7 +97,7 @@ agent = Agent('openai:gpt-5.2', instructions='You always respond in Italian.')
 agent.to_cli_sync()
 ```
 
-You can also use the async interface with `Agent.to_cli()`:
+你也可以使用 async 接口 `Agent.to_cli()`：
 
 ```python {title="agent_to_cli.py" test="skip" hl_lines=6}
 from pydantic_ai import Agent
@@ -108,11 +108,11 @@ async def main():
     await agent.to_cli()
 ```
 
-_(You'll need to add `asyncio.run(main())` to run `main`)_
+_（你需要添加 `asyncio.run(main())` 来运行 `main`。）_
 
 ### Message History
 
-Both `Agent.to_cli()` and `Agent.to_cli_sync()` support a `message_history` parameter, allowing you to continue an existing conversation or provide conversation context:
+`Agent.to_cli()` 和 `Agent.to_cli_sync()` 都支持 `message_history` 参数，允许你继续现有对话或提供对话上下文：
 
 ```python {title="agent_with_history.py" test="skip"}
 from pydantic_ai import (
@@ -136,19 +136,19 @@ message_history: list[ModelMessage] = [
 agent.to_cli_sync(message_history=message_history)
 ```
 
-The CLI will start with the provided conversation history, allowing the agent to refer back to previous exchanges and maintain context throughout the session.
+CLI 会从提供的对话历史开始，让 agent 能在整个会话中引用之前的交流并保持上下文。
 
 ## Web Chat UI
 
-Launch a web-based chat interface by running:
+运行以下命令启动基于 Web 的聊天界面：
 
 ```bash
 clai web -m openai:gpt-5.2
 ```
 
-This will start a web server (default: http://127.0.0.1:7932) with a chat interface.
+这会启动一个带聊天界面的 Web server（默认：http://127.0.0.1:7932）。
 
-You can also serve an existing agent. For example, if you have an agent defined in `my_agent.py`:
+你也可以托管已有 agent。例如，如果你在 `my_agent.py` 中定义了一个 agent：
 
 ```python
 from pydantic_ai import Agent
@@ -156,7 +156,7 @@ from pydantic_ai import Agent
 my_agent = Agent('openai:gpt-5.2', instructions='You are a helpful assistant.')
 ```
 
-Launch the web UI:
+启动 Web UI：
 
 ```bash
 # With a custom agent
@@ -176,25 +176,25 @@ clai web --agent my_module:my_agent -i 'Always respond in Spanish'
 ```
 
 !!! note "Memory Tool"
-    The [`memory`](native-tools.md#memory-tool) native tool cannot be enabled via `-t memory`. If your agent needs memory, configure the [`MemoryTool`][pydantic_ai.native_tools.MemoryTool] directly on the agent and provide it via `--agent`.
+    [`memory`](native-tools.md#memory-tool) 原生工具不能通过 `-t memory` 启用。如果你的 agent 需要 memory，请直接在 agent 上配置 [`MemoryTool`][pydantic_ai.native_tools.MemoryTool] 并通过 `--agent` 提供它。
 
-### Web UI Options
+### Web UI 选项
 
 | Option | Description |
 |--------|-------------|
-| `--agent`, `-a` | Agent to serve in [`module:variable` format](#custom-agents) |
-| `--model`, `-m` | Models to list as options in the UI (repeatable) |
-| `--tool`, `-t` | [Native tool](native-tools.md)s to list as options in the UI (repeatable). See [available tools](web.md#native-tool-support). |
-| `--instructions`, `-i` | System instructions. When `--agent` is specified, these are additional to the agent's existing instructions. |
-| `--host` | Host to bind server (default: 127.0.0.1) |
-| `--port` | Port to bind server (default: 7932) |
-| `--html-source` | URL or file path for the chat UI HTML. |
+| `--agent`, `-a` | 要托管的 agent，使用 [`module:variable` 格式](#自定义-agents) |
+| `--model`, `-m` | 在 UI 中列为选项的模型（可重复） |
+| `--tool`, `-t` | 在 UI 中列为选项的[原生工具](native-tools.md)（可重复）。参见[可用工具](web.md#native-tool-support)。 |
+| `--instructions`, `-i` | System instructions。指定 `--agent` 时，这些会追加到 agent 现有 instructions。 |
+| `--host` | server 绑定的 host（默认：127.0.0.1） |
+| `--port` | server 绑定的 port（默认：7932） |
+| `--html-source` | chat UI HTML 的 URL 或文件路径。 |
 
-When using `--agent`, the agent's configured model becomes the default. CLI models (`-m`) are additional options. Without `--agent`, the first `-m` model is the default.
+使用 `--agent` 时，agent 配置的模型会成为默认模型。CLI models（`-m`）是额外选项。不使用 `--agent` 时，第一个 `-m` 模型是默认模型。
 
-The web chat UI can also be launched programmatically using [`Agent.to_web()`][pydantic_ai.agent.Agent.to_web], see the [Web UI documentation](web.md).
+Web chat UI 也可以用 [`Agent.to_web()`][pydantic_ai.agent.Agent.to_web] 以编程方式启动；参见 [Web UI 文档](web.md)。
 
-Run the `web` command with `--help` to see all available options:
+运行带 `--help` 的 `web` 命令查看所有可用选项：
 
 ```bash
 clai web --help

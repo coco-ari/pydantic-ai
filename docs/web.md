@@ -1,25 +1,25 @@
 # Web Chat UI
 
-Pydantic AI includes a built-in web chat interface that you can use to interact with your agents through a browser.
+Pydantic AI 内置了一个 Web 聊天界面，你可以通过浏览器与自己的 agents 交互。
 
 ![Web Chat UI](img/web-chat-ui.png)
 
-For CLI usage with `clai web`, see the [CLI - Web Chat UI documentation](cli.md#web-chat-ui).
+关于使用 `clai web` 的 CLI 用法，请参见 [CLI - Web Chat UI 文档](cli.md#web-chat-ui)。
 
 !!! note
-    The web UI is meant for local development and debugging. In production, you can use one of the [UI Event Stream integrations](ui/overview.md) to connect your agent to a custom frontend.
+    Web UI 主要用于本地开发和调试。在生产环境中，可以使用某个 [UI Event Stream integrations](ui/overview.md)，将智能体连接到自定义前端。
 
-## Installation
+## 安装
 
-Install the `web` extra (installs Starlette and Uvicorn):
+安装 `web` extra（会安装 Starlette 和 Uvicorn）：
 
 ```bash
 pip/uv-add 'pydantic-ai-slim[web]'
 ```
 
-## Basic Usage
+## 基础用法
 
-Create a web app from an agent instance using [`Agent.to_web()`][pydantic_ai.agent.Agent.to_web]:
+使用 [`Agent.to_web()`][pydantic_ai.agent.Agent.to_web] 从 agent 实例创建 Web app：
 
 ```python
 from pydantic_ai import Agent
@@ -33,15 +33,15 @@ def get_weather(city: str) -> str:
 app = agent.to_web()
 ```
 
-Run the app with any ASGI server:
+使用任意 ASGI server 运行 app：
 
 ```bash
 uvicorn my_module:app --host 127.0.0.1 --port 7932
 ```
 
-## Configuring Models
+## 配置模型
 
-You can specify additional models to make available in the UI. Models can be provided as a list of model names/instances or a dictionary mapping display labels to model names/instances.
+你可以指定额外模型，让它们在 UI 中可用。Models 可以以模型名称/实例列表提供，也可以以 display labels 到模型名称/实例的字典提供。
 
 ```python
 from pydantic_ai import Agent
@@ -62,9 +62,9 @@ app = agent.to_web(
 )
 ```
 
-## Native Tool Support
+## 原生工具支持
 
-Configure [native tools](native-tools.md) on the agent with `capabilities=[NativeTool(...)]` to expose them as options in the UI (shown only for models that support each tool):
+在 agent 上使用 `capabilities=[NativeTool(...)]` 配置[原生工具](native-tools.md)，可将它们作为 UI 中的选项暴露出来（仅对支持相应工具的模型显示）：
 
 ```python
 from pydantic_ai import Agent
@@ -80,11 +80,11 @@ app = agent.to_web(models=['anthropic:claude-sonnet-4-6'])
 ```
 
 !!! note "Memory Tool"
-    The `memory` native tool is not supported via `to_web()` or `clai web`. If your agent needs memory, configure the [`MemoryTool`][pydantic_ai.native_tools.MemoryTool] directly on the agent at construction time.
+    `memory` 原生工具不支持通过 `to_web()` 或 `clai web` 使用。如果你的 agent 需要 memory，请在构造 agent 时直接配置 [`MemoryTool`][pydantic_ai.native_tools.MemoryTool]。
 
-## Extra Instructions
+## 额外 Instructions
 
-You can pass extra instructions that will be included in each agent run:
+你可以传入额外 instructions，它们会包含在每次 agent run 中：
 
 ```python
 from pydantic_ai import Agent
@@ -94,22 +94,22 @@ agent = Agent('openai:gpt-5.2')
 app = agent.to_web(instructions='Always respond in a friendly tone.')
 ```
 
-## Reserved Routes
+## 保留路由
 
-The web UI app uses the following routes which should not be overwritten:
+Web UI app 使用以下路由，不应覆盖：
 
-- `/` and `/{id}` - Serves the chat UI
-- `/api/chat` - Chat endpoint (POST, OPTIONS)
-- `/api/configure` - Frontend configuration (GET)
-- `/api/health` - Health check (GET)
+- `/` 和 `/{id}` - 提供 chat UI
+- `/api/chat` - 聊天 endpoint（POST、OPTIONS）
+- `/api/configure` - 前端配置（GET）
+- `/api/health` - 健康检查（GET）
 
-The app cannot currently be mounted at a subpath (e.g., `/chat`) because the UI expects these routes at the root. You can add additional routes to the app, but avoid conflicts with these reserved paths.
+当前 app 不能挂载在子路径（例如 `/chat`），因为 UI 期望这些路由位于根路径。你可以向 app 添加其他路由，但要避免与这些保留路径冲突。
 
-## Custom HTML Source
+## 自定义 HTML 来源
 
-By default, the web UI is fetched from a CDN and cached locally. You can provide `html_source` to override this for offline usage or enterprise environments.
+默认情况下，Web UI 会从 CDN 获取并缓存在本地。你可以提供 `html_source` 来覆盖它，以支持离线使用或企业环境。
 
-For offline usage, download the html file once while you have internet access:
+离线使用时，请在有网络访问时先下载一次 html 文件：
 
 ```python
 from pydantic_ai.ui import DEFAULT_HTML_URL
@@ -118,13 +118,13 @@ print(DEFAULT_HTML_URL)  # Use this URL to download the UI HTML file
 #> https://cdn.jsdelivr.net/npm/@pydantic/ai-chat-ui@1.2.0/dist/index.html
 ```
 
-You can then download the file using the URL printed above:
+然后可以使用上面打印的 URL 下载文件：
 
 ```bash
 curl -o ~/pydantic-ai-ui.html <chat_ui_url>
 ```
 
-Then use `html_source` to point to your local file or custom URL:
+然后使用 `html_source` 指向本地文件或自定义 URL：
 
 ```python
 from pydantic_ai import Agent

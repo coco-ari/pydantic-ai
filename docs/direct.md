@@ -1,19 +1,19 @@
-# Direct Model Requests
+# 直接模型请求
 
-The `direct` module provides low-level methods for making imperative requests to LLMs where the only abstraction is input and output schema translation, enabling you to use all models with the same API.
+`direct` 模块提供底层方法，用于以命令式方式向 LLM 发起请求；这里唯一的抽象是输入和输出 schema 转换，让你可以用同一个 API 使用所有模型。
 
-These methods are thin wrappers around the [`Model`][pydantic_ai.models.Model] implementations, offering a simpler interface when you don't need the full functionality of an [`Agent`][pydantic_ai.Agent].
+这些方法是 [`Model`][pydantic_ai.models.Model] 实现之上的薄包装。当你不需要 [`Agent`][pydantic_ai.Agent] 的完整功能时，它们提供了更简单的接口。
 
-The following functions are available:
+可用函数如下：
 
-- [`model_request`][pydantic_ai.direct.model_request]: Make a non-streamed async request to a model
-- [`model_request_sync`][pydantic_ai.direct.model_request_sync]: Make a non-streamed synchronous request to a model
-- [`model_request_stream`][pydantic_ai.direct.model_request_stream]: Make a streamed async request to a model
-- [`model_request_stream_sync`][pydantic_ai.direct.model_request_stream_sync]: Make a streamed sync request to a model
+- [`model_request`][pydantic_ai.direct.model_request]：向模型发起非流式 async 请求
+- [`model_request_sync`][pydantic_ai.direct.model_request_sync]：向模型发起非流式同步请求
+- [`model_request_stream`][pydantic_ai.direct.model_request_stream]：向模型发起流式 async 请求
+- [`model_request_stream_sync`][pydantic_ai.direct.model_request_stream_sync]：向模型发起流式同步请求
 
-## Basic Example
+## 基础示例
 
-Here's a simple example demonstrating how to use the direct API to make a basic request:
+下面是一个简单示例，展示如何使用 direct API 发起基础请求：
 
 ```python title="direct_basic.py"
 from pydantic_ai import ModelRequest
@@ -31,16 +31,16 @@ print(model_response.usage)
 #> RequestUsage(input_tokens=56, output_tokens=7)
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以“原样”运行。）_
 
 !!! note
-    Instructions are not cumulative across message history. If multiple [`ModelRequest`][pydantic_ai.messages.ModelRequest]s include [`instructions`][pydantic_ai.messages.ModelRequest.instructions], the direct API uses the most recent one.
+    Instructions 不会在 message history 中累计。如果多个 [`ModelRequest`][pydantic_ai.messages.ModelRequest] 包含 [`instructions`][pydantic_ai.messages.ModelRequest.instructions]，direct API 会使用最新的一条。
 
-## Advanced Example with Tool Calling
+## 带工具调用的高级示例
 
-You can also use the direct API to work with function/tool calling.
+你也可以使用 direct API 处理 function/tool calling。
 
-Even here we can use Pydantic to generate the JSON schema for the tool:
+即使在这里，我们也可以使用 Pydantic 为工具生成 JSON schema：
 
 ```python
 from typing import Literal
@@ -93,21 +93,21 @@ async def main():
     """
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以“原样”运行；你需要添加 `asyncio.run(main())` 来运行 `main`。）_
 
-## When to Use the direct API vs Agent
+## 何时使用 direct API 而不是 Agent
 
-The direct API is ideal when:
+direct API 适合以下情况：
 
-1. You need more direct control over model interactions
-2. You want to implement custom behavior around model requests
-3. You're building your own abstractions on top of model interactions
+1. 你需要对模型交互进行更直接的控制
+2. 你想围绕模型请求实现自定义行为
+3. 你正在模型交互之上构建自己的抽象
 
-For most application use cases, the higher-level [`Agent`][pydantic_ai.Agent] API provides a more convenient interface with additional features such as native tool execution, retrying, structured output parsing, and more.
+对大多数应用用例而言，更高层的 [`Agent`][pydantic_ai.Agent] API 提供了更方便的接口，并附带原生工具执行、重试、结构化输出解析等额外功能。
 
-## OpenTelemetry or Logfire Instrumentation
+## OpenTelemetry 或 Logfire 插桩
 
-As with [agents][pydantic_ai.Agent], you can enable OpenTelemetry/Logfire instrumentation with just a few extra lines
+和 [agents][pydantic_ai.Agent] 一样，只需几行额外代码就可以启用 OpenTelemetry/Logfire 插桩：
 
 ```python {title="direct_instrumented.py" hl_lines="1 6 7"}
 import logfire
@@ -128,9 +128,9 @@ print(model_response.parts[0].content)
 #> The capital of France is Paris.
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以“原样”运行。）_
 
-You can also enable OpenTelemetry on a per call basis:
+你也可以按单次调用启用 OpenTelemetry：
 
 ```python {title="direct_instrumented.py" hl_lines="1 6 12"}
 import logfire
@@ -151,4 +151,4 @@ print(model_response.parts[0].content)
 #> The capital of France is Paris.
 ```
 
-See [Debugging and Monitoring](logfire.md) for more details, including how to instrument with plain OpenTelemetry without Logfire.
+更多细节参见[调试和监控](logfire.md)，包括如何在不使用 Logfire 的情况下用普通 OpenTelemetry 插桩。

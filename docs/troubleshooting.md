@@ -1,12 +1,12 @@
-# Troubleshooting
+# 故障排查
 
-Below are suggestions on how to fix some common errors you might encounter while using Pydantic AI. If the issue you're experiencing is not listed below or addressed in the documentation, please feel free to ask in the [Pydantic Slack](help.md) or create an issue on [GitHub](https://github.com/pydantic/pydantic-ai/issues).
+下面是一些修复 Pydantic AI 使用过程中常见错误的建议。如果你遇到的问题没有列在下面，也没有在文档中说明，欢迎在 [Pydantic Slack](help.md) 提问，或在 [GitHub](https://github.com/pydantic/pydantic-ai/issues) 创建 issue。
 
-## Jupyter Notebook Errors
+## Jupyter Notebook 错误
 
 ### `RuntimeError: This event loop is already running`
 
-**Modern Jupyter/IPython (7.0+)**: This environment supports top-level `await` natively. You can use [`Agent.run()`][pydantic_ai.agent.Agent.run] directly in notebook cells without additional setup:
+**现代 Jupyter/IPython（7.0+）**：这个环境原生支持顶层 `await`。你可以直接在 notebook cell 中使用 [`Agent.run()`][pydantic_ai.agent.Agent.run]，无需额外设置：
 
 ```python {test="skip" lint="skip"}
 from pydantic_ai import Agent
@@ -15,7 +15,7 @@ agent = Agent('openai:gpt-5.2')
 result = await agent.run('Who let the dogs out?')
 ```
 
-**Legacy environments or specific integrations**: If you encounter event loop conflicts, use [`nest-asyncio`](https://pypi.org/project/nest-asyncio/):
+**旧环境或特定集成**：如果遇到 event loop 冲突，请使用 [`nest-asyncio`](https://pypi.org/project/nest-asyncio/)：
 
 ```python {test="skip"}
 import nest_asyncio
@@ -28,16 +28,16 @@ agent = Agent('openai:gpt-5.2')
 result = agent.run_sync('Who let the dogs out?')
 ```
 
-**Note**: This also applies to Google Colab and [Marimo](https://github.com/marimo-team/marimo) environments.
+**注意**：这也适用于 Google Colab 和 [Marimo](https://github.com/marimo-team/marimo) 环境。
 
-## API Key Configuration
+## API Key 配置
 
 ### `UserError: API key must be provided or set in the [MODEL]_API_KEY environment variable`
 
-If you're running into issues with setting the API key for your model, visit the [Models](models/overview.md) page to learn more about how to set an environment variable and/or pass in an `api_key` argument.
+如果你在为模型设置 API key 时遇到问题，请访问 [Models](models/overview.md) 页面，了解如何设置环境变量和/或传入 `api_key` 参数。
 
-## Monitoring HTTPX Requests
+## 监控 HTTPX 请求
 
-You can use custom `httpx` clients in your models in order to access specific requests, responses, and headers at runtime.
+你可以在模型中使用自定义 `httpx` clients，以便在运行时访问具体请求、响应和 headers。
 
-It's particularly helpful to use `logfire`'s [HTTPX integration](logfire.md#monitoring-http-requests) to monitor the above.
+使用 `logfire` 的 [HTTPX integration](logfire.md#monitoring-http-requests) 监控上述内容会特别有帮助。
