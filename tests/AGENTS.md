@@ -1,6 +1,6 @@
-# Testing Guidelines
+# 测试指南
 
-## Test File Structure
+## 测试文件结构
 
 ```python
 from __future__ import annotations
@@ -27,9 +27,9 @@ async def test_feature(model: Model, stream: bool):
     ...
 ```
 
-## Parametrization with Expectations
+## 带预期值的参数化
 
-For cartesian product tests, use a dict to map parameter combinations to expected results:
+对于笛卡尔积测试，使用 dict 将参数组合映射到预期结果：
 
 ```python
 from vcr.cassette import Cassette
@@ -70,22 +70,21 @@ async def test_feature(model: Model, stream: bool, request: pytest.FixtureReques
     assert output == expected
 ```
 
-## VCR Workflow
+## VCR 工作流
 
-Record cassettes with `--record-mode=rewrite`, verify playback without the flag, and review diffs.
-For detailed workflows see `.claude/skills/testing-skill/SKILL.md`.
+使用 `--record-mode=rewrite` 录制 cassettes，不带该标志验证回放，并审查 diff。详细工作流见 `.claude/skills/testing-skill/SKILL.md`。
 
-## Key Fixtures
+## 关键 Fixtures
 
-### From `conftest.py`
+### 来自 `conftest.py`
 
-#### Model requests
-- `allow_model_requests` - bypasses the default `ALLOW_MODEL_REQUESTS = False`
+#### 模型请求
 
-#### The `model` fixture (use with `indirect=True`)
+- `allow_model_requests`：绕过默认的 `ALLOW_MODEL_REQUESTS = False`
 
-The `model` fixture takes a string param (e.g. `'openai'`, `'anthropic'`, `'google'`) and returns a configured `Model` instance, using session-scoped API key fixtures that default to `'mock-api-key'` (real keys loaded from env when recording).
-See `tests/conftest.py` for the full list of supported param values.
+#### `model` fixture（配合 `indirect=True` 使用）
+
+`model` fixture 接受一个字符串参数（例如 `'openai'`、`'anthropic'`、`'google'`），并返回一个已配置的 `Model` 实例。它使用 session-scoped API key fixtures，这些 fixtures 默认值为 `'mock-api-key'`（录制时从环境加载真实 key）。支持的参数值完整列表见 `tests/conftest.py`。
 
 ```python
 @pytest.mark.parametrize('model', ['openai', 'anthropic'], indirect=True)
@@ -93,8 +92,9 @@ async def test_something(model: Model):
     ...
 ```
 
-#### Environment management
-- `env` - `TestEnv` instance for temporary env var changes
+#### 环境管理
+
+- `env`：用于临时 env var 变更的 `TestEnv` 实例
   ```python
   def test_missing_key(env: TestEnv):
       env.remove('OPENAI_API_KEY')
@@ -102,32 +102,36 @@ async def test_something(model: Model):
           ...
   ```
 
-#### Binary content (session-scoped)
-- `assets_path` - `Path` to `tests/assets/`
-- `image_content` - `BinaryImage` (kiwi.jpg)
-- `audio_content` - `BinaryContent` (marcelo.mp3)
-- `video_content` - `BinaryContent` (small_video.mp4)
-- `document_content` - `BinaryContent` (dummy.pdf)
-- `text_document_content` - `BinaryContent` (dummy.txt)
+#### 二进制内容（session-scoped）
 
-#### SSRF protection for URL downloads
-- `disable_ssrf_protection_for_vcr` - required for VCR tests that download URL content (`ImageUrl`, `AudioUrl`, `DocumentUrl`, `VideoUrl` with `force_download=True`)
-- An autouse guard raises a `RuntimeError` if a VCR test triggers SSRF validation without this fixture
+- `assets_path`：指向 `tests/assets/` 的 `Path`
+- `image_content`：`BinaryImage`（kiwi.jpg）
+- `audio_content`：`BinaryContent`（marcelo.mp3）
+- `video_content`：`BinaryContent`（small_video.mp4）
+- `document_content`：`BinaryContent`（dummy.pdf）
+- `text_document_content`：`BinaryContent`（dummy.txt）
 
-## Assertion Helpers
+#### URL 下载的 SSRF 保护
 
-### From `conftest.py`
-- `IsNow(tz=timezone.utc)` - datetime within 10 seconds of now
-- `IsStr()` - any string, supports `regex=r'...'`
-- `IsDatetime()` - any datetime
-- `IsBytes()` - any bytes
-- `IsInt()` - any int
-- `IsFloat()` - any float
-- `IsList()` - any list
-- `IsInstance(SomeClass)` - instance of class
+- `disable_ssrf_protection_for_vcr`：下载 URL 内容的 VCR 测试必需（带 `force_download=True` 的 `ImageUrl`、`AudioUrl`、`DocumentUrl`、`VideoUrl`）
+- 如果 VCR 测试在没有这个 fixture 的情况下触发 SSRF validation，autouse guard 会抛出 `RuntimeError`
 
-### Additional helpers
-- `IsSameStr()` - asserts same string value across multiple uses in one assertion
+## 断言 Helpers
+
+### 来自 `conftest.py`
+
+- `IsNow(tz=timezone.utc)`：距离当前时间 10 秒内的 datetime
+- `IsStr()`：任意字符串，支持 `regex=r'...'`
+- `IsDatetime()`：任意 datetime
+- `IsBytes()`：任意 bytes
+- `IsInt()`：任意 int
+- `IsFloat()`：任意 float
+- `IsList()`：任意 list
+- `IsInstance(SomeClass)`：某个 class 的实例
+
+### 额外 helpers
+
+- `IsSameStr()`：在同一个断言的多次使用中断言相同字符串值
   ```python
   assert events == [
       {'id': (msg_id := IsSameStr())},
@@ -135,20 +139,20 @@ async def test_something(model: Model):
   ]
   ```
 
-## Best Practices
+## 最佳实践
 
-- Test through public APIs, not private methods (prefixed with `_`) or helpers — validates actual user-facing behavior and prevents brittle tests tied to implementation details
-- Prefer feature-centric parametrized test files (e.g. `test_multimodal_tool_returns.py`) over appending to monolithic `test_<provider>.py` files — the legacy per-provider files are large and hard for agents to navigate; new features should get their own test file with a `Case` class and parametrized providers
-- Use `snapshot()` for complex structured outputs (objects, message sequences, API responses, nested dicts) — catches unexpected changes more reliably than field-by-field assertions; use `IsStr` and similar matchers for variable values
-- Assert the core aspect of the change being introduced — use whatever means necessary: patching clients to inspect request payloads, tapping into pydantic-ai internals, snapshot comparisons. Snapshots are valuable for catching structural drift in objects and message arrays, but only use `result.all_messages()` or output assertions when the structure demonstrates behavior you care about keeping consistent
-- Test both positive and negative cases for optional capabilities (model features, server features, streaming) — ensures features work when supported AND fail gracefully when absent
-- Ensure test assertions match test names and docstrings — tests without proper assertions or that verify opposite behavior create false positives
-- Test MCP against real `tests.mcp_server` instance, not mocks — extend test server with helper tools to expose runtime context (instructions, client info, session state)
-- Remove stale test docstrings, comments, and historical provider bug notes when behavior changes
-- Prefer `instructions=` over `system_prompt=` when the test doesn't specifically need the system-prompt code path — `instructions=` is the canonical entry point for non-system-prompt-specific behavior (cacheable prefix, persona priming, format guidance), and reserving `system_prompt=` for tests that exercise the system-prompt machinery keeps intent legible
-- Never reference line numbers in test docstrings or comments (`lines 872-873`, `L42`, `line 100`) — they go stale on the next edit to the referenced file. Describe the condition or behavior instead
+- 通过公共 API 测试，而不是 private methods（以 `_` 开头）或 helpers。这样可以验证真实的面向用户行为，并防止测试脆弱地绑定到实现细节。
+- 相比追加到巨大的 `test_<provider>.py` 文件，更偏好以功能为中心的参数化测试文件（例如 `test_multimodal_tool_returns.py`）。旧的 per-provider 文件很大，智能体很难导航；新功能应拥有自己的测试文件，使用 `Case` 类和参数化 providers。
+- 对复杂结构化输出（对象、message sequences、API responses、嵌套 dicts）使用 `snapshot()`。相比逐字段断言，它能更可靠地捕获意外变化；对变量值使用 `IsStr` 和类似 matchers。
+- 断言正在引入变更的核心方面。使用任何必要手段：patch clients 检查 request payloads、接入 pydantic-ai internals、snapshot comparisons。Snapshots 对捕获对象和 message arrays 的结构漂移很有价值，但只有当结构展示了你关心且需要保持一致的行为时，才使用 `result.all_messages()` 或输出断言。
+- 对 optional capabilities（model features、server features、streaming）同时测试正向和负向情况。这样可以确保功能在支持时有效，并在缺失时优雅失败。
+- 确保测试断言匹配测试名称和 docstrings。没有合适断言或验证相反行为的测试会制造假阳性。
+- 针对 MCP 使用真实的 `tests.mcp_server` 实例测试，而不是 mocks。扩展测试服务器，添加 helper tools 以暴露 runtime context（instructions、client info、session state）。
+- 当行为变化时，移除陈旧的测试 docstrings、comments 和历史 provider bug notes。
+- 当测试不特别需要 system-prompt 代码路径时，优先使用 `instructions=` 而不是 `system_prompt=`。`instructions=` 是非 system-prompt-specific 行为的规范入口（cacheable prefix、persona priming、format guidance）；将 `system_prompt=` 保留给测试 system-prompt 机制的场景，可以让意图更清晰。
+- 永远不要在测试 docstrings 或 comments 中引用行号（`lines 872-873`、`L42`、`line 100`）。它们会在下一次编辑被引用文件时过时。请描述条件或行为。
 
-## Directory Structure
+## 目录结构
 
 ```
 tests/

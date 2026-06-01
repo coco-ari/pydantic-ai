@@ -1,9 +1,9 @@
-# profiles/ Guidelines
+# profiles/ 指南
 
-Profiles describe model-family capability facts and schema/request quirks.
+Profiles 描述模型族能力事实以及 schema/request 方面的特殊行为。
 
-- Put intrinsic model-family facts here: structured-output support/defaults, native tool support, thinking support, JSON schema transformation, return-schema support, prompted-output templates, and model-family quirks.
-- Do not put provider client/auth behavior here; that belongs in providers or model adapters.
-- Prefer explicit capability fields over scattered `isinstance` or provider-name checks.
-- When a feature only applies to some models, model the support fact clearly and fail or degrade in the layer that owns the user-facing behavior.
-- Keep profile merging and user overrides in mind; avoid assuming a complete concrete profile object when sparse profile data is allowed.
+- 将模型族自身固有的事实放在这里：结构化输出支持/默认值、原生工具支持、thinking 支持、JSON schema 转换、return-schema 支持、prompted-output 模板，以及模型族特殊行为。
+- 不要把 provider 客户端/认证行为放在这里；那属于 providers 或模型适配器。
+- 优先使用显式能力字段，而不是分散的 `isinstance` 或 provider-name 检查。
+- 当某个功能只适用于部分模型时，清晰地建模该支持事实，并在拥有面向用户行为的层中失败或降级。
+- 记住 profile 合并和用户覆盖的存在；当允许稀疏 profile 数据时，避免假设一定存在完整的具体 profile 对象。
