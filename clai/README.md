@@ -6,29 +6,29 @@
 [![versions](https://img.shields.io/pypi/pyversions/clai.svg)](https://github.com/pydantic/pydantic-ai)
 [![license](https://img.shields.io/github/license/pydantic/pydantic-ai.svg?v)](https://github.com/pydantic/pydantic-ai/blob/main/LICENSE)
 
-(pronounced "clay")
+（发音为 "clay"）
 
-Command line interface to chat to LLMs, part of the [Pydantic AI project](https://github.com/pydantic/pydantic-ai).
+用于与 LLM 聊天的命令行界面，是 [Pydantic AI 项目](https://github.com/pydantic/pydantic-ai)的一部分。
 
-## Usage
+## 使用
 
 <!-- Keep this in sync with docs/cli.md -->
 
-You'll need to set an environment variable depending on the provider you intend to use.
+你需要根据打算使用的提供商设置一个环境变量。
 
-E.g. if you're using OpenAI, set the `OPENAI_API_KEY` environment variable:
+例如，如果你使用 OpenAI，请设置 `OPENAI_API_KEY` 环境变量：
 
 ```bash
 export OPENAI_API_KEY='your-api-key-here'
 ```
 
-Then with [`uvx`](https://docs.astral.sh/uv/guides/tools/), run:
+然后使用 [`uvx`](https://docs.astral.sh/uv/guides/tools/) 运行：
 
 ```bash
 uvx clai
 ```
 
-Or to install `clai` globally [with `uv`](https://docs.astral.sh/uv/guides/tools/#installing-tools), run:
+或者[使用 `uv`](https://docs.astral.sh/uv/guides/tools/#installing-tools) 全局安装 `clai`：
 
 ```bash
 uv tool install clai
@@ -36,7 +36,7 @@ uv tool install clai
 clai
 ```
 
-Or with `pip`, run:
+或者使用 `pip`：
 
 ```bash
 pip install clai
@@ -44,14 +44,14 @@ pip install clai
 clai
 ```
 
-Either way, running `clai` will start an interactive session where you can chat with the AI model. Special commands available in interactive mode:
+无论哪种方式，运行 `clai` 都会启动一个交互式会话，你可以在其中与 AI 模型聊天。交互模式中可用的特殊命令：
 
-- `/exit`: Exit the session
-- `/markdown`: Show the last response in markdown format
-- `/multiline`: Toggle multiline input mode (use Ctrl+D to submit)
-- `/cp`: Copy the last response to clipboard
+- `/exit`：退出会话
+- `/markdown`：以 Markdown 格式显示上一条响应
+- `/multiline`：切换多行输入模式（使用 Ctrl+D 提交）
+- `/cp`：将上一条响应复制到剪贴板
 
-## Help
+## 帮助
 
 ```
 usage: clai [-h] [-l] [--version] [-m MODEL] [-a AGENT] [-t CODE_THEME] [--no-stream] [prompt]
@@ -78,11 +78,11 @@ options:
   --no-stream           Disable streaming from the model
 ```
 
-For more information on how to use it, see the [CLI documentation](https://ai.pydantic.dev/cli/).
+关于如何使用它的更多信息，请参见 [CLI 文档](https://ai.pydantic.dev/cli/)。
 
 ## Web Chat UI
 
-Launch a web-based chat interface:
+启动基于 Web 的聊天界面：
 
 ```bash
 clai web -m openai:gpt-5.2
@@ -90,9 +90,9 @@ clai web -m openai:gpt-5.2
 
 ![Web Chat UI](https://ai.pydantic.dev/img/web-chat-ui.png)
 
-This will start a web server (default: http://127.0.0.1:7932) with a chat interface.
+这会启动一个带聊天界面的 Web 服务器（默认地址：http://127.0.0.1:7932）。
 
-You can also serve an existing agent. For example, if you have an agent defined in `my_agent.py`:
+你也可以托管已有智能体。例如，如果你在 `my_agent.py` 中定义了一个智能体：
 
 ```python
 from pydantic_ai import Agent
@@ -100,10 +100,10 @@ from pydantic_ai import Agent
 my_agent = Agent('openai:gpt-5.2', instructions='You are a helpful assistant.')
 ```
 
-Launch the web UI with:
+使用以下命令启动 Web UI：
 
 ```bash
 clai web --agent my_agent:my_agent
 ```
 
-For full Web UI documentation, see [Web Chat UI](https://ai.pydantic.dev/web/).
+完整的 Web UI 文档见 [Web Chat UI](https://ai.pydantic.dev/web/)。

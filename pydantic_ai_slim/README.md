@@ -6,6 +6,6 @@
 [![versions](https://img.shields.io/pypi/pyversions/pydantic-ai-slim.svg)](https://github.com/pydantic/pydantic-ai)
 [![license](https://img.shields.io/github/license/pydantic/pydantic-ai.svg?v)](https://github.com/pydantic/pydantic-ai/blob/main/LICENSE)
 
-Pydantic AI core logic with minimal required dependencies.
+Pydantic AI 的核心逻辑包，只包含最低限度的必需依赖。
 
-For more information on how to use this package see [ai.pydantic.dev/install](https://ai.pydantic.dev/install/).
+关于如何使用这个包，请参见 [ai.pydantic.dev/install](https://ai.pydantic.dev/install/)。

@@ -6,35 +6,30 @@
 [![python versions](https://img.shields.io/pypi/pyversions/pydantic-evals.svg)](https://github.com/pydantic/pydantic-ai)
 [![license](https://img.shields.io/github/license/pydantic/pydantic-ai.svg)](https://github.com/pydantic/pydantic-ai/blob/main/LICENSE)
 
-This is a library for evaluating non-deterministic (or "stochastic") functions in Python. It provides a simple,
-Pythonic interface for defining and running stochastic functions, and analyzing the results of running those functions.
+这是一个用于评估 Python 中非确定性（或“随机”）函数的库。它提供了一个简单、Pythonic 的接口，用于定义和运行随机函数，并分析这些函数的运行结果。
 
-While this library is developed as part of [Pydantic AI](https://ai.pydantic.dev), it only uses Pydantic AI for a small
-subset of generative functionality internally, and it is designed to be used with arbitrary "stochastic function"
-implementations. In particular, it can be used with other (non-Pydantic AI) AI libraries, agent frameworks, etc.
+虽然这个库作为 [Pydantic AI](https://ai.pydantic.dev) 的一部分开发，但它在内部只把 Pydantic AI 用于一小部分生成式功能，并且设计上可以配合任意“随机函数”实现使用。尤其是，它可以与其他（非 Pydantic AI）AI 库、智能体框架等一起使用。
 
-As with Pydantic AI, this library prioritizes type safety and use of common Python syntax over esoteric, domain-specific
-use of Python syntax.
+和 Pydantic AI 一样，这个库优先考虑类型安全和常见 Python 语法的使用，而不是晦涩、领域特定的 Python 语法用法。
 
-Full documentation is available at [ai.pydantic.dev/evals](https://ai.pydantic.dev/evals).
+完整文档见 [ai.pydantic.dev/evals](https://ai.pydantic.dev/evals)。
 
-## Example
+## 示例
 
-While you'd typically use Pydantic Evals with more complex functions (such as Pydantic AI agents or graphs), here's a
-quick example that evaluates a simple function against a test case using both custom and built-in evaluators:
+通常你会把 Pydantic Evals 用于更复杂的函数（例如 Pydantic AI 智能体或图），但下面是一个快速示例：使用自定义评估器和内置评估器，根据一个测试用例评估一个简单函数。
 
 ```python
 from pydantic_evals import Case, Dataset
 from pydantic_evals.evaluators import Evaluator, EvaluatorContext, IsInstance
 
-# Define a test case with inputs and expected output
+# 定义一个包含输入和预期输出的测试用例
 case = Case(
     name='capital_question',
     inputs='What is the capital of France?',
     expected_output='Paris',
 )
 
-# Define a custom evaluator
+# 定义一个自定义评估器
 class MatchAnswer(Evaluator[str, str]):
     def evaluate(self, ctx: EvaluatorContext[str, str]) -> float:
         if ctx.output == ctx.expected_output:
@@ -43,18 +38,18 @@ class MatchAnswer(Evaluator[str, str]):
             return 0.8
         return 0.0
 
-# Create a dataset with the test case and evaluators
+# 用测试用例和评估器创建数据集
 dataset = Dataset(
     name='capital_eval',
     cases=[case],
     evaluators=[IsInstance(type_name='str'), MatchAnswer()],
 )
 
-# Define the function to evaluate
+# 定义要评估的函数
 async def answer_question(question: str) -> str:
     return 'Paris'
 
-# Run the evaluation
+# 运行评估
 report = dataset.evaluate_sync(answer_question)
 report.print(include_input=True, include_output=True)
 """
@@ -69,24 +64,22 @@ report.print(include_input=True, include_output=True)
 """
 ```
 
-Using the library with more complex functions, such as Pydantic AI agents, is similar — all you need to do is define a
-task function wrapping the function you want to evaluate, with a signature that matches the inputs and outputs of your
-test cases.
+将这个库用于更复杂的函数（例如 Pydantic AI 智能体）时也类似：你只需要定义一个任务函数来包装要评估的函数，并让它的签名匹配测试用例的输入和输出。
 
-## Logfire Integration
+## Logfire 集成
 
-Pydantic Evals uses OpenTelemetry to record traces for each case in your evaluations.
+Pydantic Evals 使用 OpenTelemetry 为评估中的每个 case 记录 trace。
 
-You can send these traces to any OpenTelemetry-compatible backend. For the best experience, we recommend [Pydantic Logfire](https://logfire.pydantic.dev/docs), which includes custom views for evals:
+你可以把这些 trace 发送到任何兼容 OpenTelemetry 的后端。为了获得最佳体验，我们推荐 [Pydantic Logfire](https://logfire.pydantic.dev/docs)，它包含针对 evals 的自定义视图：
 
 <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
   <img src="https://ai.pydantic.dev/img/logfire-evals-overview.png" alt="Logfire Evals Overview" width="48%">
   <img src="https://ai.pydantic.dev/img/logfire-evals-case.png" alt="Logfire Evals Case View" width="48%">
 </div>
 
-You'll see full details about the inputs, outputs, token usage, execution durations, etc. And you'll have access to the full trace for each case — ideal for debugging, writing path-aware evaluators, or running the similar evaluations against production traces.
+你将看到输入、输出、token 使用量、执行耗时等完整细节。你还可以访问每个 case 的完整 trace，这非常适合调试、编写路径感知评估器，或针对生产 trace 运行类似评估。
 
-Basic setup:
+基础设置：
 
 ```python {test="skip" lint="skip" format="skip"}
 import logfire
@@ -102,4 +95,4 @@ logfire.configure(
 my_dataset.evaluate_sync(my_task)
 ```
 
-[Read more about the Logfire integration here.](https://ai.pydantic.dev/evals/#logfire-integration)
+[在这里阅读更多关于 Logfire 集成的内容。](https://ai.pydantic.dev/evals/#logfire-integration)

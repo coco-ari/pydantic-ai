@@ -6,18 +6,17 @@
 [![python versions](https://img.shields.io/pypi/pyversions/pydantic-graph.svg)](https://github.com/pydantic/pydantic-ai)
 [![license](https://img.shields.io/github/license/pydantic/pydantic-ai.svg)](https://github.com/pydantic/pydantic-ai/blob/main/LICENSE)
 
-Graph and finite state machine library.
+图和有限状态机库。
 
-This library is developed as part of [Pydantic AI](https://ai.pydantic.dev), however it has no dependency
-on `pydantic-ai` or related packages and can be considered as a pure graph-based state machine library. You may find it useful whether or not you're using Pydantic AI or even building with GenAI.
+这个库作为 [Pydantic AI](https://ai.pydantic.dev) 的一部分开发，但它不依赖 `pydantic-ai` 或相关包，也可以视为一个纯粹的基于图的状态机库。无论你是否使用 Pydantic AI，甚至是否在构建 GenAI 应用，它都可能对你有用。
 
-As with Pydantic AI, this library prioritizes type safety and use of common Python syntax over esoteric, domain-specific use of Python syntax.
+和 Pydantic AI 一样，这个库优先考虑类型安全和常见 Python 语法的使用，而不是晦涩、领域特定的 Python 语法用法。
 
-`pydantic-graph` allows you to define graphs using standard Python syntax. In particular, edges are defined using the return type hint of nodes.
+`pydantic-graph` 允许你使用标准 Python 语法定义图。具体来说，边是通过节点的返回类型提示定义的。
 
-Full documentation is available at [ai.pydantic.dev/graph](https://ai.pydantic.dev/graph).
+完整文档见 [ai.pydantic.dev/graph](https://ai.pydantic.dev/graph)。
 
-Here's a basic example:
+下面是一个基础示例：
 
 ```python {noqa="I001"}
 from __future__ import annotations

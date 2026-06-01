@@ -1,7 +1,5 @@
-# docs site
+# 文档站点
 
-This is a [cloudflare workers static assets](https://developers.cloudflare.com/workers/static-assets/)
-site used to host the documentation.
+这是一个用于托管文档的 [cloudflare workers static assets](https://developers.cloudflare.com/workers/static-assets/) 站点。
 
-We're currently not using all the features of static assets, but we'll keep this structure in case they're
-needed in the future.
+我们目前并未使用 static assets 的全部功能，但会保留这个结构，以备将来需要。
