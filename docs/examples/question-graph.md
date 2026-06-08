@@ -1,24 +1,24 @@
-# Question Graph
+# 问题图
 
-Example of a graph for asking and evaluating questions.
+一个用于提问并评估答案的图示例。
 
-Demonstrates:
+演示内容：
 
 * [`pydantic_graph`](../graph.md)
 
-## Running the Example
+## 运行示例
 
-With [dependencies installed and environment variables set](./setup.md#usage), run:
+在[安装依赖并设置环境变量](./setup.md#usage)后运行：
 
 ```bash
 python/uv-run -m pydantic_ai_examples.question_graph
 ```
 
-## Example Code
+## 示例代码
 
 ```snippet {path="/examples/pydantic_ai_examples/question_graph.py"}```
 
-The mermaid diagram generated in this example looks like this:
+此示例生成的 Mermaid 图如下：
 
 ```mermaid
 ---
@@ -26,10 +26,10 @@ title: question_graph
 ---
 stateDiagram-v2
   [*] --> Ask
-  Ask --> Answer: ask the question
-  Answer --> Evaluate: answer the question
+  Ask --> Answer: 提出问题
+  Answer --> Evaluate: 回答问题
   Evaluate --> Congratulate
   Evaluate --> Castigate
-  Congratulate --> [*]: success
-  Castigate --> Ask: try again
+  Congratulate --> [*]: 成功
+  Castigate --> Ask: 重试
 ```

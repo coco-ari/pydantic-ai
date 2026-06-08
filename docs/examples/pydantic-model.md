@@ -1,28 +1,27 @@
-# Pydantic Model
+# Pydantic 模型
 
-Simple example of using Pydantic AI to construct a Pydantic model from a text input.
+一个简单示例，展示如何使用 Pydantic AI 根据文本输入构造 Pydantic 模型。
 
-Demonstrates:
+演示内容：
 
-- [structured `output_type`](../output.md#structured-output)
+- [结构化 `output_type`](../output.md#structured-output)
 
-## Running the Example
+## 运行示例
 
-With [dependencies installed and environment variables set](./setup.md#usage), run:
+在[安装依赖并设置环境变量](./setup.md#usage)后运行：
 
 ```bash
 python/uv-run -m pydantic_ai_examples.pydantic_model
 ```
 
-This examples uses `openai:gpt-5` by default, but it works well with other models, e.g. you can run it
-with Gemini using:
+此示例默认使用 `openai:gpt-5`，但也能很好地配合其他模型使用。例如，你可以用 Gemini 运行：
 
 ```bash
 PYDANTIC_AI_MODEL=gemini-3-pro-preview python/uv-run -m pydantic_ai_examples.pydantic_model
 ```
 
-(or `PYDANTIC_AI_MODEL=gemini-3-flash-preview ...`)
+（或使用 `PYDANTIC_AI_MODEL=gemini-3-flash-preview ...`）
 
-## Example Code
+## 示例代码
 
 ```snippet {path="/examples/pydantic_ai_examples/pydantic_model.py"}```

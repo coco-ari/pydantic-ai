@@ -1,23 +1,23 @@
 # Model Context Protocol (MCP)
 
-Pydantic AI supports [Model Context Protocol (MCP)](https://modelcontextprotocol.io) in multiple ways:
+Pydantic AI 通过多种方式支持 [Model Context Protocol (MCP)](https://modelcontextprotocol.io)：
 
-1. [Agents](../agent.md) can connect to MCP servers and use their tools using three different methods:
-    1. Pydantic AI can act as an MCP client and connect directly to local and remote MCP servers. [Learn more](client.md) about [`MCPServer`][pydantic_ai.mcp.MCPServer].
-    2. Pydantic AI can use the [FastMCP Client](https://gofastmcp.com/clients/client/) to connect to local and remote MCP servers, whether or not they're built using [FastMCP Server](https://gofastmcp.com/servers). [Learn more](fastmcp-client.md) about [`FastMCPToolset`][pydantic_ai.toolsets.fastmcp.FastMCPToolset].
-    3. Some model providers can themselves connect to remote MCP servers using a "native tool". [Learn more](../native-tools.md#mcp-server-tool) about [`MCPServerTool`][pydantic_ai.native_tools.MCPServerTool].
-2. Agents can be used within MCP servers. [Learn more](server.md)
+1. [智能体](../agent.md)可以通过三种不同方式连接到 MCP server 并使用其工具：
+    1. Pydantic AI 可以充当 MCP client，并直接连接到本地和远程 MCP server。进一步了解 [`MCPServer`][pydantic_ai.mcp.MCPServer] 请参见[这里](client.md)。
+    2. Pydantic AI 可以使用 [FastMCP Client](https://gofastmcp.com/clients/client/) 连接到本地和远程 MCP server，无论这些 server 是否使用 [FastMCP Server](https://gofastmcp.com/servers) 构建。进一步了解 [`FastMCPToolset`][pydantic_ai.toolsets.fastmcp.FastMCPToolset] 请参见[这里](fastmcp-client.md)。
+    3. 一些模型提供商本身可以使用"原生工具"连接到远程 MCP server。进一步了解 [`MCPServerTool`][pydantic_ai.native_tools.MCPServerTool] 请参见[这里](../native-tools.md#mcp-server-tool)。
+2. 智能体也可以在 MCP server 内使用。进一步了解请参见[这里](server.md)。
 
-## What is MCP?
+## 什么是 MCP？
 
-The Model Context Protocol is a standardized protocol that allow AI applications (including programmatic agents like Pydantic AI, coding agents like [cursor](https://www.cursor.com/), and desktop applications like [Claude Desktop](https://claude.ai/download)) to connect to external tools and services using a common interface.
+Model Context Protocol 是一种标准化协议，允许 AI 应用（包括 Pydantic AI 这类编程式智能体、[Cursor](https://www.cursor.com/) 这类编码智能体，以及 [Claude Desktop](https://claude.ai/download) 这类桌面应用）通过通用接口连接到外部工具和服务。
 
-As with other protocols, the dream of MCP is that a wide range of applications can speak to each other without the need for specific integrations.
+与其他协议一样，MCP 的愿景是让各种应用无需专门集成即可相互通信。
 
-There is a great list of MCP servers at [github.com/modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers).
+你可以在 [github.com/modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) 找到一份不错的 MCP server 列表。
 
-Some examples of what this means:
+下面是一些具体含义示例：
 
-- Pydantic AI could use a web search service implemented as an MCP server to implement a deep research agent
-- Cursor could connect to the [Pydantic Logfire](https://github.com/pydantic/logfire-mcp) MCP server to search logs, traces and metrics to gain context while fixing a bug
-- Pydantic AI, or any other MCP client could connect to our [Run Python](https://github.com/pydantic/mcp-run-python) MCP server to run arbitrary Python code in a sandboxed environment
+- Pydantic AI 可以使用作为 MCP server 实现的网页搜索服务，来实现深度研究智能体
+- Cursor 可以连接到 [Pydantic Logfire](https://github.com/pydantic/logfire-mcp) MCP server，搜索日志、追踪和指标，以便在修复 bug 时获取上下文
+- Pydantic AI 或任何其他 MCP client 都可以连接到我们的 [Run Python](https://github.com/pydantic/mcp-run-python) MCP server，在沙箱环境中运行任意 Python 代码

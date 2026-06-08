@@ -1,38 +1,38 @@
-# SQL Generation
+# SQL 生成
 
-Example demonstrating how to use Pydantic AI to generate SQL queries based on user input.
+此示例展示如何使用 Pydantic AI 根据用户输入生成 SQL 查询。
 
-Demonstrates:
+演示内容：
 
-- [dynamic system prompt](../agent.md#system-prompts)
-- [structured `output_type`](../output.md#structured-output)
-- [output validation](../output.md#output-validator-functions)
-- [agent dependencies](../dependencies.md)
+- [动态系统提示](../agent.md#system-prompts)
+- [结构化 `output_type`](../output.md#structured-output)
+- [输出校验](../output.md#output-validator-functions)
+- [智能体依赖](../dependencies.md)
 
-## Running the Example
+## 运行示例
 
-The resulting SQL is validated by running it as an `EXPLAIN` query on PostgreSQL. To run the example, you first need to run PostgreSQL, e.g. via Docker:
+生成的 SQL 会通过在 PostgreSQL 上以 `EXPLAIN` 查询运行来校验。要运行此示例，你需要先启动 PostgreSQL，例如通过 Docker：
 
 ```bash
 docker run --rm -e POSTGRES_PASSWORD=postgres -p 54320:5432 postgres
 ```
 
-_(we run postgres on port `54320` to avoid conflicts with any other postgres instances you may have running)_
+_（这里在 `54320` 端口运行 postgres，以避免与你可能正在运行的其他 postgres 实例冲突）_
 
-With [dependencies installed and environment variables set](./setup.md#usage), run:
+在[安装依赖并设置环境变量](./setup.md#usage)后运行：
 
 ```bash
 python/uv-run -m pydantic_ai_examples.sql_gen
 ```
 
-or to use a custom prompt:
+或者使用自定义提示：
 
 ```bash
 python/uv-run -m pydantic_ai_examples.sql_gen "find me errors"
 ```
 
-This model uses `gemini-3-flash-preview` by default since Gemini is good at single shot queries of this kind.
+此模型默认使用 `gemini-3-flash-preview`，因为 Gemini 擅长处理这类一次性查询。
 
-## Example Code
+## 示例代码
 
 ```snippet {path="/examples/pydantic_ai_examples/sql_gen.py"}```

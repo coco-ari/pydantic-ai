@@ -1,18 +1,18 @@
 # OpenRouter
 
-## Install
+## 安装
 
-To use `OpenRouterModel`, you need to either install `pydantic-ai`, or install `pydantic-ai-slim` with the `openrouter` optional group:
+要使用 `OpenRouterModel`，你需要安装 `pydantic-ai`，或安装带 `openrouter` 可选组的 `pydantic-ai-slim`：
 
 ```bash
 pip/uv-add "pydantic-ai-slim[openrouter]"
 ```
 
-## Configuration
+## 配置
 
-To use [OpenRouter](https://openrouter.ai), first create an API key at [openrouter.ai/keys](https://openrouter.ai/keys).
+要使用 [OpenRouter](https://openrouter.ai)，请先在 [openrouter.ai/keys](https://openrouter.ai/keys) 创建 API key。
 
-You can set the `OPENROUTER_API_KEY` environment variable and use [`OpenRouterProvider`][pydantic_ai.providers.openrouter.OpenRouterProvider] by name:
+你可以设置 `OPENROUTER_API_KEY` 环境变量，并通过名称使用 [`OpenRouterProvider`][pydantic_ai.providers.openrouter.OpenRouterProvider]：
 
 ```python
 from pydantic_ai import Agent
@@ -21,7 +21,7 @@ agent = Agent('openrouter:anthropic/claude-sonnet-4-5')
 ...
 ```
 
-Or initialise the model and provider directly:
+也可以直接初始化模型和 provider：
 
 ```python
 from pydantic_ai import Agent
@@ -36,11 +36,11 @@ agent = Agent(model)
 ...
 ```
 
-## App Attribution
+## 应用归因
 
-OpenRouter has an [app attribution](https://openrouter.ai/docs/app-attribution) feature to track your application in their public ranking and analytics.
+OpenRouter 提供[应用归因](https://openrouter.ai/docs/app-attribution)功能，可在其公开排名和分析中跟踪你的应用。
 
-You can pass in an `app_url` and `app_title` when initializing the provider to enable app attribution.
+初始化 provider 时，可以传入 `app_url` 和 `app_title` 来启用应用归因。
 
 ```python
 from pydantic_ai.providers.openrouter import OpenRouterProvider
@@ -53,9 +53,9 @@ provider=OpenRouterProvider(
 ...
 ```
 
-## Model Settings
+## 模型设置
 
-You can customize model behavior using [`OpenRouterModelSettings`][pydantic_ai.models.openrouter.OpenRouterModelSettings]:
+你可以使用 [`OpenRouterModelSettings`][pydantic_ai.models.openrouter.OpenRouterModelSettings] 自定义模型行为：
 
 ```python
 from pydantic_ai import Agent
@@ -74,10 +74,10 @@ agent = Agent(model, model_settings=settings)
 ...
 ```
 
-### Eager Input Streaming
+### 急切输入流式传输
 
-For Anthropic models via OpenRouter, you can enable eager input streaming to reduce latency for tool calls with large inputs.
-Set [`anthropic_eager_input_streaming`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_eager_input_streaming] in [`AnthropicModelSettings`][pydantic_ai.models.anthropic.AnthropicModelSettings]:
+对于通过 OpenRouter 使用的 Anthropic 模型，可以启用急切输入流式传输，以降低大输入工具调用的延迟。
+请在 [`AnthropicModelSettings`][pydantic_ai.models.anthropic.AnthropicModelSettings] 中设置 [`anthropic_eager_input_streaming`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_eager_input_streaming]：
 
 ```python
 from pydantic_ai import Agent
@@ -90,13 +90,13 @@ agent = Agent(model, model_settings=settings)
 ...
 ```
 
-## Web Search
+## 网页搜索
 
-OpenRouter supports web search via its [plugins](https://openrouter.ai/docs/guides/features/plugins/web-search). You can enable it using the [`WebSearchTool`][pydantic_ai.native_tools.WebSearchTool].
+OpenRouter 通过其[插件](https://openrouter.ai/docs/guides/features/plugins/web-search)支持网页搜索。你可以使用 [`WebSearchTool`][pydantic_ai.native_tools.WebSearchTool] 启用它。
 
-### Web Search Parameters
+### 网页搜索参数
 
-You can customize the web search behavior using the `search_context_size` parameter on [`WebSearchTool`][pydantic_ai.native_tools.WebSearchTool]:
+你可以使用 [`WebSearchTool`][pydantic_ai.native_tools.WebSearchTool] 上的 `search_context_size` 参数自定义网页搜索行为：
 
 ```python
 from pydantic_ai import Agent

@@ -1,28 +1,28 @@
 # Cohere
 
-## Install
+## 安装
 
-To use `CohereModel`, you need to either install `pydantic-ai`, or install `pydantic-ai-slim` with the `cohere` optional group:
+要使用 `CohereModel`，你需要安装 `pydantic-ai`，或安装带 `cohere` 可选组的 `pydantic-ai-slim`：
 
 ```bash
 pip/uv-add "pydantic-ai-slim[cohere]"
 ```
 
-## Configuration
+## 配置
 
-To use [Cohere](https://cohere.com/) through their API, go to [dashboard.cohere.com/api-keys](https://dashboard.cohere.com/api-keys) and follow your nose until you find the place to generate an API key.
+要通过 API 使用 [Cohere](https://cohere.com/)，请前往 [dashboard.cohere.com/api-keys](https://dashboard.cohere.com/api-keys)，按页面指引生成 API key。
 
-`CohereModelName` contains a list of the most popular Cohere models.
+`CohereModelName` 包含最常用 Cohere 模型的列表。
 
-## Environment variable
+## 环境变量
 
-Once you have the API key, you can set it as an environment variable:
+获得 API key 后，可以将其设置为环境变量：
 
 ```bash
 export CO_API_KEY='your-api-key'
 ```
 
-You can then use `CohereModel` by name:
+然后你可以通过名称使用 `CohereModel`：
 
 ```python
 from pydantic_ai import Agent
@@ -31,7 +31,7 @@ agent = Agent('cohere:command-r7b-12-2024')
 ...
 ```
 
-Or initialise the model directly with just the model name:
+也可以只用模型名称直接初始化模型：
 
 ```python
 from pydantic_ai import Agent
@@ -42,9 +42,9 @@ agent = Agent(model)
 ...
 ```
 
-## `provider` argument
+## `provider` 参数
 
-You can provide a custom `Provider` via the `provider` argument:
+你可以通过 `provider` 参数提供自定义 `Provider`：
 
 ```python
 from pydantic_ai import Agent
@@ -56,7 +56,7 @@ agent = Agent(model)
 ...
 ```
 
-You can also customize the `CohereProvider` with a custom `http_client`:
+也可以使用自定义 `http_client` 来定制 `CohereProvider`：
 
 ```python
 from httpx import AsyncClient

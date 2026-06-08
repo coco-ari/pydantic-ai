@@ -1,21 +1,21 @@
-Small but complete example of using Pydantic AI to build a support agent for a bank.
+一个小而完整的示例，展示如何使用 Pydantic AI 为银行构建支持智能体。
 
-Demonstrates:
+演示内容：
 
-- [dynamic system prompt](../agent.md#system-prompts)
-- [structured `output_type`](../output.md#structured-output)
-- [tools](../tools.md)
+- [动态系统提示](../agent.md#system-prompts)
+- [结构化 `output_type`](../output.md#structured-output)
+- [工具](../tools.md)
 
-## Running the Example
+## 运行示例
 
-With [dependencies installed and environment variables set](./setup.md#usage), run:
+在[安装依赖并设置环境变量](./setup.md#usage)后运行：
 
 ```bash
 python/uv-run -m pydantic_ai_examples.bank_support
 ```
 
-(or `PYDANTIC_AI_MODEL=gemini-3-flash-preview ...`)
+（或使用 `PYDANTIC_AI_MODEL=gemini-3-flash-preview ...`）
 
-## Example Code
+## 示例代码
 
 ```snippet {path="/examples/pydantic_ai_examples/bank_support.py"}```

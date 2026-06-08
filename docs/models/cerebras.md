@@ -1,28 +1,28 @@
 # Cerebras
 
-## Install
+## 安装
 
-To use `CerebrasModel`, you need to either install `pydantic-ai`, or install `pydantic-ai-slim` with the `cerebras` optional group:
+要使用 `CerebrasModel`，你需要安装 `pydantic-ai`，或安装带 `cerebras` 可选组的 `pydantic-ai-slim`：
 
 ```bash
 pip/uv-add "pydantic-ai-slim[cerebras]"
 ```
 
-## Configuration
+## 配置
 
-To use [Cerebras](https://cerebras.ai/) through their API, go to [cloud.cerebras.ai](https://cloud.cerebras.ai/?utm_source=3pi_pydantic-ai&utm_campaign=partner_doc) and generate an API key.
+要通过 API 使用 [Cerebras](https://cerebras.ai/)，请前往 [cloud.cerebras.ai](https://cloud.cerebras.ai/?utm_source=3pi_pydantic-ai&utm_campaign=partner_doc) 并生成 API key。
 
-For a list of available models, see the [Cerebras models documentation](https://inference-docs.cerebras.ai/models).
+可用模型列表请参见 [Cerebras 模型文档](https://inference-docs.cerebras.ai/models)。
 
-## Environment variable
+## 环境变量
 
-Once you have the API key, you can set it as an environment variable:
+获得 API key 后，可以将其设置为环境变量：
 
 ```bash
 export CEREBRAS_API_KEY='your-api-key'
 ```
 
-You can then use `CerebrasModel` by name:
+然后你可以通过名称使用 `CerebrasModel`：
 
 ```python
 from pydantic_ai import Agent
@@ -31,7 +31,7 @@ agent = Agent('cerebras:llama-3.3-70b')
 ...
 ```
 
-Or initialise the model directly with just the model name:
+也可以只用模型名称直接初始化模型：
 
 ```python
 from pydantic_ai import Agent
@@ -42,9 +42,9 @@ agent = Agent(model)
 ...
 ```
 
-## `provider` argument
+## `provider` 参数
 
-You can provide a custom `Provider` via the `provider` argument:
+你可以通过 `provider` 参数提供自定义 `Provider`：
 
 ```python
 from pydantic_ai import Agent
@@ -58,7 +58,7 @@ agent = Agent(model)
 ...
 ```
 
-You can also customize the `CerebrasProvider` with a custom `httpx.AsyncClient`:
+也可以使用自定义 `httpx.AsyncClient` 来定制 `CerebrasProvider`：
 
 ```python
 from httpx import AsyncClient

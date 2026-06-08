@@ -1,14 +1,14 @@
-Example of a multi-agent flow where one agent delegates work to another, then hands off control to a third agent.
+一个多智能体流程示例：一个智能体将工作委托给另一个智能体，然后把控制权移交给第三个智能体。
 
-Demonstrates:
+演示内容：
 
-* [agent delegation](../multi-agent-applications.md#agent-delegation)
-* [programmatic agent hand-off](../multi-agent-applications.md#programmatic-agent-hand-off)
-* [usage limits](../agent.md#usage-limits)
+* [智能体委托](../multi-agent-applications.md#agent-delegation)
+* [程序化智能体移交](../multi-agent-applications.md#programmatic-agent-hand-off)
+* [用量限制](../agent.md#usage-limits)
 
-In this scenario, a group of agents work together to find the best flight for a user.
+在这个场景中，一组智能体协作，为用户找到最佳航班。
 
-The control flow for this example can be summarised as follows:
+此示例的控制流可概括如下：
 
 ```mermaid
 graph TD
@@ -26,14 +26,14 @@ graph TD
   buy_flights --> SUCCESS
 ```
 
-## Running the Example
+## 运行示例
 
-With [dependencies installed and environment variables set](./setup.md#usage), run:
+在[安装依赖并设置环境变量](./setup.md#usage)后运行：
 
 ```bash
 python/uv-run -m pydantic_ai_examples.flight_booking
 ```
 
-## Example Code
+## 示例代码
 
 ```snippet {path="/examples/pydantic_ai_examples/flight_booking.py"}```

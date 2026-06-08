@@ -1,19 +1,19 @@
-This example shows how to stream markdown from an agent, using the [`rich`](https://github.com/Textualize/rich) library to highlight the output in the terminal.
+此示例展示如何从智能体流式传输 Markdown，并使用 [`rich`](https://github.com/Textualize/rich) 库在终端中高亮输出。
 
-It'll run the example with both OpenAI and Google Gemini models if the required environment variables are set.
+如果设置了所需的环境变量，它会分别使用 OpenAI 和 Google Gemini 模型运行此示例。
 
-Demonstrates:
+演示内容：
 
-* [streaming text responses](../output.md#streaming-text)
+* [流式文本响应](../output.md#streaming-text)
 
-## Running the Example
+## 运行示例
 
-With [dependencies installed and environment variables set](./setup.md#usage), run:
+在[安装依赖并设置环境变量](./setup.md#usage)后运行：
 
 ```bash
 python/uv-run -m pydantic_ai_examples.stream_markdown
 ```
 
-## Example Code
+## 示例代码
 
 ```snippet {path="/examples/pydantic_ai_examples/stream_markdown.py"}```
