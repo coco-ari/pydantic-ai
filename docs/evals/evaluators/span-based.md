@@ -1,49 +1,49 @@
-# Span-Based Evaluation
+# 基于 Span 的评估 {#span-based-evaluation}
 
-Evaluate AI system behavior by analyzing OpenTelemetry spans captured during execution.
+通过分析执行期间捕获的 OpenTelemetry spans 来评估 AI 系统行为。
 
-!!! note "Requires Logfire"
-    Span-based evaluation requires `logfire` to be installed and configured:
+!!! note "需要 Logfire"
+    基于 span 的评估需要安装并配置 `logfire`：
     ```bash
     pip install 'pydantic-evals[logfire]'
     ```
 
-## Overview
+## 概览 {#overview}
 
-Span-based evaluation enables you to evaluate **how** your AI system executes, not just **what** it produces. This is essential for complex agents where ensuring the desired behavior depends on the execution path taken, not just the final output.
+基于 span 的评估让你不仅能评估 AI 系统产生了**什么**，还能评估它是**如何**执行的。对于复杂 agents，这非常关键，因为确保期望行为往往取决于所采取的执行路径，而不只是最终输出。
 
-### Why Span-Based Evaluation?
+### 为什么需要基于 Span 的评估？ {#why-span-based-evaluation}
 
-Traditional evaluators assess task inputs and outputs. For simple tasks, this may be sufficient—if the output is correct, the task succeeded. But for complex multi-step agents, the _process_ matters as much as the result:
+传统评估器评估任务输入和输出。对于简单任务，这可能足够：如果输出正确，任务就成功了。但对于复杂的多步骤 agents，_过程_ 和结果同样重要：
 
-- **A correct answer reached incorrectly** - An agent might produce the right output by accident (e.g., guessing, using cached data when it should have searched, calling the wrong tools but getting lucky)
-- **Verification of required behaviors** - You need to ensure specific tools were called, certain code paths executed, or particular patterns followed
-- **Performance and efficiency** - The agent should reach the answer efficiently, without unnecessary tool calls, infinite loops, or excessive retries
-- **Safety and compliance** - Critical to verify that dangerous operations weren't attempted, sensitive data wasn't accessed inappropriately, or guardrails weren't bypassed
+- **以错误方式得到正确答案**：agent 可能偶然产生正确输出（例如猜测、在本应搜索时使用缓存数据、调用了错误工具但碰巧成功）
+- **验证必需行为**：你需要确保调用了特定工具、执行了特定代码路径，或遵循了特定模式
+- **性能和效率**：agent 应该高效得到答案，不应出现不必要的工具调用、无限循环或过多重试
+- **安全和合规**：必须验证未尝试危险操作、未不当访问敏感数据，或未绕过 guardrails
 
-### Real-World Scenarios
+### 真实场景 {#real-world-scenarios}
 
-Span-based evaluation is particularly valuable for:
+基于 span 的评估尤其适用于：
 
-- **RAG systems** - Verify documents were retrieved and reranked before generation, not just that the answer included citations
-- **Multi-agent coordination** - Ensure the orchestrator delegated to the right specialist agents in the correct order
-- **Tool-calling agents** - Confirm specific tools were used (or avoided), and in the expected sequence
-- **Debugging and regression testing** - Catch behavioral regressions where outputs remain correct but the internal logic deteriorates
-- **Production alignment** - Ensure your evaluation assertions operate on the same telemetry data captured in production, so eval insights directly translate to production monitoring
+- **RAG 系统**：验证生成前确实检索并 rerank 了文档，而不只是答案包含引用
+- **多 agent 协调**：确保 orchestrator 按正确顺序委派给正确的 specialist agents
+- **工具调用 agents**：确认使用（或避免）了特定工具，并且顺序符合预期
+- **调试和回归测试**：捕获输出仍然正确但内部逻辑退化的行为回归
+- **生产对齐**：确保你的评估断言基于生产中捕获的同一份 telemetry 数据运行，这样 eval 洞察能直接转化为生产监控
 
-### How It Works
+### 工作方式 {#how-it-works}
 
-When you configure logfire (`logfire.configure()`), Pydantic Evals captures all OpenTelemetry spans generated during task execution. You can then write evaluators that assert conditions on:
+当你配置 logfire（`logfire.configure()`）后，Pydantic Evals 会捕获任务执行期间生成的所有 OpenTelemetry spans。随后你可以编写评估器，对以下内容断言条件：
 
-- **Which tools were called** - `HasMatchingSpan(query={'name_contains': 'search_tool'})`
-- **Code paths executed** - Verify specific functions ran or particular branches taken
-- **Timing characteristics** - Check that operations complete within SLA bounds
-- **Error conditions** - Detect retries, fallbacks, or specific failure modes
-- **Execution structure** - Verify parent-child relationships, delegation patterns, or execution order
+- **调用了哪些工具**：`HasMatchingSpan(query={'name_contains': 'search_tool'})`
+- **执行了哪些代码路径**：验证特定函数已运行或走到了特定分支
+- **时序特征**：检查操作是否在 SLA 边界内完成
+- **错误条件**：检测重试、fallback 或特定失败模式
+- **执行结构**：验证父子关系、委派模式或执行顺序
 
-This creates a fundamentally different evaluation paradigm: you're testing behavioral contracts, not just input-output relationships.
+这创造了一种根本不同的评估范式：你测试的是行为契约，而不仅是输入输出关系。
 
-## Basic Usage
+## 基础用法 {#basic-usage}
 
 ```python
 import logfire
@@ -67,9 +67,9 @@ dataset = Dataset(
 )
 ```
 
-## HasMatchingSpan Evaluator
+## HasMatchingSpan 评估器 {#hasmatchingspan-evaluator}
 
-The [`HasMatchingSpan`][pydantic_evals.evaluators.HasMatchingSpan] evaluator checks if any span matches a query:
+[`HasMatchingSpan`][pydantic_evals.evaluators.HasMatchingSpan] 评估器会检查是否有任意 span 匹配查询：
 
 ```python
 from pydantic_evals.evaluators import HasMatchingSpan
@@ -80,15 +80,15 @@ HasMatchingSpan(
 )
 ```
 
-**Returns:** `bool` - `True` if any span matches the query
+**返回：** `bool` - 如果任意 span 匹配查询，则为 `True`
 
-## SpanQuery Reference
+## SpanQuery 参考 {#spanquery-reference}
 
-A [`SpanQuery`][pydantic_evals.otel.SpanQuery] is a dictionary with query conditions:
+[`SpanQuery`][pydantic_evals.otel.SpanQuery] 是一个包含查询条件的字典：
 
-### Name Conditions
+### 名称条件 {#name-conditions}
 
-Match spans by name:
+按名称匹配 spans：
 
 ```python
 # Exact name match
@@ -101,9 +101,9 @@ Match spans by name:
 {'name_matches_regex': r'llm_call_\d+'}
 ```
 
-### Attribute Conditions
+### 属性条件 {#attribute-conditions}
 
-Match spans with specific attributes:
+匹配带有特定 attributes 的 spans：
 
 ```python
 # Has specific attribute values
@@ -113,9 +113,9 @@ Match spans with specific attributes:
 {'has_attribute_keys': ['user_id', 'request_id']}
 ```
 
-### Duration Conditions
+### 耗时条件 {#duration-conditions}
 
-Match based on execution time:
+按执行时间匹配：
 
 ```python
 from datetime import timedelta
@@ -132,9 +132,9 @@ from datetime import timedelta
 {'min_duration': 0.5, 'max_duration': 2.0}
 ```
 
-### Logical Operators
+### 逻辑运算符 {#logical-operators}
 
-Combine conditions:
+组合条件：
 
 ```python
 # NOT
@@ -153,9 +153,9 @@ Combine conditions:
 ]}
 ```
 
-### Child/Descendant Conditions
+### 子级/后代条件 {#childdescendant-conditions}
 
-Query relationships between spans:
+查询 spans 之间的关系：
 
 ```python
 # Count direct children
@@ -176,9 +176,9 @@ Query relationships between spans:
 {'some_descendant_has': {'name_contains': 'api_call'}}
 ```
 
-### Ancestor/Depth Conditions
+### 祖先/深度条件 {#ancestordepth-conditions}
 
-Query span hierarchy:
+查询 span 层级结构：
 
 ```python
 # Depth (root spans have depth 0)
@@ -191,9 +191,9 @@ Query span hierarchy:
 {'no_ancestor_has': {'has_attributes': {'error': True}}}
 ```
 
-### Stop Recursing
+### 停止递归 {#stop-recursing}
 
-Control recursive queries:
+控制递归查询：
 
 ```python
 {
@@ -203,11 +203,11 @@ Control recursive queries:
 # Only search descendants until hitting a span named 'boundary'
 ```
 
-## Practical Examples
+## 实用示例 {#practical-examples}
 
-### Verify Tool Usage
+### 验证工具使用 {#verify-tool-usage}
 
-Check that specific tools were called:
+检查是否调用了特定工具：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -232,9 +232,9 @@ dataset = Dataset(
 )
 ```
 
-### Check Multiple Tools
+### 检查多个工具 {#check-multiple-tools}
 
-Verify a sequence of operations:
+验证一系列操作：
 
 ```python
 from pydantic_evals.evaluators import HasMatchingSpan
@@ -258,9 +258,9 @@ evaluators = [
 ]
 ```
 
-### Performance Assertions
+### 性能断言 {#performance-assertions}
 
-Ensure operations meet latency requirements:
+确保操作满足延迟要求：
 
 ```python
 from pydantic_evals.evaluators import HasMatchingSpan
@@ -286,9 +286,9 @@ evaluators = [
 ]
 ```
 
-### Error Detection
+### 错误检测 {#error-detection}
 
-Check for error conditions:
+检查错误条件：
 
 ```python
 from pydantic_evals.evaluators import HasMatchingSpan
@@ -314,9 +314,9 @@ evaluators = [
 ]
 ```
 
-### Complex Behavioral Checks
+### 复杂行为检查 {#complex-behavioral-checks}
 
-Verify sophisticated behavior patterns:
+验证复杂行为模式：
 
 ```python
 from pydantic_evals.evaluators import HasMatchingSpan
@@ -335,7 +335,7 @@ evaluators = [
     HasMatchingSpan(
         query={'and_': [
             {'name_contains': 'llm_call'},
-            {'some_descendant_has': {'name_contains': 'retry'}},
+            {'some_descendant_has': {'name_contains': 'retry'}}
             {'min_descendant_count': 3},
         ]},
         evaluation_name='retry_pattern',
@@ -343,9 +343,9 @@ evaluators = [
 ]
 ```
 
-## Custom Evaluators with SpanTree
+## 使用 SpanTree 的自定义评估器 {#custom-evaluators-with-spantree}
 
-For more complex span analysis, write custom evaluators:
+如需更复杂的 span 分析，可以编写自定义评估器：
 
 ```python
 from dataclasses import dataclass
@@ -375,9 +375,9 @@ class CustomSpanCheck(Evaluator):
         }
 ```
 
-### SpanTree API
+### SpanTree API {#spantree-api}
 
-The [`SpanTree`][pydantic_evals.otel.SpanTree] provides methods for span analysis:
+[`SpanTree`][pydantic_evals.otel.SpanTree] 提供 span 分析方法：
 
 ```python
 from pydantic_evals.otel import SpanTree
@@ -395,9 +395,9 @@ def example_api(span_tree: SpanTree) -> None:
         print(node.name, node.duration, node.attributes)
 ```
 
-### SpanNode Properties
+### SpanNode 属性 {#spannode-properties}
 
-Each [`SpanNode`][pydantic_evals.otel.SpanNode] has:
+每个 [`SpanNode`][pydantic_evals.otel.SpanNode] 都有：
 
 ```python
 from pydantic_evals.otel import SpanNode
@@ -416,13 +416,13 @@ def example_properties(node: SpanNode) -> None:
     _ = node.parent  # SpanNode | None
 ```
 
-## Debugging Span Queries
+## 调试 Span 查询 {#debugging-span-queries}
 
-### View Spans in Logfire
+### 在 Logfire 中查看 Spans {#view-spans-in-logfire}
 
-If you're sending data to Logfire, you can view all spans in the web UI to understand the trace structure.
+如果你正向 Logfire 发送数据，可以在 Web UI 中查看所有 spans，以理解 trace 结构。
 
-### Print Span Tree
+### 打印 Span Tree {#print-span-tree}
 
 ```python
 from dataclasses import dataclass
@@ -438,9 +438,9 @@ class DebugSpans(Evaluator):
         return True
 ```
 
-### Query Testing
+### 查询测试 {#query-testing}
 
-Test queries incrementally:
+逐步测试查询：
 
 ```python
 from pydantic_evals.evaluators import HasMatchingSpan
@@ -458,11 +458,11 @@ query = {'and_': [
 HasMatchingSpan(query=query, evaluation_name='test')
 ```
 
-## Use Cases
+## 使用场景 {#use-cases}
 
-### RAG System Verification
+### RAG 系统验证 {#rag-system-verification}
 
-Verify retrieval-augmented generation workflow:
+验证检索增强生成工作流：
 
 ```python
 from pydantic_evals.evaluators import HasMatchingSpan
@@ -491,9 +491,9 @@ evaluators = [
 ]
 ```
 
-### Multi-Agent Systems
+### 多 Agent 系统 {#multi-agent-systems}
 
-Verify agent coordination:
+验证 agent 协调：
 
 ```python
 from pydantic_evals.evaluators import HasMatchingSpan
@@ -518,7 +518,7 @@ evaluators = [
     HasMatchingSpan(
         query={'not_': {'and_': [
             {'name_contains': 'agent'},
-            {'some_descendant_has': {'name_contains': 'agent'}},
+            {'some_descendant_has': {'name_contains': 'agent'}}
             {'some_ancestor_has': {'name_contains': 'agent'}},
         ]}},
         evaluation_name='no_circular_delegation',
@@ -526,9 +526,9 @@ evaluators = [
 ]
 ```
 
-### Tool Usage Patterns
+### 工具使用模式 {#tool-usage-patterns}
 
-Verify intelligent tool selection:
+验证智能工具选择：
 
 ```python
 from pydantic_evals.evaluators import HasMatchingSpan
@@ -554,16 +554,16 @@ evaluators = [
 ]
 ```
 
-## Best Practices
+## 最佳实践 {#best-practices}
 
-1. **Start Simple**: Begin with basic name queries, add complexity as needed
-2. **Use Descriptive Names**: Name your spans well in your application code
-3. **Test Queries**: Verify queries work before running full evaluations
-4. **Combine with Other Evaluators**: Use span checks alongside output validation
-5. **Document Expectations**: Comment why specific spans should/shouldn't exist
+1. **从简单开始**：先使用基础名称查询，再按需增加复杂度
+2. **使用描述性名称**：在应用代码中为 spans 取好名称
+3. **测试查询**：在运行完整评估前验证查询有效
+4. **与其他评估器组合使用**：把 span 检查与输出验证结合
+5. **记录预期**：用注释说明为什么特定 spans 应该存在或不应该存在
 
-## Next Steps
+## 下一步 {#next-steps}
 
-- **[Logfire Integration](../how-to/logfire-integration.md)** - Set up Logfire for span capture
-- **[Custom Evaluators](custom.md)** - Write advanced span analysis
-- **[Native Evaluators](built-in.md)** - Other evaluator types
+- **[Logfire 集成](../how-to/logfire-integration.md)** - 设置 Logfire 来捕获 spans
+- **[自定义评估器](custom.md)** - 编写高级 span 分析
+- **[原生评估器](built-in.md)** - 其他评估器类型

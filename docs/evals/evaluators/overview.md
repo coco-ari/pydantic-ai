@@ -1,39 +1,39 @@
-# Evaluators Overview
+# 评估器概览 {#evaluators-overview}
 
-Evaluators are the core of Pydantic Evals. They analyze task outputs and provide scores, labels, or pass/fail assertions.
+Evaluators 是 Pydantic Evals 的核心。它们分析任务输出，并提供分数、标签或通过/失败断言。
 
-## When to Use Different Evaluators
+## 何时使用不同评估器 {#when-to-use-different-evaluators}
 
-### Deterministic Checks (Fast & Reliable)
+### 确定性检查（快速且可靠） {#deterministic-checks-fast-reliable}
 
-Use deterministic evaluators when you can define exact rules:
+当你可以定义精确规则时，使用确定性评估器：
 
-| Evaluator | Use Case | Example |
+| 评估器 | 使用场景 | 示例 |
 |-----------|----------|---------|
-| [`EqualsExpected`][pydantic_evals.evaluators.EqualsExpected] | Exact output match | Structured data, classification |
-| [`Equals`][pydantic_evals.evaluators.Equals] | Equals specific value | Checking for sentinel values |
-| [`Contains`][pydantic_evals.evaluators.Contains] | Substring/element check | Required keywords, PII detection |
-| [`IsInstance`][pydantic_evals.evaluators.IsInstance] | Type validation | Format validation |
-| [`MaxDuration`][pydantic_evals.evaluators.MaxDuration] | Performance threshold | SLA compliance |
-| [`HasMatchingSpan`][pydantic_evals.evaluators.HasMatchingSpan] | Behavior verification | Tool calls, code paths |
+| [`EqualsExpected`][pydantic_evals.evaluators.EqualsExpected] | 精确输出匹配 | 结构化数据、分类 |
+| [`Equals`][pydantic_evals.evaluators.Equals] | 等于指定值 | 检查哨兵值 |
+| [`Contains`][pydantic_evals.evaluators.Contains] | 子字符串/元素检查 | 必需关键词、PII 检测 |
+| [`IsInstance`][pydantic_evals.evaluators.IsInstance] | 类型验证 | 格式验证 |
+| [`MaxDuration`][pydantic_evals.evaluators.MaxDuration] | 性能阈值 | SLA 合规 |
+| [`HasMatchingSpan`][pydantic_evals.evaluators.HasMatchingSpan] | 行为验证 | 工具调用、代码路径 |
 
-**Advantages:**
+**优点：**
 
-- Fast execution (microseconds to milliseconds)
-- Deterministic results
-- No cost
-- Easy to debug
+- 执行快（微秒到毫秒）
+- 结果确定
+- 无成本
+- 易调试
 
-**When to use:**
+**何时使用：**
 
-- Format validation (JSON structure, type checking)
-- Required content checks (must contain X, must not contain Y)
-- Performance requirements (latency, token counts)
-- Behavioral checks (which tools were called, which code paths executed)
+- 格式验证（JSON 结构、类型检查）
+- 必需内容检查（必须包含 X，必须不包含 Y）
+- 性能要求（延迟、token 数）
+- 行为检查（调用了哪些工具，执行了哪些代码路径）
 
-### LLM-as-a-Judge (Flexible & Nuanced)
+### LLM 作为裁判（灵活且细致） {#llm-as-a-judge-flexible-nuanced}
 
-Use [`LLMJudge`][pydantic_evals.evaluators.LLMJudge] when evaluation requires understanding or judgment:
+当评估需要理解或判断时，使用 [`LLMJudge`][pydantic_evals.evaluators.LLMJudge]：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -51,33 +51,33 @@ dataset = Dataset(
 )
 ```
 
-**Advantages:**
+**优点：**
 
-- Can evaluate subjective qualities (helpfulness, tone, creativity)
-- Understands natural language
-- Can follow complex rubrics
-- Flexible across domains
+- 可以评估主观质量（有帮助程度、语气、创造力）
+- 理解自然语言
+- 可以遵循复杂评分规则
+- 可跨领域灵活使用
 
-**Disadvantages:**
+**缺点：**
 
-- Slower (seconds per evaluation)
-- Costs money
-- Non-deterministic
-- Can have biases
+- 更慢（每次评估数秒）
+- 需要花费模型调用成本
+- 非确定性
+- 可能存在偏见
 
-**When to use:**
+**何时使用：**
 
-- Factual accuracy
-- Relevance and helpfulness
-- Tone and style
-- Completeness
-- Following instructions
-- RAG quality (groundedness, citation accuracy)
+- 事实准确性
+- 相关性和有帮助程度
+- 语气和风格
+- 完整性
+- 指令遵循
+- RAG 质量（groundedness、引用准确性）
 
-### Custom Evaluators
+### 自定义评估器 {#custom-evaluators}
 
-Custom evaluators can be useful if you want to make use of any evaluation logic we don't provide with the framework.
-They are frequently useful for domain-specific logic:
+如果你想使用框架未提供的评估逻辑，自定义评估器会很有用。
+它们经常用于 domain-specific 逻辑：
 
 ```python
 from dataclasses import dataclass
@@ -96,23 +96,23 @@ class ValidSQL(Evaluator):
             return False
 ```
 
-**When to use:**
+**何时使用：**
 
-- Domain-specific validation (SQL syntax, regex patterns, business rules)
-- External API calls (running generated code, checking databases)
-- Complex calculations (precision/recall, BLEU scores)
-- Integration checks (does API call succeed?)
+- Domain-specific 验证（SQL 语法、正则模式、业务规则）
+- 外部 API 调用（运行生成的代码、检查数据库）
+- 复杂计算（precision/recall、BLEU 分数）
+- 集成检查（API 调用是否成功？）
 
-## Evaluation Types
+## 评估类型 {#evaluation-types}
 
-!!! info "Detailed Return Types Guide"
-    For full detail about precisely what custom Evaluators may return, see [Custom Evaluator Return Types](custom.md#return-types).
+!!! info "详细返回类型指南"
+    关于自定义 Evaluators 可以返回什么内容的完整细节，请参阅[自定义评估器返回类型](custom.md#return-types)。
 
-Evaluators essentially return three types of results:
+Evaluators 基本返回三类结果：
 
-### 1. Assertions (bool)
+### 1. 断言（bool） {#1-assertions-bool}
 
-Pass/fail checks that appear as ✔ or ✗ in reports:
+通过/失败检查，在报告中显示为 ✔ 或 ✗：
 
 ```python
 from dataclasses import dataclass
@@ -128,11 +128,11 @@ class HasKeyword(Evaluator):
         return self.keyword in ctx.output
 ```
 
-**Use for:** Binary checks, quality gates, compliance requirements
+**用于：** 二元检查、质量门禁、合规要求
 
-### 2. Scores (int or float)
+### 2. 分数（int 或 float） {#2-scores-int-or-float}
 
-Numeric metrics:
+数值指标：
 
 ```python
 from dataclasses import dataclass
@@ -147,11 +147,11 @@ class ConfidenceScore(Evaluator):
         return 0.87  # 87% confidence
 ```
 
-**Use for:** Quality metrics, ranking, A/B testing, regression tracking
+**用于：** 质量指标、排序、A/B 测试、回归跟踪
 
-### 3. Labels (str)
+### 3. 标签（str） {#3-labels-str}
 
-Categorical classifications:
+分类结果：
 
 ```python
 from dataclasses import dataclass
@@ -169,11 +169,11 @@ class SentimentClassifier(Evaluator):
         return 'neutral'
 ```
 
-**Use for:** Classification, error categorization, quality buckets
+**用于：** 分类、错误归类、质量分桶
 
-### Multiple Results
+### 多个结果 {#multiple-results}
 
-You can return multiple evaluations from a single evaluator:
+你可以从单个评估器返回多个评估结果：
 
 ```python
 from dataclasses import dataclass
@@ -200,9 +200,9 @@ class ComprehensiveCheck(Evaluator):
         return 'good'
 ```
 
-## Combining Evaluators
+## 组合评估器 {#combining-evaluators}
 
-Mix and match evaluators to create comprehensive evaluation suites:
+混合搭配评估器来创建全面的评估套件：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -230,9 +230,9 @@ dataset = Dataset(
 )
 ```
 
-## Case-specific evaluators
+## Case-specific evaluators {#case-specific-evaluators}
 
-Case-specific evaluators are one of the most powerful features for building comprehensive evaluation suites. You can attach evaluators to individual [`Case`][pydantic_evals.dataset.Case] objects that only run for those specific cases:
+Case-specific evaluators 是构建全面评估套件时最强大的功能之一。你可以把评估器附加到单个 [`Case`][pydantic_evals.dataset.Case] 对象上，并且它们只会针对这些特定 cases 运行：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -271,19 +271,19 @@ dataset = Dataset(
 )
 ```
 
-### Why Case-Specific Evaluators Matter
+### 为什么 Case-Specific Evaluators 很重要 {#why-case-specific-evaluators-matter}
 
-Case-specific evaluators solve a fundamental problem with one-size-fits-all evaluation: **if you could write a single evaluator rubric that perfectly captured your requirements across all cases, you'd just incorporate that rubric into your agent's instructions**. (Note: this is less relevant in cases where you want to use a cheaper model in production and assess it using a more expensive model, but in many cases it makes sense to use the best model you can in production.)
+Case-specific evaluators 解决了 "一刀切" 评估的根本问题：**如果你能写出一个单一评估器评分规则，完美覆盖所有 cases 的需求，那你应该直接把这个规则合并进 agent 的 instructions**。（注意：当你希望生产中使用更便宜的模型，并用更贵的模型评估它时，这一点没那么适用；但在很多情况下，在生产中使用你能用到的最佳模型是合理的。）
 
-The power of case-specific evaluation comes from the nuance:
+Case-specific evaluation 的力量来自细微差别：
 
-- **Different cases have different requirements**: A customer support response needs empathy; a technical API response needs precision
-- **Avoid "inmates running the asylum"**: If your LLMJudge rubric is generic enough to work everywhere, your agent should already be following it
-- **Capture nuanced golden behavior**: Each case can specify exactly what "good" looks like for that scenario
+- **不同 cases 有不同需求**：客服回复需要共情；技术 API 回复需要精确
+- **避免 "inmates running the asylum"**：如果你的 LLMJudge 评分规则足够通用，能到处适用，那你的 agent 本来就应该遵守它
+- **捕获细致的 golden 行为**：每个 case 都可以准确指定该场景下的 "好" 是什么样
 
-### Building Golden Datasets with Case-Specific LLMJudge
+### 使用 Case-Specific LLMJudge 构建 Golden Datasets {#building-golden-datasets-with-case-specific-llmjudge}
 
-A particularly powerful pattern is using case-specific [`LLMJudge`][pydantic_evals.evaluators.LLMJudge] evaluators to quickly build comprehensive, maintainable evaluation suites. Instead of needing exact `expected_output` values, you can describe what you care about:
+一个特别强大的模式，是用 case-specific [`LLMJudge`][pydantic_evals.evaluators.LLMJudge] evaluators 快速构建全面、可维护的评估套件。你不需要精确的 `expected_output` 值，而是可以描述你关心什么：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -344,18 +344,18 @@ dataset = Dataset(
 )
 ```
 
-This approach lets you:
+这种方法让你可以：
 
-- **Build comprehensive test suites quickly**: Just describe what you want per case
-- **Maintain easily**: Update rubrics as requirements change, without regenerating outputs
-- **Cover edge cases naturally**: Add new cases with specific requirements as you discover them
-- **Capture domain knowledge**: Each rubric documents what "good" means for that scenario
+- **快速构建全面测试套件**：只需描述每个 case 想要什么
+- **易维护**：需求变化时更新 rubrics，而不需要重新生成输出
+- **自然覆盖边界情况**：发现新问题后添加带具体需求的新 cases
+- **捕获领域知识**：每个 rubric 都记录该场景下 "好" 的含义
 
-The LLM evaluator excels at understanding nuanced requirements and assessing compliance, making this a practical way to create thorough evaluation coverage without brittleness.
+LLM evaluator 擅长理解细微需求并评估合规性，因此这是一种实用方式，能创建彻底的评估覆盖，同时避免脆弱性。
 
-## Async vs Sync
+## Async vs Sync {#async-vs-sync}
 
-Evaluators can be sync or async:
+Evaluators 可以是同步或异步的：
 
 ```python
 from dataclasses import dataclass
@@ -380,30 +380,30 @@ class AsyncEvaluator(Evaluator):
         return result
 ```
 
-Pydantic Evals handles both automatically. Use async when:
-- Making API calls
-- Running database queries
-- Performing I/O operations
-- Calling LLMs (like [`LLMJudge`][pydantic_evals.evaluators.LLMJudge])
+Pydantic Evals 会自动处理两者。以下情况使用 async：
+- 发起 API 调用
+- 运行数据库查询
+- 执行 I/O 操作
+- 调用 LLM（例如 [`LLMJudge`][pydantic_evals.evaluators.LLMJudge]）
 
-## Evaluation Context
+## 评估上下文 {#evaluation-context}
 
-All evaluators receive an [`EvaluatorContext`][pydantic_evals.evaluators.EvaluatorContext]:
+所有 evaluators 都会收到一个 [`EvaluatorContext`][pydantic_evals.evaluators.EvaluatorContext]：
 
-- `ctx.inputs` - Task inputs
-- `ctx.output` - Task output (to evaluate)
-- `ctx.expected_output` - Expected output (if provided)
-- `ctx.metadata` - Case metadata (if provided)
-- `ctx.duration` - Task execution time (seconds)
-- `ctx.span_tree` - OpenTelemetry spans (if logfire configured)
-- `ctx.metrics` - Custom metrics dict
-- `ctx.attributes` - Custom attributes dict
+- `ctx.inputs` - Task 输入
+- `ctx.output` - Task 输出（要评估的内容）
+- `ctx.expected_output` - 预期输出（如果提供）
+- `ctx.metadata` - Case metadata（如果提供）
+- `ctx.duration` - Task 执行时间（秒）
+- `ctx.span_tree` - OpenTelemetry spans（如果配置了 logfire）
+- `ctx.metrics` - 自定义 metrics 字典
+- `ctx.attributes` - 自定义 attributes 字典
 
-This gives evaluators full context to make informed assessments.
+这为 evaluators 提供了完整上下文，以便做出有依据的评估。
 
-## Error Handling
+## 错误处理 {#error-handling}
 
-If an evaluator raises an exception, it's captured as an [`EvaluatorFailure`][pydantic_evals.evaluators.EvaluatorFailure]:
+如果 evaluator 抛出异常，该异常会被捕获为 [`EvaluatorFailure`][pydantic_evals.evaluators.EvaluatorFailure]：
 
 ```python
 from dataclasses import dataclass
@@ -426,25 +426,24 @@ class RiskyEvaluator(Evaluator):
         return result
 ```
 
-Failures appear in `report.cases[i].evaluator_failures` with:
+失败会出现在 `report.cases[i].evaluator_failures` 中，并包含：
 
-- Evaluator name
-- Error message
-- Full stacktrace
+- Evaluator 名称
+- 错误消息
+- 完整 stacktrace
 
-Use retry configuration to handle transient failures (see [Retry Strategies](../how-to/retry-strategies.md)).
+使用重试配置来处理瞬时失败（见[重试策略](../how-to/retry-strategies.md)）。
 
-## Report Evaluators (Experiment-Wide)
+## 报告评估器（实验范围） {#report-evaluators-experiment-wide}
 
-All the evaluators above run once per case. **Report evaluators** are different: they run once per
-experiment after all cases have been evaluated, and analyze the full set of results together.
+上面的所有评估器都会对每个 case 运行一次。**报告评估器**不同：它们会在所有 cases 都完成评估后，对每个 experiment 运行一次，并一起分析完整结果集。
 
-Use report evaluators for experiment-wide statistics like:
+使用报告评估器计算实验范围统计，例如：
 
-- **Confusion matrices** — visualize classification accuracy across classes
-- **Precision-recall curves** — assess ranking quality with AUC scores
-- **Scalar metrics** — overall accuracy, F1, BLEU, or any single number
-- **Summary tables** — per-class breakdowns, error category summaries
+- **混淆矩阵**：可视化各分类的分类准确率
+- **Precision-recall 曲线**：用 AUC 分数评估排序质量
+- **标量指标**：整体准确率、F1、BLEU 或任何单个数值
+- **摘要表**：按类别拆分、错误类别摘要
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -465,13 +464,13 @@ dataset = Dataset(
 )
 ```
 
-**See:** [Report Evaluators](report-evaluators.md) for the full guide, including built-in report evaluators and how to write custom ones.
+**另见：** [报告评估器](report-evaluators.md) 获取完整指南，包括内置报告评估器以及如何编写自定义报告评估器。
 
-## Next Steps
+## 下一步 {#next-steps}
 
-- **[Native Evaluators](built-in.md)** - Complete reference of all provided evaluators
-- **[LLM Judge](llm-judge.md)** - Deep dive on LLM-as-a-Judge evaluation
-- **[Third-Party Integrations](framework-integrations.md)** - Wrap Ragas, DeepEval, and other metrics libraries
-- **[Custom Evaluators](custom.md)** - Write your own evaluation logic
-- **[Report Evaluators](report-evaluators.md)** - Experiment-wide analyses
-- **[Span-Based Evaluation](span-based.md)** - Evaluate using OpenTelemetry spans
+- **[原生评估器](built-in.md)** - 所有已提供评估器的完整参考
+- **[LLM Judge](llm-judge.md)** - 深入了解 LLM 作为裁判的评估
+- **[第三方集成](framework-integrations.md)** - 包装 Ragas、DeepEval 和其他指标库
+- **[自定义评估器](custom.md)** - 编写你自己的评估逻辑
+- **[报告评估器](report-evaluators.md)** - 实验范围分析
+- **[基于 Span 的评估](span-based.md)** - 使用 OpenTelemetry spans 进行评估

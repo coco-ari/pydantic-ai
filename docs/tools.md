@@ -1,32 +1,32 @@
-# Function Tools
+# 函数工具 {#function-tools}
 
-Function tools provide a mechanism for models to perform actions and retrieve extra information to help them generate a response.
+Function tools 为模型提供一种机制，让它们可以执行动作并检索额外信息，以帮助生成响应。
 
-They're useful when you want to enable the model to take some action and use the result, when it is impractical or impossible to put all the context an agent might need into the instructions, or when you want to make agents' behavior more deterministic or reliable by deferring some of the logic required to generate a response to another (not necessarily AI-powered) tool.
+当你想让模型执行某个动作并使用结果时，当把 agent 可能需要的所有上下文都放进 instructions 不现实或不可能时，或者当你希望通过把生成响应所需的部分逻辑委托给另一个（不一定由 AI 驱动的）工具来让 agents 的行为更确定或更可靠时，tools 很有用。
 
-If you want a model to be able to call a function as its final action, without the result being sent back to the model, you can use an [output function](output.md#output-functions) instead.
+如果你希望模型可以把函数调用作为最终动作，而不把结果发回模型，可以改用[输出函数](output.md#output-functions)。
 
-There are a number of ways to register tools with an agent:
+有多种方式可以向 agent 注册 tools：
 
-- via the [`@agent.tool`][pydantic_ai.agent.Agent.tool] decorator — for tools that need access to the agent [context][pydantic_ai.tools.RunContext]
-- via the [`@agent.tool_plain`][pydantic_ai.agent.Agent.tool_plain] decorator — for tools that do not need access to the agent [context][pydantic_ai.tools.RunContext]
-- via the [`tools`][pydantic_ai.agent.Agent.__init__] keyword argument to `Agent` which can take either plain functions, or instances of [`Tool`][pydantic_ai.tools.Tool]
+- 通过 [`@agent.tool`][pydantic_ai.agent.Agent.tool] 装饰器：适用于需要访问 agent [context][pydantic_ai.tools.RunContext] 的 tools
+- 通过 [`@agent.tool_plain`][pydantic_ai.agent.Agent.tool_plain] 装饰器：适用于不需要访问 agent [context][pydantic_ai.tools.RunContext] 的 tools
+- 通过 `Agent` 的 [`tools`][pydantic_ai.agent.Agent.__init__] 关键字参数：可以接收普通函数，也可以接收 [`Tool`][pydantic_ai.tools.Tool] 实例
 
-For more advanced use cases, the [toolsets](toolsets.md) feature lets you manage collections of tools (built by you or provided by an [MCP server](mcp/client.md) or other [third party](third-party-tools.md#third-party-tools)) and register them with an agent in one go via the [`toolsets`][pydantic_ai.agent.Agent.__init__] keyword argument to `Agent`. Internally, all `tools` and `toolsets` are gathered into a single [combined toolset](toolsets.md#combining-toolsets) that's made available to the model.
+对于更高级的用例，[toolsets](toolsets.md) 功能允许你管理一组 tools（由你构建，或由 [MCP server](mcp/client.md) 或其他[第三方](third-party-tools.md#third-party-tools)提供），并通过 `Agent` 的 [`toolsets`][pydantic_ai.agent.Agent.__init__] 关键字参数一次性注册到 agent。内部会把所有 `tools` 和 `toolsets` 收集到一个[组合 toolset](toolsets.md#combining-toolsets) 中，提供给模型使用。
 
 !!! info "Function tools vs. RAG"
-    Function tools are basically the "R" of RAG (Retrieval-Augmented Generation) — they augment what the model can do by letting it request extra information.
+    Function tools 基本上是 RAG（Retrieval-Augmented Generation）中的 "R"：它们通过让模型请求额外信息，扩展模型能做的事情。
 
-    The main semantic difference between Pydantic AI Tools and RAG is RAG is synonymous with vector search, while Pydantic AI tools are more general-purpose. For vector search, you can use our [embeddings](embeddings.md) support to generate embeddings across multiple providers.
+    Pydantic AI Tools 和 RAG 的主要语义区别在于，RAG 通常等同于向量搜索，而 Pydantic AI tools 更通用。对于向量搜索，你可以使用我们的 [embeddings](embeddings.md) 支持，跨多个 providers 生成 embeddings。
 
 !!! info "Function Tools vs. Structured Outputs"
-    As the name suggests, function tools use the model's "tools" or "functions" API to let the model know what is available to call. Tools or functions are also used to define the schema(s) for [structured output](output.md) when using the default [tool output mode](output.md#tool-output), thus a model might have access to many tools, some of which call function tools while others end the run and produce a final output.
+    顾名思义，function tools 使用模型的 "tools" 或 "functions" API 告诉模型有哪些内容可以调用。使用默认[工具输出模式](output.md#tool-output)时，tools 或 functions 也用于定义[结构化输出](output.md)的 schema。因此，模型可能可以访问许多 tools，其中一些调用 function tools，另一些则结束运行并生成最终输出。
 
-## Registering via Decorator {#registering-function-tools-via-decorator}
+## 通过装饰器注册 {#registering-function-tools-via-decorator}
 
-`@agent.tool` is considered the default decorator since in the majority of cases tools will need access to the agent [context][pydantic_ai.tools.RunContext].
+`@agent.tool` 被视为默认装饰器，因为大多数情况下 tools 都需要访问 agent [context][pydantic_ai.tools.RunContext]。
 
-Here's an example using both:
+下面是一个同时使用两种装饰器的示例：
 
 ```python {title="dice_game.py"}
 import random
@@ -61,15 +61,15 @@ print(dice_result.output)
 #> Congratulations Anne, you guessed correctly! You're a winner!
 ```
 
-1. This is a pretty simple task, so we can use the fast and cheap Gemini flash model.
-2. We pass the user's name as the dependency, to keep things simple we use just the name as a string as the dependency.
-3. This tool doesn't need any context, it just returns a random number. You could probably use dynamic instructions in this case.
-4. This tool needs the player's name, so it uses `RunContext` to access dependencies which are just the player's name in this case.
-5. Run the agent, passing the player's name as the dependency.
+1. 这是个相当简单的任务，因此可以使用快速且便宜的 Gemini flash 模型。
+2. 我们把用户姓名作为依赖传入；为了简单起见，这里只用字符串形式的姓名作为依赖。
+3. 这个 tool 不需要任何 context，只返回一个随机数。在这个场景中也可能使用 dynamic instructions。
+4. 这个 tool 需要玩家姓名，因此使用 `RunContext` 访问依赖；这里依赖就是玩家姓名。
+5. 运行 agent，并把玩家姓名作为依赖传入。
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以直接运行）_
 
-Let's print the messages from that game to see what happened:
+我们打印这局游戏的消息，看看发生了什么：
 
 ```python {title="dice_game_messages.py" requires="dice_game.py"}
 from dice_game import dice_result
@@ -157,7 +157,7 @@ print(dice_result.all_messages())
 """
 ```
 
-We can represent this with a diagram:
+可以用图表示这个过程：
 
 ```mermaid
 sequenceDiagram
@@ -193,9 +193,9 @@ sequenceDiagram
     Note over Agent: Game session complete
 ```
 
-## Registering via Agent Argument {#registering-function-tools-via-agent-argument}
+## 通过 Agent 参数注册 {#registering-function-tools-via-agent-argument}
 
-As well as using the decorators, we can register tools via the `tools` argument to the [`Agent` constructor][pydantic_ai.agent.Agent.__init__]. This is useful when you want to reuse tools, and can also give more fine-grained control over the tools.
+除了使用装饰器，也可以通过 [`Agent` 构造函数][pydantic_ai.agent.Agent.__init__]的 `tools` 参数注册 tools。当你想复用 tools，或者想更细粒度控制 tools 时，这很有用。
 
 ```python {title="dice_game_tool_kwarg.py"}
 import random
@@ -244,24 +244,24 @@ print(dice_result['b'].output)
 #> Congratulations Anne, you guessed correctly! You're a winner!
 ```
 
-1. The simplest way to register tools via the `Agent` constructor is to pass a list of functions, the function signature is inspected to determine if the tool takes [`RunContext`][pydantic_ai.tools.RunContext].
-2. `agent_a` and `agent_b` are identical — but we can use [`Tool`][pydantic_ai.tools.Tool] to reuse tool definitions and give more fine-grained control over how tools are defined, e.g. setting their name or description, or using a custom [`prepare`](tools-advanced.md#tool-prepare) method.
+1. 通过 `Agent` 构造函数注册 tools 的最简单方式是传入函数列表；函数签名会被检查，以判断该 tool 是否接收 [`RunContext`][pydantic_ai.tools.RunContext]。
+2. `agent_a` 和 `agent_b` 是等价的，但我们可以使用 [`Tool`][pydantic_ai.tools.Tool] 来复用 tool 定义，并更细粒度控制 tools 的定义方式，例如设置名称或描述，或使用自定义 [`prepare`](tools-advanced.md#tool-prepare) 方法。
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以直接运行）_
 
-## Tool Output {#function-tool-output}
+## 工具输出 {#function-tool-output}
 
-Tools can return anything that Pydantic can serialize to JSON. For advanced output options including multi-modal content and metadata, see [Advanced Tool Features](tools-advanced.md#function-tool-output).
+Tools 可以返回任何 Pydantic 能序列化为 JSON 的内容。关于包括多模态内容和 metadata 在内的高级输出选项，请参阅[高级工具功能](tools-advanced.md#function-tool-output)。
 
-## Tool Schema {#function-tools-and-schema}
+## 工具 Schema {#function-tools-and-schema}
 
-Function parameters are extracted from the function signature, and all parameters except `RunContext` are used to build the schema for that tool call.
+函数参数会从函数签名中提取，除 `RunContext` 之外的所有参数都会用于构建该 tool call 的 schema。
 
-Even better, Pydantic AI extracts the docstring from functions and (thanks to [griffe](https://mkdocstrings.github.io/griffe/)) extracts parameter descriptions from the docstring and adds them to the schema.
+更进一步，Pydantic AI 会从函数提取 docstring，并且（借助 [griffe](https://mkdocstrings.github.io/griffe/)）从 docstring 中提取参数描述并添加到 schema。
 
-[Griffe supports](https://mkdocstrings.github.io/griffe/reference/docstrings/#docstrings) extracting parameter descriptions from `google`, `numpy`, and `sphinx` style docstrings. Pydantic AI will infer the format to use based on the docstring, but you can explicitly set it using [`docstring_format`][pydantic_ai.tools.DocstringFormat]. You can also enforce parameter requirements by setting `require_parameter_descriptions=True`. This will raise a [`UserError`][pydantic_ai.exceptions.UserError] if a parameter description is missing.
+[Griffe 支持](https://mkdocstrings.github.io/griffe/reference/docstrings/#docstrings)从 `google`、`numpy` 和 `sphinx` 风格 docstrings 中提取参数描述。Pydantic AI 会根据 docstring 推断要使用的格式，但你也可以通过 [`docstring_format`][pydantic_ai.tools.DocstringFormat] 显式设置。也可以通过设置 `require_parameter_descriptions=True` 强制要求参数描述。如果缺少参数描述，会抛出 [`UserError`][pydantic_ai.exceptions.UserError]。
 
-To demonstrate a tool's schema, here we use [`FunctionModel`][pydantic_ai.models.function.FunctionModel] to print the schema a model would receive:
+为了演示 tool 的 schema，这里使用 [`FunctionModel`][pydantic_ai.models.function.FunctionModel] 打印模型会收到的 schema：
 
 ```python {title="tool_schema.py"}
 from pydantic_ai import Agent, ModelMessage, ModelResponse, TextPart
@@ -309,11 +309,11 @@ def print_schema(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse
 agent.run_sync('hello', model=FunctionModel(print_schema))
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以直接运行）_
 
-If a tool has a single parameter that can be represented as an object in JSON schema (e.g. dataclass, TypedDict, pydantic model), the schema for the tool is simplified to be just that object.
+如果 tool 只有一个参数，并且该参数可以在 JSON schema 中表示为对象（例如 dataclass、TypedDict、pydantic model），则该 tool 的 schema 会简化为该对象本身。
 
-Here's an example where we use [`TestModel.last_model_request_parameters`][pydantic_ai.models.test.TestModel.last_model_request_parameters] to inspect the tool schema that would be passed to the model.
+下面的示例使用 [`TestModel.last_model_request_parameters`][pydantic_ai.models.test.TestModel.last_model_request_parameters] 检查会传给模型的 tool schema。
 
 ```python {title="single_parameter_tool.py"}
 from pydantic import BaseModel
@@ -362,34 +362,30 @@ print(test_model.last_model_request_parameters.function_tools)
 """
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以直接运行）_
 
 
-!!! tip "Debugging Tool Calls"
-    Understanding tool behavior is crucial for agent development. By instrumenting your agent with [Logfire](logfire.md), you can see:
+!!! tip "调试工具调用"
+    理解 tool 行为对 agent 开发很关键。通过用 [Logfire](logfire.md) 对 agent 做 instrumentation，你可以看到：
 
-    - What arguments were passed to each tool
-    - What each tool returned
-    - How long each tool took to execute
-    - Any errors that occurred
+    - 传给每个 tool 的参数
+    - 每个 tool 返回了什么
+    - 每个 tool 执行耗时
+    - 发生的任何错误
 
-    This visibility helps you understand why an agent made specific decisions and identify issues in tool implementations.
+    这种可见性有助于理解 agent 为什么做出特定决策，并识别 tool 实现中的问题。
 
-## Injecting Follow-up Messages from a Tool
+## 从工具注入后续消息 {#injecting-follow-up-messages-from-a-tool}
 
-A tool can push extra messages into the conversation via
-[`RunContext.enqueue`][pydantic_ai.tools.RunContext.enqueue] — useful when a tool wants
-to add follow-up context, redirect the agent's plan, or surface an event the model
-should react to. See [Injecting messages mid-run](message-history.md#injecting-messages-mid-run)
-for the full pattern.
+工具可以通过 [`RunContext.enqueue`][pydantic_ai.tools.RunContext.enqueue] 向对话中推入额外消息；当工具想添加后续上下文、重定向 agent 的计划，或暴露一个模型应当响应的事件时，这很有用。完整模式见[运行中注入消息](message-history.md#injecting-messages-mid-run)。
 
-## See Also
+## 另见 {#see-also}
 
-For more tool features and integrations, see:
+更多工具功能和集成见：
 
-- [Advanced Tool Features](tools-advanced.md) - Custom schemas, dynamic tools, tool execution and retries
-- [Toolsets](toolsets.md) - Managing collections of tools
-- [Native Tools](native-tools.md) - Native tools provided by LLM providers
-- [Common Tools](common-tools.md) - Ready-to-use tool implementations
-- [Third-Party Tools](third-party-tools.md) - Integrations with MCP, LangChain, ACI.dev and other tool libraries
-- [Deferred Tools](deferred-tools.md) - Tools requiring approval or external execution
+- [高级工具功能](tools-advanced.md) - 自定义 schemas、动态 tools、tool 执行和重试
+- [Toolsets](toolsets.md) - 管理工具集合
+- [Native Tools](native-tools.md) - LLM providers 提供的原生 tools
+- [常用工具](common-tools.md) - 开箱即用的 tool 实现
+- [第三方工具](third-party-tools.md) - 与 MCP、LangChain、ACI.dev 和其他 tool libraries 的集成
+- [Deferred Tools](deferred-tools.md) - 需要审批或外部执行的 tools

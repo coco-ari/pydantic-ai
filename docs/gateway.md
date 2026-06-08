@@ -5,30 +5,30 @@ status: new
 
 # Pydantic AI Gateway
 
-**[Pydantic AI Gateway](https://logfire.pydantic.dev/)** is a unified interface for accessing multiple AI providers with a single key, managed through [Pydantic Logfire](https://logfire.pydantic.dev/). Features include built-in OpenTelemetry observability, real-time cost monitoring, failover management, and native integration with the other tools in the [Pydantic stack](https://pydantic.dev/).
+**[Pydantic AI Gateway](https://logfire.pydantic.dev/)** 是一个统一接口，可用单个 key 访问多个 AI providers，并通过 [Pydantic Logfire](https://logfire.pydantic.dev/) 管理。功能包括内置 OpenTelemetry 可观测性、实时成本监控、failover 管理，以及与 [Pydantic stack](https://pydantic.dev/) 中其他工具的原生集成。
 
-!!! warning "Migrated to Pydantic Logfire"
-    The AI Gateway has moved from `gateway.pydantic.dev` to [Pydantic Logfire](https://logfire.pydantic.dev/). If you were using the standalone gateway, see [Pydantic AI Gateway is Moving to Pydantic Logfire](https://logfire.pydantic.dev/docs/gateway-migration/).
+!!! warning "已迁移到 Pydantic Logfire"
+    AI Gateway 已从 `gateway.pydantic.dev` 迁移到 [Pydantic Logfire](https://logfire.pydantic.dev/)。如果你之前使用独立 gateway，请参阅 [Pydantic AI Gateway is Moving to Pydantic Logfire](https://logfire.pydantic.dev/docs/gateway-migration/)。
 
-Sign up at [logfire.pydantic.dev](https://logfire.pydantic.dev/).
+在 [logfire.pydantic.dev](https://logfire.pydantic.dev/) 注册。
 
-!!! question "Questions?"
-    For questions and feedback, contact us on [Slack](https://logfire.pydantic.dev/docs/join-slack/).
+!!! question "有问题？"
+    如有问题和反馈，请在 [Slack](https://logfire.pydantic.dev/docs/join-slack/) 联系我们。
 
-## Documentation Integration
+## 文档集成 {#documentation-integration}
 
-To help you get started with Pydantic AI Gateway, some code examples on the Pydantic AI documentation include a "Via Pydantic AI Gateway" tab, alongside a "Direct to Provider API" tab with the standard Pydantic AI model string. The main difference between them is that when using Gateway, model strings use the `gateway/` prefix.
+为了帮助你开始使用 Pydantic AI Gateway，Pydantic AI 文档中的一些代码示例包含 "Via Pydantic AI Gateway" 选项卡，并列提供 "Direct to Provider API" 选项卡，后者使用标准 Pydantic AI 模型字符串。两者的主要区别是：使用 Gateway 时，模型字符串使用 `gateway/` 前缀。
 
-## Key features
+## 主要功能 {#key-features}
 
-- **API key management**: Access multiple LLM providers with a single Gateway key.
-- **Cost Limits**: Set spending limits at project, user, and API key levels with daily, weekly, and monthly caps.
-- **BYOK and managed providers:** Bring your own API keys (BYOK) from LLM providers, or pay for inference directly through the platform.
-- **Multi-provider support:** Access models from OpenAI, Anthropic, Google Vertex, Groq, and AWS Bedrock. _More providers coming soon_.
-- **Routing groups:** Configure [routing groups](#routing-groups) to fail over between providers serving the same model, or load-balance traffic across them by weight.
-- **Backend observability:** Log every request through [Pydantic Logfire](https://pydantic.dev/logfire) or any OpenTelemetry backend (_coming soon_).
-- **Zero translation**: Unlike traditional AI gateways that translate everything to one common schema, **Pydantic AI Gateway** allows requests to flow through directly in each provider's native format. This gives you immediate access to new model features as soon as they are released.
-- **Enterprise ready**: Inherits Logfire's enterprise features — including SSO, custom roles and permissions.
+- **API key 管理**：使用单个 Gateway key 访问多个 LLM providers。
+- **成本限制**：在项目、用户和 API key 层级设置支出限制，并支持每日、每周和每月上限。
+- **BYOK 和托管 providers**：带上你自己的 LLM provider API keys（BYOK），或直接通过平台为推理付费。
+- **多 provider 支持**：访问 OpenAI、Anthropic、Google Vertex、Groq 和 AWS Bedrock 的模型。_更多 providers 即将推出_。
+- **路由组**：配置[路由组](#routing-groups)，在服务同一模型的 providers 之间 fail over，或按权重进行流量负载均衡。
+- **后端可观测性**：通过 [Pydantic Logfire](https://pydantic.dev/logfire) 或任何 OpenTelemetry 后端记录每个请求（_即将推出_）。
+- **零转换**：不同于把所有内容都转换为一个通用 schema 的传统 AI gateways，**Pydantic AI Gateway** 允许请求直接以每个 provider 的原生格式流转。这让你能在新模型功能发布后立即使用。
+- **企业就绪**：继承 Logfire 的企业功能，包括 SSO、自定义角色和权限。
 
 ```python {title="hello_world.py"}
 from pydantic_ai import Agent
@@ -42,40 +42,40 @@ The first known use of "hello, world" was in a 1974 textbook about the C program
 """
 ```
 
-## Quick Start
+## 快速开始 {#quick-start}
 
-This section contains instructions on how to set up your account and run your app with Pydantic AI Gateway credentials.
+本节包含如何设置账号并使用 Pydantic AI Gateway 凭据运行应用的说明。
 
-### Create an account
+### 创建账号 {#create-an-account}
 
-1. Sign up at [logfire.pydantic.dev](https://logfire.pydantic.dev/)
-2. Choose a region and create an account.
-3. Activate the gateway in your organizations settings.
+1. 在 [logfire.pydantic.dev](https://logfire.pydantic.dev/) 注册
+2. 选择区域并创建账号。
+3. 在你的 organization settings 中激活 gateway。
 
-### Create Gateway API keys
+### 创建 Gateway API keys {#create-gateway-api-keys}
 
-Go to your organization's Gateway settings in Logfire and create an API key.
+进入 Logfire 中 organization 的 Gateway settings 并创建 API key。
 
-## Usage
+## 使用方式 {#usage}
 
-After setting up your account with the instructions above, you will be able to make an AI model request with the Pydantic AI Gateway.
-The code snippets below show how you can use Pydantic AI Gateway with different frameworks and SDKs.
+按照上面的说明设置账号后，你就可以通过 Pydantic AI Gateway 发起 AI 模型请求。
+下面的代码片段展示了如何在不同框架和 SDK 中使用 Pydantic AI Gateway。
 
-To use different models, change the model string `gateway/<api_format>:<model_name>` to other models offered by the supported providers.
+要使用不同模型，请把模型字符串 `gateway/<api_format>:<model_name>` 改为受支持 providers 提供的其他模型。
 
-Examples of providers and models that can be used are:
+可用 providers 和模型示例：
 
-| **Provider** | **API Format**  | **Example Model**                        |
+| **Provider** | **API Format**  | **示例模型**                        |
 | --- |-----------------|------------------------------------------|
 | OpenAI | `openai`        | `gateway/openai:gpt-5.2`                 |
 | Anthropic | `anthropic`     | `gateway/anthropic:claude-sonnet-4-6`    |
-| Google Cloud (formerly Vertex AI) | `google-cloud` | `gateway/google-cloud:gemini-3-flash-preview` |
+| Google Cloud（之前称为 Vertex AI） | `google-cloud` | `gateway/google-cloud:gemini-3-flash-preview` |
 | Groq | `groq`          | `gateway/groq:openai/gpt-oss-120b`       |
 | AWS Bedrock | `bedrock`       | `gateway/bedrock:amazon.nova-micro-v1:0` |
 
 ### Pydantic AI
 
-Before you start, make sure you are on version 1.16 or later of `pydantic-ai`. To update to the latest version run:
+开始前，请确保你使用的是 `pydantic-ai` 1.16 或更高版本。要更新到最新版本，请运行：
 
 === "uv"
 
@@ -89,13 +89,13 @@ Before you start, make sure you are on version 1.16 or later of `pydantic-ai`. T
     pip install -U pydantic-ai
     ```
 
-Set the `PYDANTIC_AI_GATEWAY_API_KEY` environment variable to your Gateway API key:
+把 `PYDANTIC_AI_GATEWAY_API_KEY` 环境变量设置为你的 Gateway API key：
 
 ```bash
 export PYDANTIC_AI_GATEWAY_API_KEY="pylf_v..."
 ```
 
-You can access multiple models with the same API key, as shown in the code snippet below.
+你可以用同一个 API key 访问多个模型，如下面的代码片段所示。
 
 ```python {title="hello_world.py"}
 from pydantic_ai import Agent
@@ -109,9 +109,9 @@ The first known use of "hello, world" was in a 1974 textbook about the C program
 """
 ```
 
-#### Passing API Key directly
+#### 直接传入 API Key {#passing-api-key-directly}
 
-Pass your API key directly using the [`gateway_provider`][pydantic_ai.providers.gateway.gateway_provider]:
+使用 [`gateway_provider`][pydantic_ai.providers.gateway.gateway_provider] 直接传入 API key：
 
 ```python {title="passing_api_key.py"}
 from pydantic_ai import Agent
@@ -129,9 +129,9 @@ The first known use of "hello, world" was in a 1974 textbook about the C program
 """
 ```
 
-#### Using a different upstream provider
+#### 使用不同上游 provider {#using-a-different-upstream-provider}
 
-To use an alternate provider or routing group, you can specify it in the route parameter:
+要使用替代 provider 或路由组，可以在 route 参数中指定：
 
 ```python {title="routing_via_provider.py"}
 from pydantic_ai import Agent
@@ -155,9 +155,9 @@ The first known use of "hello, world" was in a 1974 textbook about the C program
 
 ### Claude Code
 
-Before you start, log out of Claude Code using `/logout`.
+开始前，请用 `/logout` 退出 Claude Code。
 
-Set your gateway credentials as environment variables, using the base URL that matches your Logfire region:
+使用与你的 Logfire 区域匹配的 base URL，把 gateway 凭据设置为环境变量：
 
 === "US"
 
@@ -173,21 +173,21 @@ Set your gateway credentials as environment variables, using the base URL that m
     export ANTHROPIC_AUTH_TOKEN="YOUR_GATEWAY_API_KEY"
     ```
 
-Replace `YOUR_GATEWAY_API_KEY` with the API key from your Logfire organization's Gateway settings.
+将 `YOUR_GATEWAY_API_KEY` 替换为你在 Logfire organization 的 Gateway settings 中获取的 API key。
 
-Launch Claude Code by typing `claude`. All requests will now route through the Pydantic AI Gateway.
+输入 `claude` 启动 Claude Code。之后所有请求都会通过 Pydantic AI Gateway 路由。
 
 ### Codex
 
-Codex uses the OpenAI Responses API, so it should use the Gateway's `openai-responses` route.
+Codex 使用 OpenAI Responses API，因此应使用 Gateway 的 `openai-responses` route。
 
-Set your gateway API key as an environment variable:
+把 gateway API key 设置为环境变量：
 
 ```bash
 export PYDANTIC_AI_GATEWAY_API_KEY="YOUR_GATEWAY_API_KEY"
 ```
 
-Then add the following configuration to `~/.codex/config.toml`, using the base URL that matches your Logfire region:
+然后使用与你的 Logfire 区域匹配的 base URL，把下面的配置添加到 `~/.codex/config.toml`：
 
 === "US"
 
@@ -217,17 +217,17 @@ Then add the following configuration to `~/.codex/config.toml`, using the base U
     wire_api = "responses"
     ```
 
-For more details on configuring custom providers in Codex, see the [Codex custom model providers docs](https://developers.openai.com/codex/config-advanced#custom-model-providers) and the [Codex configuration reference](https://developers.openai.com/codex/config-reference/).
+关于在 Codex 中配置自定义 providers 的更多细节，请参阅 [Codex custom model providers docs](https://developers.openai.com/codex/config-advanced#custom-model-providers) 和 [Codex configuration reference](https://developers.openai.com/codex/config-reference/)。
 
-If you already have a `~/.codex/config.toml`, add the `[model_providers.pydantic_gateway]` block and update `model_provider` instead of replacing the whole file. Replace `gpt-5.4` with whichever OpenAI Responses model you want Codex to use.
+如果你已经有 `~/.codex/config.toml`，请添加 `[model_providers.pydantic_gateway]` block 并更新 `model_provider`，而不是替换整个文件。把 `gpt-5.4` 替换为你希望 Codex 使用的任意 OpenAI Responses 模型。
 
-Launch Codex by typing `codex`. All requests will now route through the Pydantic AI Gateway.
+输入 `codex` 启动 Codex。之后所有请求都会通过 Pydantic AI Gateway 路由。
 
 ### SDKs
 
 #### OpenAI SDK
 
-Use the base URL that matches your Logfire region (`gateway-us` or `gateway-eu`).
+使用与你的 Logfire 区域匹配的 base URL（`gateway-us` 或 `gateway-eu`）。
 
 === "US"
 
@@ -267,7 +267,7 @@ Use the base URL that matches your Logfire region (`gateway-us` or `gateway-eu`)
 
 #### Anthropic SDK
 
-Use the base URL that matches your Logfire region (`gateway-us` or `gateway-eu`).
+使用与你的 Logfire 区域匹配的 base URL（`gateway-us` 或 `gateway-eu`）。
 
 === "US"
 
@@ -309,7 +309,7 @@ Use the base URL that matches your Logfire region (`gateway-us` or `gateway-eu`)
 
 #### Vercel AI SDK
 
-The [Vercel AI SDK](https://ai-sdk.dev/) can route through the Gateway by pointing each provider's `baseURL` at the matching proxy path (e.g. `/proxy/openai` or `/proxy/anthropic`). Use the base URL that matches your Logfire region (`gateway-us` or `gateway-eu`).
+[Vercel AI SDK](https://ai-sdk.dev/) 可以通过把每个 provider 的 `baseURL` 指向匹配的 proxy path（例如 `/proxy/openai` 或 `/proxy/anthropic`）来经由 Gateway 路由。请使用与你的 Logfire 区域匹配的 base URL（`gateway-us` 或 `gateway-eu`）。
 
 === "US"
 
@@ -367,29 +367,29 @@ The [Vercel AI SDK](https://ai-sdk.dev/) can route through the Gateway by pointi
     });
     ```
 
-## Routing groups
+## 路由组 {#routing-groups}
 
-A **routing group** is a named collection of providers that all serve the same model. Each member has a **priority**, a **weight**, and an **active** flag, and those three values together let a single group express two different routing strategies:
+**路由组**是一组具名 providers，它们都服务同一个模型。每个成员都有一个**优先级**、一个**权重**和一个 **active** 标志，这三个值组合起来，让单个组可以表达两种不同的路由策略：
 
-- **Failover / fallback**: Assign members different priorities. The Gateway always tries the highest-priority active member first, and only falls through to a lower-priority member when the higher one is unavailable (for example if it is down, rate-limited, or returns an error).
-- **Load balancing**: Assign two or more members the same priority and give each a weight. The Gateway splits traffic across those members in proportion to their weights.
+- **Failover / fallback**：为成员分配不同优先级。Gateway 总是先尝试优先级最高的 active 成员，只有当更高优先级成员不可用时（例如宕机、被限流或返回错误），才会落到低优先级成员。
+- **负载均衡**：为两个或更多成员分配相同优先级，并给每个成员一个权重。Gateway 会按照权重比例把流量分配给这些成员。
 
-The two strategies compose: you can have, for example, a top priority tier with two providers load-balanced 70/30, and a second priority tier that only receives traffic when both top-tier providers fail.
+两种策略可以组合：例如，你可以有一个最高优先级层，其中两个 providers 以 70/30 负载均衡；再有一个第二优先级层，只有当顶层两个 providers 都失败时才接收流量。
 
-### Creating a routing group
+### 创建路由组 {#creating-a-routing-group}
 
-Routing groups are managed from your organization's Gateway settings in Logfire:
+路由组从 Logfire 中 organization 的 Gateway settings 管理：
 
-1. Open **Gateway -> Routing Groups** and click **Add Routing Group**.
-2. Give the group a slug (e.g. `anthropic-routing`) and an optional description.
-3. Open the group's **Members** page and add one or more providers. For each member set:
-    - **Priority** - higher values are tried first. Use different priorities across members for failover.
-    - **Weight** - load-balancing weight used between members that share the same priority.
-    - **Active** - inactive members are skipped during routing.
+1. 打开 **Gateway -> Routing Groups**，点击 **Add Routing Group**。
+2. 为该组指定一个 slug（例如 `anthropic-routing`）和可选描述。
+3. 打开该组的 **Members** 页面，并添加一个或多个 providers。为每个成员设置：
+    - **Priority**：值越高越优先尝试。为成员设置不同优先级可实现 failover。
+    - **Weight**：同优先级成员之间使用的负载均衡权重。
+    - **Active**：inactive 成员会在路由时跳过。
 
-### Using a routing group
+### 使用路由组 {#using-a-routing-group}
 
-Point the Gateway provider at the group via the `route` parameter (the group's slug):
+通过 `route` 参数（路由组 slug）把 Gateway provider 指向该组：
 
 ```python {title="routing_group.py"}
 from pydantic_ai import Agent
@@ -411,19 +411,19 @@ The first known use of "hello, world" was in a 1974 textbook about the C program
 """
 ```
 
-1. The slug of the routing group you created in Logfire.
+1. 你在 Logfire 中创建的路由组 slug。
 
-## Troubleshooting
+## 故障排查 {#troubleshooting}
 
-### Unable to calculate spend
+### 无法计算支出 {#unable-to-calculate-spend}
 
-The gateway needs to know the cost of a request in order to provide spend insights and enforce spending limits.
+Gateway 需要知道请求成本，才能提供支出洞察并强制执行支出限制。
 
-Each provider has a **Require pricing data** toggle in its settings. When enabled (the default), the gateway rejects requests for models it has no pricing data for before forwarding them upstream. When disabled, those requests are allowed through, but their cost will not be tracked and they will not count toward spending limits.
+每个 provider 的设置中都有一个 **Require pricing data** 开关。启用时（默认），gateway 会在把请求转发到上游之前，拒绝它没有价格数据的模型请求。禁用时，这些请求会被允许通过，但其成本不会被跟踪，也不会计入支出限制。
 
-The rejection response depends on the provider type:
+拒绝响应取决于 provider 类型：
 
-- **Built-in providers** (Pydantic-managed): `404` with a message asking you to let us know on Slack so we can add the model.
-- **Custom providers** (your own API keys): `400` indicating that pricing data is required, with a hint to disable the toggle if you want the request through anyway.
+- **内置 providers**（Pydantic 管理）：`404`，并带有一条消息，请你在 Slack 上告知我们，以便添加该模型。
+- **自定义 providers**（你自己的 API keys）：`400`，表示需要价格数据，并提示如果你仍然想让请求通过，可以禁用该开关。
 
-We are actively working on supporting more providers and models. If there's a specific provider or model you'd like to see supported, please let us know on [Slack](https://logfire.pydantic.dev/docs/join-slack/) or [open an issue on `genai-prices`](https://github.com/pydantic/genai-prices/issues/new).
+我们正在积极支持更多 providers 和模型。如果你希望看到某个特定 provider 或模型受到支持，请在 [Slack](https://logfire.pydantic.dev/docs/join-slack/) 告诉我们，或在 [`genai-prices` 上提交 issue](https://github.com/pydantic/genai-prices/issues/new)。
