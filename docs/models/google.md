@@ -1,40 +1,40 @@
 # Google
 
-The `GoogleModel` is a model that uses the [`google-genai`](https://pypi.org/project/google-genai/) package under the hood to
-access Google's Gemini models via both the Gemini API and Google Cloud (formerly known as Vertex AI).
+`GoogleModel` 是一个底层使用 [`google-genai`](https://pypi.org/project/google-genai/) 包的模型，
+可通过 Gemini API 和 Google Cloud（以前称为 Vertex AI）访问 Google 的 Gemini 模型。
 
-Two providers wrap those endpoints:
+两个 provider 会包装这些端点：
 
-- [`GoogleProvider`][pydantic_ai.providers.google.GoogleProvider] — the Gemini API (Google AI Studio), surfaced under the `'google:'` prefix.
-- [`GoogleCloudProvider`][pydantic_ai.providers.google_cloud.GoogleCloudProvider] — Google Cloud (formerly known as Vertex AI), surfaced under the `'google-cloud:'` prefix.
+- [`GoogleProvider`][pydantic_ai.providers.google.GoogleProvider] - Gemini API（Google AI Studio），通过 `'google:'` 前缀暴露。
+- [`GoogleCloudProvider`][pydantic_ai.providers.google_cloud.GoogleCloudProvider] - Google Cloud（以前称为 Vertex AI），通过 `'google-cloud:'` 前缀暴露。
 
-!!! note "Renamed prefixes (1.x → v2)"
-    The `'google-gla:'` and `'google-vertex:'` prefixes still work in 1.x but emit a `DeprecationWarning`. Use `'google:'` and `'google-cloud:'` instead. Likewise `GoogleProvider(...)` with any Google Cloud-only argument (`vertexai=True`, `location`, `project`, or `credentials`) is deprecated in favor of `GoogleCloudProvider(...)`.
+!!! note "已重命名前缀（1.x -> v2）"
+    `'google-gla:'` 和 `'google-vertex:'` 前缀在 1.x 中仍可使用，但会发出 `DeprecationWarning`。请改用 `'google:'` 和 `'google-cloud:'`。同样，带有任何仅适用于 Google Cloud 的参数（`vertexai=True`、`location`、`project` 或 `credentials`）的 `GoogleProvider(...)` 已弃用，请改用 `GoogleCloudProvider(...)`。
 
-## Install
+## 安装
 
-To use `GoogleModel`, you need to either install `pydantic-ai`, or install `pydantic-ai-slim` with the `google` optional group:
+要使用 `GoogleModel`，你需要安装 `pydantic-ai`，或安装带 `google` 可选组的 `pydantic-ai-slim`：
 
 ```bash
 pip/uv-add "pydantic-ai-slim[google]"
 ```
 
 
-## Configuration
+## 配置
 
-`GoogleModel` lets you use Google's Gemini models through their [Gemini API](https://ai.google.dev/api/all-methods) (`generativelanguage.googleapis.com`) or [Google Cloud](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models) (`*-aiplatform.googleapis.com`, formerly known as Vertex AI).
+`GoogleModel` 允许你通过 [Gemini API](https://ai.google.dev/api/all-methods)（`generativelanguage.googleapis.com`）或 [Google Cloud](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)（`*-aiplatform.googleapis.com`，以前称为 Vertex AI）使用 Google 的 Gemini 模型。
 
-### API Key (Gemini API)
+### API Key（Gemini API）
 
-To use Gemini via the Gemini API, go to [aistudio.google.com](https://aistudio.google.com/apikey) and create an API key.
+要通过 Gemini API 使用 Gemini，请前往 [aistudio.google.com](https://aistudio.google.com/apikey) 创建 API key。
 
-Once you have the API key, set it as an environment variable:
+取得 API key 后，将其设置为环境变量：
 
 ```bash
 export GOOGLE_API_KEY=your-api-key
 ```
 
-You can then use `GoogleModel` by name:
+然后即可按名称使用 `GoogleModel`：
 
 ```python
 from pydantic_ai import Agent
@@ -43,7 +43,7 @@ agent = Agent('google:gemini-3-pro-preview')
 ...
 ```
 
-Or you can explicitly create the provider:
+或者显式创建 provider：
 
 ```python
 from pydantic_ai import Agent
@@ -56,24 +56,24 @@ agent = Agent(model)
 ...
 ```
 
-### Google Cloud (Enterprise)
+### Google Cloud（企业） {#google-cloud-enterprise}
 
-If you are an enterprise user, you can also use `GoogleModel` to access Gemini via Google Cloud (formerly known as Vertex AI).
+如果你是企业用户，也可以使用 `GoogleModel` 通过 Google Cloud（以前称为 Vertex AI）访问 Gemini。
 
-This interface has a number of advantages over the Gemini API:
+相比 Gemini API，这个接口有一些优势：
 
-1. The Google Cloud API comes with more enterprise readiness guarantees.
-2. You can [purchase provisioned throughput](https://cloud.google.com/vertex-ai/generative-ai/docs/provisioned-throughput#purchase-provisioned-throughput) with Google Cloud to guarantee capacity.
-3. If you're running Pydantic AI inside Google Cloud, you don't need to set up authentication, it should "just work".
-4. You can decide which region to use, which might be important from a regulatory perspective, and might improve latency.
+1. Google Cloud API 提供更多企业就绪保障。
+2. 你可以通过 Google Cloud [购买预置吞吐量](https://cloud.google.com/vertex-ai/generative-ai/docs/provisioned-throughput#purchase-provisioned-throughput)来保证容量。
+3. 如果你在 Google Cloud 内运行 Pydantic AI，则无需设置身份验证，通常可以"直接工作"。
+4. 你可以决定使用哪个区域，这可能对监管合规很重要，也可能改善延迟。
 
-You can authenticate using [application default credentials](https://cloud.google.com/docs/authentication/application-default-credentials), a service account, or an [API key](https://cloud.google.com/vertex-ai/generative-ai/docs/start/api-keys?usertype=expressmode).
+你可以使用[应用默认凭据](https://cloud.google.com/docs/authentication/application-default-credentials)、服务账号或 [API key](https://cloud.google.com/vertex-ai/generative-ai/docs/start/api-keys?usertype=expressmode) 进行身份验证。
 
-Whichever way you authenticate, you'll need to have the Vertex AI API (now branded as Google Cloud AI) enabled in your Google Cloud account.
+无论采用哪种身份验证方式，你都需要在 Google Cloud 账号中启用 Vertex AI API（现在品牌名为 Google Cloud AI）。
 
-#### Application Default Credentials
+#### 应用默认凭据
 
-If you have the [`gcloud` CLI](https://cloud.google.com/sdk/gcloud) installed and configured, you can use the `GoogleCloudProvider` by name:
+如果你已安装并配置 [`gcloud` CLI](https://cloud.google.com/sdk/gcloud)，可以按名称使用 `GoogleCloudProvider`：
 
 ```python {test="ci_only"}
 from pydantic_ai import Agent
@@ -82,7 +82,7 @@ agent = Agent('google-cloud:gemini-3-pro-preview')
 ...
 ```
 
-Or you can explicitly create the provider and model:
+或者显式创建 provider 和 model：
 
 ```python {test="ci_only"}
 from pydantic_ai import Agent
@@ -95,9 +95,9 @@ agent = Agent(model)
 ...
 ```
 
-#### Service Account
+#### 服务账号
 
-To use a service account JSON file, explicitly create the provider and model:
+要使用服务账号 JSON 文件，请显式创建 provider 和 model：
 
 ```python {title="google_model_service_account.py" test="skip"}
 from google.oauth2 import service_account
@@ -118,13 +118,13 @@ agent = Agent(model)
 
 #### API Key
 
-To use Google Cloud with an API key, [create a key](https://cloud.google.com/vertex-ai/generative-ai/docs/start/api-keys?usertype=expressmode) and set it as an environment variable:
+要使用 API key 访问 Google Cloud，请[创建一个 key](https://cloud.google.com/vertex-ai/generative-ai/docs/start/api-keys?usertype=expressmode)，并将其设置为环境变量：
 
 ```bash
 export GOOGLE_API_KEY=your-api-key
 ```
 
-You can then use `GoogleModel` via the `GoogleCloudProvider` by name:
+然后即可按名称通过 `GoogleCloudProvider` 使用 `GoogleModel`：
 
 ```python {test="ci_only"}
 from pydantic_ai import Agent
@@ -133,7 +133,7 @@ agent = Agent('google-cloud:gemini-3-pro-preview')
 ...
 ```
 
-Or you can explicitly create the provider and model:
+或者显式创建 provider 和 model：
 
 ```python {test="skip"}
 from pydantic_ai import Agent
@@ -146,9 +146,9 @@ agent = Agent(model)
 ...
 ```
 
-#### Customizing Location or Project
+#### 自定义 Location 或 Project
 
-You can specify the location and/or project when using Google Cloud:
+使用 Google Cloud 时，可以指定 location 和/或 project：
 
 ```python {title="google_model_location.py" test="skip"}
 from pydantic_ai import Agent
@@ -161,41 +161,41 @@ agent = Agent(model)
 ...
 ```
 
-#### Service tier (`service_tier`, `google_cloud_service_tier`)
+#### 服务层级（`service_tier`、`google_cloud_service_tier`）
 
-The unified [`service_tier`][pydantic_ai.settings.ModelSettings.service_tier] field works on both Google subsystems, with [`google_cloud_service_tier`][pydantic_ai.models.google.GoogleModelSettings.google_cloud_service_tier] available for finer Google Cloud routing control. The provider-specific field wins when both are set.
+统一的 [`service_tier`][pydantic_ai.settings.ModelSettings.service_tier] 字段可用于 Google 的两个子系统；[`google_cloud_service_tier`][pydantic_ai.models.google.GoogleModelSettings.google_cloud_service_tier] 则可用于更细粒度的 Google Cloud 路由控制。当两者同时设置时，提供商专用字段优先。
 
-**Gemini API** — sent as the request's `service_tier` field:
+**Gemini API** - 作为请求的 `service_tier` 字段发送：
 
-| `service_tier` | Sent to Gemini API |
+| `service_tier` | 发送给 Gemini API |
 |---|---|
-| `'auto'` | _(omitted — server default)_ |
+| `'auto'` | _（省略，使用服务端默认值）_ |
 | `'default'` | `'standard'` |
 | `'flex'` | `'flex'` |
 | `'priority'` | `'priority'` |
 
-**Google Cloud** — sent as HTTP routing headers; `'flex'` and `'priority'` always pick the **PT-with-spillover** variant, so customers with [Provisioned Throughput](https://cloud.google.com/vertex-ai/generative-ai/docs/provisioned-throughput/use-provisioned-throughput) (PT) keep using their reserved capacity first:
+**Google Cloud** - 作为 HTTP 路由 headers 发送；`'flex'` 和 `'priority'` 始终选择 **PT-with-spillover** 变体，因此拥有[预置吞吐量](https://cloud.google.com/vertex-ai/generative-ai/docs/provisioned-throughput/use-provisioned-throughput)（PT）的客户会优先继续使用预留容量：
 
-| `service_tier` | Google Cloud routing headers | Effective behavior |
+| `service_tier` | Google Cloud routing headers | 实际行为 |
 |---|---|---|
-| `'auto'` / `'default'` | _(none)_ | PT first, then standard on-demand spillover |
-| `'flex'` | `X-Vertex-AI-LLM-Shared-Request-Type: flex` | PT first, then [Flex PayGo](https://cloud.google.com/vertex-ai/generative-ai/docs/flex-paygo) spillover |
-| `'priority'` | `X-Vertex-AI-LLM-Shared-Request-Type: priority` | PT first, then [Priority PayGo](https://cloud.google.com/vertex-ai/generative-ai/docs/priority-paygo) spillover |
+| `'auto'` / `'default'` | _（无）_ | 优先使用 PT，然后溢出到标准按需 |
+| `'flex'` | `X-Vertex-AI-LLM-Shared-Request-Type: flex` | 优先使用 PT，然后溢出到 [Flex PayGo](https://cloud.google.com/vertex-ai/generative-ai/docs/flex-paygo) |
+| `'priority'` | `X-Vertex-AI-LLM-Shared-Request-Type: priority` | 优先使用 PT，然后溢出到 [Priority PayGo](https://cloud.google.com/vertex-ai/generative-ai/docs/priority-paygo) |
 
-To bypass PT entirely (or use it exclusively, or any of the other Google Cloud-specific routing combinations) set [`google_cloud_service_tier`][pydantic_ai.models.google.GoogleModelSettings.google_cloud_service_tier] directly — the unified field is intentionally limited to the safe PT-with-spillover variants.
+要完全绕过 PT（或仅使用 PT，或使用其他任何 Google Cloud 专用路由组合），请直接设置 [`google_cloud_service_tier`][pydantic_ai.models.google.GoogleModelSettings.google_cloud_service_tier]；统一字段有意限制为安全的 PT-with-spillover 变体。
 
-**Google Cloud — full set of routing values**
+**Google Cloud - 完整路由值集合**
 
-The full [`google_cloud_service_tier`][pydantic_ai.models.google.GoogleModelSettings.google_cloud_service_tier] values map to these HTTP headers:
+完整的 [`google_cloud_service_tier`][pydantic_ai.models.google.GoogleModelSettings.google_cloud_service_tier] 值会映射为这些 HTTP headers：
 
-- `'pt_only'`: PT only (`X-Vertex-AI-LLM-Request-Type: dedicated`).
-- `'pt_then_flex'`: PT when quota allows, then [Flex PayGo](https://cloud.google.com/vertex-ai/generative-ai/docs/flex-paygo) spillover (`X-Vertex-AI-LLM-Shared-Request-Type: flex`).
-- `'pt_then_priority'`: PT when quota allows, then [Priority PayGo](https://cloud.google.com/vertex-ai/generative-ai/docs/priority-paygo) spillover (`X-Vertex-AI-LLM-Shared-Request-Type: priority`).
-- `'on_demand'`: Standard on-demand only (`X-Vertex-AI-LLM-Request-Type: shared`).
-- `'flex_only'`: [Flex PayGo](https://cloud.google.com/vertex-ai/generative-ai/docs/flex-paygo) only (`X-Vertex-AI-LLM-Request-Type: shared` and `X-Vertex-AI-LLM-Shared-Request-Type: flex`).
-- `'priority_only'`: [Priority PayGo](https://cloud.google.com/vertex-ai/generative-ai/docs/priority-paygo) only (`X-Vertex-AI-LLM-Request-Type: shared` and `X-Vertex-AI-LLM-Shared-Request-Type: priority`).
+- `'pt_only'`: 仅 PT（`X-Vertex-AI-LLM-Request-Type: dedicated`）。
+- `'pt_then_flex'`: 配额允许时使用 PT，然后溢出到 [Flex PayGo](https://cloud.google.com/vertex-ai/generative-ai/docs/flex-paygo)（`X-Vertex-AI-LLM-Shared-Request-Type: flex`）。
+- `'pt_then_priority'`: 配额允许时使用 PT，然后溢出到 [Priority PayGo](https://cloud.google.com/vertex-ai/generative-ai/docs/priority-paygo)（`X-Vertex-AI-LLM-Shared-Request-Type: priority`）。
+- `'on_demand'`: 仅标准按需（`X-Vertex-AI-LLM-Request-Type: shared`）。
+- `'flex_only'`: 仅 [Flex PayGo](https://cloud.google.com/vertex-ai/generative-ai/docs/flex-paygo)（`X-Vertex-AI-LLM-Request-Type: shared` 和 `X-Vertex-AI-LLM-Shared-Request-Type: flex`）。
+- `'priority_only'`: 仅 [Priority PayGo](https://cloud.google.com/vertex-ai/generative-ai/docs/priority-paygo)（`X-Vertex-AI-LLM-Request-Type: shared` 和 `X-Vertex-AI-LLM-Shared-Request-Type: priority`）。
 
-**Example**
+**示例**
 
 ```python {test="skip"}
 from pydantic_ai import Agent
@@ -212,17 +212,17 @@ result = agent.run_sync(
 )
 ```
 
-Swap `'pt_then_flex'` for any [`GoogleCloudServiceTier`][pydantic_ai.models.google.GoogleCloudServiceTier] value — e.g. `'pt_then_priority'` for [Priority PayGo](https://cloud.google.com/vertex-ai/generative-ai/docs/priority-paygo) spillover, or `'flex_only'` / `'priority_only'` to bypass PT entirely.
+可将 `'pt_then_flex'` 替换为任意 [`GoogleCloudServiceTier`][pydantic_ai.models.google.GoogleCloudServiceTier] 值，例如使用 `'pt_then_priority'` 溢出到 [Priority PayGo](https://cloud.google.com/vertex-ai/generative-ai/docs/priority-paygo)，或使用 `'flex_only'` / `'priority_only'` 完全绕过 PT。
 
-The [`google_service_tier`][pydantic_ai.models.google.GoogleModelSettings.google_service_tier] field is deprecated in favor of these more specific fields.
+[`google_service_tier`][pydantic_ai.models.google.GoogleModelSettings.google_service_tier] 字段已弃用，请改用这些更具体的字段。
 
-After the request, inspect [`ModelResponse`][pydantic_ai.messages.ModelResponse] `provider_details.get('traffic_type')` (e.g. `ON_DEMAND_FLEX`, `ON_DEMAND_PRIORITY`) to see which tier served it, when the API returns it.
+请求完成后，可检查 [`ModelResponse`][pydantic_ai.messages.ModelResponse] 的 `provider_details.get('traffic_type')`（例如 `ON_DEMAND_FLEX`、`ON_DEMAND_PRIORITY`），在 API 返回该值时确认由哪个层级提供服务。
 
 #### Model Garden
 
-You can access models from the [Model Garden](https://cloud.google.com/model-garden?hl=en) that support the `generateContent` API and are available under your Google Cloud project, including but not limited to Gemini, using one of the following `model_name` patterns:
+你可以访问 [Model Garden](https://cloud.google.com/model-garden?hl=en) 中支持 `generateContent` API、并且在你的 Google Cloud project 下可用的模型，包括但不限于 Gemini。可以使用以下 `model_name` 模式之一：
 
-- `{model_id}` for Gemini models
+- `{model_id}` 用于 Gemini 模型
 - `{publisher}/{model_id}`
 - `publishers/{publisher}/models/{model_id}`
 - `projects/{project}/locations/{location}/publishers/{publisher}/models/{model_id}`
@@ -241,9 +241,9 @@ agent = Agent(model)
 ...
 ```
 
-## Custom HTTP Client
+## 自定义 HTTP Client
 
-You can customize the `GoogleProvider` with a custom `httpx.AsyncClient`:
+你可以使用自定义 `httpx.AsyncClient` 配置 `GoogleProvider`：
 
 ```python
 from httpx import AsyncClient
@@ -262,11 +262,11 @@ agent = Agent(model)
 ```
 
 
-## Document, Image, Audio, and Video Input
+## 文档、图像、音频和视频输入 {#document-image-audio-and-video-input}
 
-`GoogleModel` supports multi-modal input, including documents, images, audio, and video.
+`GoogleModel` 支持多模态输入，包括文档、图像、音频和视频。
 
-YouTube video URLs can be passed directly to Google models:
+YouTube 视频 URL 可以直接传给 Google 模型：
 
 ```py {title="youtube_input.py" test="skip" lint="skip"}
 from pydantic_ai import Agent, VideoUrl
@@ -282,7 +282,7 @@ result = agent.run_sync(
 print(result.output)
 ```
 
-Files can be uploaded via the [Files API](https://ai.google.dev/gemini-api/docs/files) and passed as URLs:
+文件可以通过 [Files API](https://ai.google.dev/gemini-api/docs/files) 上传，并作为 URL 传入：
 
 ```py {title="file_upload.py" test="skip"}
 from pydantic_ai import Agent, DocumentUrl
@@ -303,11 +303,11 @@ result = agent.run_sync(
 print(result.output)
 ```
 
-See the [input documentation](../input.md) for more details and examples.
+更多细节和示例请参阅[输入文档](../input.md)。
 
-## Model settings
+## 模型设置
 
-You can customize model behavior using [`GoogleModelSettings`][pydantic_ai.models.google.GoogleModelSettings]:
+你可以使用 [`GoogleModelSettings`][pydantic_ai.models.google.GoogleModelSettings] 自定义模型行为：
 
 ```python
 from google.genai.types import HarmBlockThreshold, HarmCategory
@@ -330,9 +330,9 @@ agent = Agent(model, model_settings=settings)
 ...
 ```
 
-### Configure thinking
+### 配置思考 {#configure-thinking}
 
-Use the provider-agnostic [`Thinking`][pydantic_ai.capabilities.Thinking] capability to enable thinking:
+使用与 provider 无关的 [`Thinking`][pydantic_ai.capabilities.Thinking] capability 启用思考：
 
 ```python
 from pydantic_ai import Agent
@@ -342,7 +342,7 @@ agent = Agent('google:gemini-3.5-flash', capabilities=[Thinking(effort='medium')
 ...
 ```
 
-For advanced usage, you can pass Google's native thinking config through [`GoogleModelSettings.google_thinking_config`][pydantic_ai.models.google.GoogleModelSettings.google_thinking_config]:
+高级用法可以通过 [`GoogleModelSettings.google_thinking_config`][pydantic_ai.models.google.GoogleModelSettings.google_thinking_config] 传入 Google 的原生 thinking config：
 
 ```python
 from pydantic_ai import Agent
@@ -354,11 +354,11 @@ agent = Agent(model, model_settings=model_settings)
 ...
 ```
 
-See [Thinking](../thinking.md) for the unified API and [Gemini API docs](https://ai.google.dev/gemini-api/docs/thinking) for Google's native thinking configuration.
+统一 API 请参阅 [Thinking](../thinking.md)，Google 原生 thinking 配置请参阅 [Gemini API docs](https://ai.google.dev/gemini-api/docs/thinking)。
 
-### Safety settings
+### 安全设置
 
-You can customize the safety settings by setting the `google_safety_settings` field.
+你可以通过设置 `google_safety_settings` 字段来自定义安全设置。
 
 ```python
 from google.genai.types import HarmBlockThreshold, HarmCategory
@@ -379,14 +379,14 @@ agent = Agent(model, model_settings=model_settings)
 ...
 ```
 
-See the [Gemini API docs](https://ai.google.dev/gemini-api/docs/safety-settings) for more on safety settings.
+更多安全设置说明请参阅 [Gemini API docs](https://ai.google.dev/gemini-api/docs/safety-settings)。
 
 
 ### Logprobs
 
-You can return logprobs from the model in your response by setting `google_logprobs` and `google_top_logprobs` in the [`GoogleModelSettings`][pydantic_ai.models.google.GoogleModelSettings].
+你可以在 [`GoogleModelSettings`][pydantic_ai.models.google.GoogleModelSettings] 中设置 `google_logprobs` 和 `google_top_logprobs`，让模型在响应中返回 logprobs。
 
-This feature is only supported for non-streaming requests and Google Cloud.
+此功能只支持非流式请求，并且只支持 Google Cloud。
 
 ```python {test="skip"}
 from pydantic_ai import Agent
@@ -409,14 +409,14 @@ logprobs = result.response.provider_details.get('logprobs')
 avg_logprobs = result.response.provider_details.get('avg_logprobs')
 ```
 
-See the [Google Dev Blog](https://developers.googleblog.com/unlock-gemini-reasoning-with-logprobs-on-vertex-ai/) for more information.
+更多信息请参阅 [Google Dev Blog](https://developers.googleblog.com/unlock-gemini-reasoning-with-logprobs-on-vertex-ai/)。
 
-## Streaming cancellation
+## 流式取消 {#streaming-cancellation}
 
-!!! warning "Cancellation limitations"
-    The `google-genai` SDK exposes streaming responses only as an async iterator, with no separate handle for closing the underlying HTTP transport. Because of a [Python language rule on async generators](https://peps.python.org/pep-0525/), [`cancel()`][pydantic_ai.result.StreamedRunResult.cancel] cannot interrupt an in-flight chunk read while another coroutine is iterating the stream. Pydantic AI marks the response with `state='interrupted'`, but upstream generation may continue until the surrounding `async with agent.run_stream(...)` block exits.
+!!! warning "取消限制"
+    `google-genai` SDK 只把流式响应暴露为异步迭代器，没有单独的句柄可用于关闭底层 HTTP transport。由于 [Python 对异步生成器的语言规则](https://peps.python.org/pep-0525/)，当另一个协程正在迭代流时，[`cancel()`][pydantic_ai.result.StreamedRunResult.cancel] 无法中断正在进行的 chunk 读取。Pydantic AI 会把响应标记为 `state='interrupted'`，但上游生成可能会持续到外围的 `async with agent.run_stream(...)` 块退出。
 
-    For reliable cancellation, either pass `debounce_by=None` to [`stream_text()`][pydantic_ai.result.StreamedRunResult.stream_text], [`stream_output()`][pydantic_ai.result.StreamedRunResult.stream_output], or [`stream_response()`][pydantic_ai.result.StreamedRunResult.stream_response] and call `cancel()` from the same task that's iterating:
+    要可靠取消，请向 [`stream_text()`][pydantic_ai.result.StreamedRunResult.stream_text]、[`stream_output()`][pydantic_ai.result.StreamedRunResult.stream_output] 或 [`stream_response()`][pydantic_ai.result.StreamedRunResult.stream_response] 传入 `debounce_by=None`，并在执行迭代的同一个 task 中调用 `cancel()`：
 
     ```python {title="cancel_google.py" test="skip"}
     from pydantic_ai import Agent
@@ -436,7 +436,7 @@ See the [Google Dev Blog](https://developers.googleblog.com/unlock-gemini-reason
                     break
     ```
 
-    Or, if you need to keep debouncing, wrap the stream with [`contextlib.aclosing`](https://docs.python.org/3/library/contextlib.html#contextlib.aclosing) so the iterator is closed before `cancel()` runs:
+    或者，如果你需要保留 debouncing，请用 [`contextlib.aclosing`](https://docs.python.org/3/library/contextlib.html#contextlib.aclosing) 包装流，让迭代器在 `cancel()` 运行前关闭：
 
     ```python {title="cancel_google_aclosing.py" test="skip"}
     from contextlib import aclosing
@@ -459,4 +459,4 @@ See the [Google Dev Blog](https://developers.googleblog.com/unlock-gemini-reason
             await result.cancel()
     ```
 
-    Calling `cancel()` from a different task while iteration is in progress is not currently reliable on this provider.
+    当前，在这个 provider 上，从另一个 task 调用 `cancel()` 并且同时仍在迭代时并不可靠。

@@ -1,13 +1,13 @@
 
 # Hooks
 
-Hooks let you intercept and modify agent behavior at every stage of a run — model requests, tool calls, streaming events — using simple decorators or constructor arguments. No subclassing needed.
+Hooks 让你可以在一次运行的每个阶段拦截和修改智能体行为，包括模型请求、工具调用、流式事件等；可以使用简单的装饰器或构造参数完成，不需要子类化。
 
-The [`Hooks`][pydantic_ai.capabilities.Hooks] capability is the recommended way to add [lifecycle hooks](capabilities.md#hooking-into-the-lifecycle) for application-level concerns like logging, metrics, and lightweight validation. For reusable capabilities that combine hooks with tools, instructions, or model settings, subclass [`AbstractCapability`][pydantic_ai.capabilities.AbstractCapability] instead — see [Building custom capabilities](capabilities.md#building-custom-capabilities).
+[`Hooks`][pydantic_ai.capabilities.Hooks] capability 是添加[生命周期 hooks](capabilities.md#hooking-into-the-lifecycle) 的推荐方式，适合日志、指标、轻量验证等应用层关注点。对于把 hooks 与工具、instructions 或模型设置组合起来的可复用 capability，请改为继承 [`AbstractCapability`][pydantic_ai.capabilities.AbstractCapability]，参见[构建自定义 capabilities](capabilities.md#building-custom-capabilities)。
 
-## Quick start
+## 快速开始
 
-Create a [`Hooks`][pydantic_ai.capabilities.Hooks] instance, register hooks via `@hooks.on.*` decorators, and pass it to your agent:
+创建一个 [`Hooks`][pydantic_ai.capabilities.Hooks] 实例，通过 `@hooks.on.*` 装饰器注册 hooks，然后把它传给智能体：
 
 ```python {title="hooks_decorator.py"}
 from pydantic_ai import Agent, ModelRequestContext, RunContext
@@ -29,11 +29,11 @@ print(result.output)
 #> success (no tool calls)
 ```
 
-## Registering hooks
+## 注册 hooks
 
-### Decorator registration
+### 装饰器注册
 
-The `hooks.on` namespace provides decorator methods for every lifecycle hook. Use them as bare decorators or with parameters:
+`hooks.on` 命名空间为每种生命周期 hook 提供装饰器方法。它们既可以作为裸装饰器使用，也可以带参数使用：
 
 ```python {test="skip" lint="skip"}
 # Bare decorator
@@ -47,11 +47,11 @@ async def my_timed_hook(ctx, request_context):
     return request_context
 ```
 
-Multiple hooks can be registered for the same event — they fire in registration order.
+同一个事件可以注册多个 hooks，它们会按注册顺序触发。
 
-### Constructor kwargs
+### 构造函数 kwargs
 
-You can also pass hook functions directly to the [`Hooks`][pydantic_ai.capabilities.Hooks] constructor:
+你也可以把 hook 函数直接传给 [`Hooks`][pydantic_ai.capabilities.Hooks] 构造函数：
 
 ```python {title="hooks_constructor.py"}
 from pydantic_ai import Agent, ModelRequestContext, RunContext
@@ -70,122 +70,122 @@ print(result.output)
 #> success (no tool calls)
 ```
 
-Both sync and async hook functions are accepted. Sync functions are automatically wrapped for async execution.
+同步和异步 hook 函数都可以使用。同步函数会自动包装为异步执行。
 
-## Hook types
+## Hook 类型
 
 ### Run hooks
 
-| `hooks.on.` | Constructor kwarg | `AbstractCapability` method |
+| `hooks.on.` | 构造函数 kwarg | `AbstractCapability` 方法 |
 |---|---|---|
 | `before_run` | `before_run=` | `before_run` |
 | `after_run` | `after_run=` | `after_run` |
 | `run` | `run=` | `wrap_run` |
 | `run_error` | `run_error=` | `on_run_error` |
 
-Run hooks fire once per agent run. `wrap_run` (registered via `hooks.on.run`) wraps the entire run and supports error recovery.
+Run hooks 在每次智能体运行时触发一次。`wrap_run`（通过 `hooks.on.run` 注册）会包装整个运行过程，并支持错误恢复。
 
 ### Node hooks
 
-| `hooks.on.` | Constructor kwarg | `AbstractCapability` method |
+| `hooks.on.` | 构造函数 kwarg | `AbstractCapability` 方法 |
 |---|---|---|
 | `before_node_run` | `before_node_run=` | `before_node_run` |
 | `after_node_run` | `after_node_run=` | `after_node_run` |
 | `node_run` | `node_run=` | `wrap_node_run` |
 | `node_run_error` | `node_run_error=` | `on_node_run_error` |
 
-Node hooks fire for each graph step ([`UserPromptNode`][pydantic_ai.UserPromptNode], [`ModelRequestNode`][pydantic_ai.ModelRequestNode], [`CallToolsNode`][pydantic_ai.CallToolsNode]).
+Node hooks 会在每个图步骤触发（[`UserPromptNode`][pydantic_ai.UserPromptNode]、[`ModelRequestNode`][pydantic_ai.ModelRequestNode]、[`CallToolsNode`][pydantic_ai.CallToolsNode]）。
 
 !!! note
-    `wrap_node_run` hooks are called automatically by [`agent.run()`][pydantic_ai.agent.AbstractAgent.run], [`agent.run_stream()`][pydantic_ai.agent.AbstractAgent.run_stream], and [`agent_run.next()`][pydantic_ai.run.AgentRun.next], but **not** when iterating with bare `async for node in agent_run:`.
+    `wrap_node_run` hooks 会由 [`agent.run()`][pydantic_ai.agent.AbstractAgent.run]、[`agent.run_stream()`][pydantic_ai.agent.AbstractAgent.run_stream] 和 [`agent_run.next()`][pydantic_ai.run.AgentRun.next] 自动调用，但在用裸 `async for node in agent_run:` 迭代时**不会**调用。
 
-### Model request hooks
+### 模型请求 hooks
 
-| `hooks.on.` | Constructor kwarg | `AbstractCapability` method |
+| `hooks.on.` | 构造函数 kwarg | `AbstractCapability` 方法 |
 |---|---|---|
 | `before_model_request` | `before_model_request=` | `before_model_request` |
 | `after_model_request` | `after_model_request=` | `after_model_request` |
 | `model_request` | `model_request=` | `wrap_model_request` |
 | `model_request_error` | `model_request_error=` | `on_model_request_error` |
 
-Model request hooks fire around each LLM call. [`ModelRequestContext`][pydantic_ai.models.ModelRequestContext] bundles `model`, `messages`, `model_settings`, and `model_request_parameters`. To swap the model for a given request, set `request_context.model` to a different [`Model`][pydantic_ai.models.Model] instance.
+模型请求 hooks 会围绕每次 LLM 调用触发。[`ModelRequestContext`][pydantic_ai.models.ModelRequestContext] 会打包 `model`、`messages`、`model_settings` 和 `model_request_parameters`。要为某个请求替换模型，请把 `request_context.model` 设置为另一个 [`Model`][pydantic_ai.models.Model] 实例。
 
-To skip the model call entirely, raise [`SkipModelRequest(response)`][pydantic_ai.exceptions.SkipModelRequest] from `before_model_request` or `model_request` (wrap).
+要完全跳过模型调用，请从 `before_model_request` 或 `model_request`（wrap）抛出 [`SkipModelRequest(response)`][pydantic_ai.exceptions.SkipModelRequest]。
 
-### Tool validation hooks
+### 工具验证 hooks
 
-| `hooks.on.` | Constructor kwarg | `AbstractCapability` method |
+| `hooks.on.` | 构造函数 kwarg | `AbstractCapability` 方法 |
 |---|---|---|
 | `before_tool_validate` | `before_tool_validate=` | `before_tool_validate` |
 | `after_tool_validate` | `after_tool_validate=` | `after_tool_validate` |
 | `tool_validate` | `tool_validate=` | `wrap_tool_validate` |
 | `tool_validate_error` | `tool_validate_error=` | `on_tool_validate_error` |
 
-Validation hooks fire when the model's JSON arguments are parsed and validated. All tool hooks receive `call` ([`ToolCallPart`][pydantic_ai.messages.ToolCallPart]) and `tool_def` ([`ToolDefinition`][pydantic_ai.tools.ToolDefinition]) parameters.
+当模型的 JSON 参数被解析和验证时，会触发验证 hooks。所有工具 hooks 都会接收 `call`（[`ToolCallPart`][pydantic_ai.messages.ToolCallPart]）和 `tool_def`（[`ToolDefinition`][pydantic_ai.tools.ToolDefinition]）参数。
 
 !!! note
-    Tool validation and execution hooks only fire for function tools. Internal output tools (used to deliver structured output) are not user-facing and are skipped.
+    工具验证和执行 hooks 只会对 function tools 触发。内部 output tools（用于交付结构化输出）不是面向用户的工具，因此会跳过。
 
-To skip validation, raise [`SkipToolValidation(args)`][pydantic_ai.exceptions.SkipToolValidation] from `before_tool_validate` or `tool_validate` (wrap).
+要跳过验证，请从 `before_tool_validate` 或 `tool_validate`（wrap）抛出 [`SkipToolValidation(args)`][pydantic_ai.exceptions.SkipToolValidation]。
 
-### Tool execution hooks
+### 工具执行 hooks
 
-| `hooks.on.` | Constructor kwarg | `AbstractCapability` method |
+| `hooks.on.` | 构造函数 kwarg | `AbstractCapability` 方法 |
 |---|---|---|
 | `before_tool_execute` | `before_tool_execute=` | `before_tool_execute` |
 | `after_tool_execute` | `after_tool_execute=` | `after_tool_execute` |
 | `tool_execute` | `tool_execute=` | `wrap_tool_execute` |
 | `tool_execute_error` | `tool_execute_error=` | `on_tool_execute_error` |
 
-Execution hooks fire when the tool function runs. `args` is always the validated `dict[str, Any]`.
+当工具函数运行时，会触发执行 hooks。`args` 始终是验证后的 `dict[str, Any]`。
 
-To skip execution, raise [`SkipToolExecution(result)`][pydantic_ai.exceptions.SkipToolExecution] from `before_tool_execute` or `tool_execute` (wrap).
+要跳过执行，请从 `before_tool_execute` 或 `tool_execute`（wrap）抛出 [`SkipToolExecution(result)`][pydantic_ai.exceptions.SkipToolExecution]。
 
-### Output validation hooks
+### 输出验证 hooks
 
-| `hooks.on.` | Constructor kwarg | `AbstractCapability` method |
+| `hooks.on.` | 构造函数 kwarg | `AbstractCapability` 方法 |
 |---|---|---|
 | `before_output_validate` | `before_output_validate=` | `before_output_validate` |
 | `after_output_validate` | `after_output_validate=` | `after_output_validate` |
 | `output_validate` | `output_validate=` | `wrap_output_validate` |
 | `output_validate_error` | `output_validate_error=` | `on_output_validate_error` |
 
-Output validation hooks fire when structured output is parsed against the output schema. They do **not** fire for plain text or image output. All output hooks receive an `output_context` ([`OutputContext`][pydantic_ai.capabilities.OutputContext]) parameter.
+当结构化输出按输出 schema 解析时，会触发输出验证 hooks。它们不会对纯文本或图像输出触发。所有输出 hooks 都会接收 `output_context`（[`OutputContext`][pydantic_ai.capabilities.OutputContext]）参数。
 
 !!! note
-    During streaming, output **validation** hooks fire on every partial validation attempt as well as the final result. Output **processing** hooks fire only when partial validation succeeds, and on the final result. Check `ctx.partial_output` in your hooks to distinguish partial from final results and avoid expensive work on partials.
+    在流式输出期间，输出**验证** hooks 会在每次部分验证尝试以及最终结果时触发。输出**处理** hooks 只会在部分验证成功时以及最终结果时触发。在 hooks 中检查 `ctx.partial_output`，以区分部分结果和最终结果，并避免在部分结果上执行昂贵工作。
 
-### Output processing hooks
+### 输出处理 hooks
 
-| `hooks.on.` | Constructor kwarg | `AbstractCapability` method |
+| `hooks.on.` | 构造函数 kwarg | `AbstractCapability` 方法 |
 |---|---|---|
 | `before_output_process` | `before_output_process=` | `before_output_process` |
 | `after_output_process` | `after_output_process=` | `after_output_process` |
 | `output_process` | `output_process=` | `wrap_output_process` |
 | `output_process_error` | `output_process_error=` | `on_output_process_error` |
 
-Output processing hooks fire when the output is processed — extracting values, calling output functions, and running output validators.
+当输出被处理时，会触发输出处理 hooks，包括提取值、调用输出函数以及运行输出验证器。
 
-See [Output hooks](capabilities.md#output-hooks) for the full lifecycle, signatures, and details on how output validators interact with processing hooks.
+完整生命周期、签名，以及输出验证器如何与处理 hooks 交互，请参阅[输出 hooks](capabilities.md#output-hooks)。
 
-### Tool preparation
+### 工具准备
 
-| `hooks.on.` | Constructor kwarg | `AbstractCapability` method |
+| `hooks.on.` | 构造函数 kwarg | `AbstractCapability` 方法 |
 |---|---|---|
 | `prepare_tools` | `prepare_tools=` | `prepare_tools` |
 | `prepare_output_tools` | `prepare_output_tools=` | `prepare_output_tools` |
 
-Filters or modifies tool definitions the model sees on each step.
+过滤或修改模型在每一步看到的工具定义。
 
-`prepare_tools` handles **function** tools; `prepare_output_tools` handles [output tools][pydantic_ai.output.ToolOutput] separately, with `ctx.max_retries` reflecting the **output** retry budget. Both run as `PreparedToolset` wrappers — the result flows into the model's request *and* `ToolManager.tools`, so filtering also blocks tool execution.
+`prepare_tools` 处理 **function** tools；`prepare_output_tools` 单独处理 [output tools][pydantic_ai.output.ToolOutput]，其中 `ctx.max_retries` 反映的是**输出**重试预算。二者都以 `PreparedToolset` 包装器形式运行，结果会同时流入模型请求和 `ToolManager.tools`，因此过滤也会阻止工具执行。
 
-### Deferred tool call hook
+### 延迟工具调用 hook {#deferred-tool-call-hook}
 
-| `hooks.on.` | Constructor kwarg | `AbstractCapability` method |
+| `hooks.on.` | 构造函数 kwarg | `AbstractCapability` 方法 |
 |---|---|---|
 | `deferred_tool_calls` | `deferred_tool_calls=` | `handle_deferred_tool_calls` |
 
-Resolves [deferred tool calls](deferred-tools.md) (approval-required or externally-executed) inline during a run. The hook receives a [`DeferredToolRequests`][pydantic_ai.tools.DeferredToolRequests] and returns a [`DeferredToolResults`][pydantic_ai.tools.DeferredToolResults] (or `None` to decline). Multiple registered hooks accumulate: each receives the still-unresolved requests and can resolve some or all of them.
+在一次运行中内联解析[延迟工具调用](deferred-tools.md)（需要批准或外部执行）。该 hook 接收 [`DeferredToolRequests`][pydantic_ai.tools.DeferredToolRequests]，并返回 [`DeferredToolResults`][pydantic_ai.tools.DeferredToolResults]（或返回 `None` 表示拒绝处理）。多个已注册 hooks 会累积执行：每个 hook 都会接收仍未解析的请求，并可以解析其中一部分或全部。
 
 ```python {title="hooks_deferred_tool_calls.py"}
 from pydantic_ai import Agent, DeferredToolRequests, DeferredToolResults, RunContext
@@ -209,16 +209,16 @@ def delete_file(path: str) -> str:
     return f'File {path!r} deleted'
 ```
 
-For pure application-level handler registration without other hooks, the dedicated [`HandleDeferredToolCalls`][pydantic_ai.capabilities.HandleDeferredToolCalls] capability is more concise — see [Resolving deferred calls with a handler](deferred-tools.md#resolving-deferred-calls-with-a-handler).
+如果只是为应用层注册处理器，而不需要其他 hooks，专用的 [`HandleDeferredToolCalls`][pydantic_ai.capabilities.HandleDeferredToolCalls] capability 会更简洁；参见[使用处理器解析延迟调用](deferred-tools.md#resolving-deferred-calls-with-a-handler)。
 
-### Event stream hooks
+### 事件流 hooks
 
-| `hooks.on.` | Constructor kwarg | `AbstractCapability` method |
+| `hooks.on.` | 构造函数 kwarg | `AbstractCapability` 方法 |
 |---|---|---|
 | `run_event_stream` | `run_event_stream=` | `wrap_run_event_stream` |
-| `event` | `event=` | _(per-event convenience)_ |
+| `event` | `event=` | _（逐事件便利形式）_ |
 
-`run_event_stream` wraps the full event stream as an async generator. `event` is a convenience — it fires for each individual event during a streamed run:
+`run_event_stream` 会以异步生成器形式包装完整事件流。`event` 是一种便利形式，会在流式运行期间针对每个单独事件触发：
 
 ```python {title="hooks_event.py"}
 from pydantic_ai import Agent, AgentStreamEvent, RunContext
@@ -238,9 +238,9 @@ async def count_events(ctx: RunContext[None], event: AgentStreamEvent) -> AgentS
 agent = Agent('test', capabilities=[hooks])
 ```
 
-## Tool hook filtering
+## 工具 hook 过滤
 
-Tool hooks (validation and execution) support a `tools` parameter to target specific tools by name:
+工具 hooks（验证和执行）支持 `tools` 参数，可按名称定位特定工具：
 
 ```python {title="hooks_tool_filter.py"}
 from typing import Any
@@ -278,11 +278,11 @@ print(call_log)
 #> ['audit: send_email']
 ```
 
-The `tools` parameter accepts a sequence of tool names. The hook only fires for matching tools — other tool calls pass through unaffected.
+`tools` 参数接受一个工具名称序列。hook 只会对匹配的工具触发，其他工具调用会不受影响地通过。
 
-## Timeouts
+## 超时
 
-Each hook supports an optional `timeout` in seconds. If the hook exceeds the timeout, a [`HookTimeoutError`][pydantic_ai.capabilities.HookTimeoutError] is raised:
+每个 hook 都支持可选的 `timeout`，单位为秒。如果 hook 超过该超时时间，会抛出 [`HookTimeoutError`][pydantic_ai.capabilities.HookTimeoutError]：
 
 ```python {title="hooks_timeout.py"}
 import asyncio
@@ -309,11 +309,11 @@ except HookTimeoutError as e:
     #> Hook timed out: before_model_request after 0.01s
 ```
 
-Timeouts are set via the decorator parameter (`@hooks.on.before_model_request(timeout=5.0)`) or via the constructor when using kwargs.
+超时可以通过装饰器参数（`@hooks.on.before_model_request(timeout=5.0)`）设置，也可以在使用 kwargs 时通过构造函数设置。
 
 ## Wrap hooks
 
-Wrap hooks let you surround an operation with setup/teardown logic. In the `hooks.on` namespace, wrap hooks drop the `wrap_` prefix — `hooks.on.model_request` corresponds to `wrap_model_request`:
+Wrap hooks 让你可以用设置/清理逻辑包围某个操作。在 `hooks.on` 命名空间中，wrap hooks 会去掉 `wrap_` 前缀；`hooks.on.model_request` 对应 `wrap_model_request`：
 
 ```python {title="hooks_wrap.py"}
 from pydantic_ai import Agent, ModelRequestContext, RunContext
@@ -340,49 +340,49 @@ print(wrap_log)
 #> ['before', 'after']
 ```
 
-## Hook ordering
+## Hook 顺序
 
-When multiple hooks are registered for the same event (either on the same `Hooks` instance or across multiple capabilities):
+当多个 hooks 注册到同一事件时（无论是在同一个 `Hooks` 实例上，还是跨多个 capabilities）：
 
-* **`before_*`** hooks fire in registration/capability order
-* **`after_*`** hooks fire in reverse order
-* **`wrap_*`** hooks nest as middleware — the first registered hook is the outermost layer
+* **`before_*`** hooks 按注册/capability 顺序触发
+* **`after_*`** hooks 按反向顺序触发
+* **`wrap_*`** hooks 像中间件一样嵌套；第一个注册的 hook 是最外层
 
-See [Composition](capabilities.md#composition) for details on how hooks from multiple capabilities interact.
+多个 capabilities 的 hooks 如何交互，详见[组合](capabilities.md#composition)。
 
-## Error hooks
+## 错误 hooks
 
-Error hooks (`*_error` in the `hooks.on` namespace, `on_*_error` on `AbstractCapability`) use **raise-to-propagate, return-to-recover** semantics:
+错误 hooks（`hooks.on` 命名空间中的 `*_error`，以及 `AbstractCapability` 上的 `on_*_error`）采用**抛出即传播，返回即恢复**的语义：
 
-- **Raise the original error** — propagates unchanged *(default)*
-- **Raise a different exception** — transforms the error
-- **Return a result** — suppresses the error
+- **抛出原始错误** - 原样传播（默认）
+- **抛出另一个异常** - 转换错误
+- **返回结果** - 抑制错误
 
-See [Error hooks](capabilities.md#error-hooks) for the full pattern and recovery types.
+完整模式和恢复类型请参阅[错误 hooks](capabilities.md#error-hooks)。
 
-## Triggering retries with `ModelRetry`
+## 使用 `ModelRetry` 触发重试 {#triggering-retries-with-modelretry}
 
-Hooks can raise [`ModelRetry`][pydantic_ai.exceptions.ModelRetry] to ask the model to try again with a custom message — the same exception used in [tool functions](tools.md#model-retry) and output validators.
+Hooks 可以抛出 [`ModelRetry`][pydantic_ai.exceptions.ModelRetry]，要求模型带着自定义消息重试。这与[工具函数](tools.md#model-retry)和输出验证器中使用的是同一个异常。
 
-**Model request hooks** (`after_model_request`, `wrap_model_request`, `on_model_request_error`):
+**模型请求 hooks**（`after_model_request`、`wrap_model_request`、`on_model_request_error`）：
 
-- The retry message is sent back to the model as a [`RetryPromptPart`][pydantic_ai.messages.RetryPromptPart]
-- `after_model_request`: the original response is preserved in message history so the model can see what it said
-- `wrap_model_request`: the response is preserved only if the handler was called
-- Retries count against the output side of the agent's retry budget
+- 重试消息会作为 [`RetryPromptPart`][pydantic_ai.messages.RetryPromptPart] 发回给模型
+- `after_model_request`：原始响应会保留在消息历史中，因此模型能看到自己刚才说了什么
+- `wrap_model_request`：只有调用了 handler 时，响应才会保留
+- 重试计入智能体输出侧的重试预算
 
-**Tool hooks** (`before/after_tool_validate`, `before/after_tool_execute`, `wrap_tool_execute`, `on_tool_execute_error`):
+**工具 hooks**（`before/after_tool_validate`、`before/after_tool_execute`、`wrap_tool_execute`、`on_tool_execute_error`）：
 
-- Converted to tool retry prompts, same as when a tool function raises `ModelRetry`
-- Retries count against the tool's `max_retries` limit
+- 会转换为工具重试提示，与工具函数抛出 `ModelRetry` 时相同
+- 重试计入工具的 `max_retries` 限制
 
-**Output hooks** (`before/after_output_validate`, `before/after_output_process`, `wrap_output_process`, `on_output_process_error`):
+**输出 hooks**（`before/after_output_validate`、`before/after_output_process`、`wrap_output_process`、`on_output_process_error`）：
 
-- Converted to retry prompts, same as when an output function raises `ModelRetry`
-- For tool output, retries count against the tool's `max_retries` limit
-- For text output, retries count against the output side of the agent's retry budget
+- 会转换为重试提示，与输出函数抛出 `ModelRetry` 时相同
+- 对于工具输出，重试计入工具的 `max_retries` 限制
+- 对于文本输出，重试计入智能体输出侧的重试预算
 
-`ModelRetry` from `wrap_model_request`, `wrap_tool_execute`, and `wrap_output_process` is treated as control flow — it bypasses the corresponding `on_*_error` hook.
+来自 `wrap_model_request`、`wrap_tool_execute` 和 `wrap_output_process` 的 `ModelRetry` 会被视为控制流，因此会绕过对应的 `on_*_error` hook。
 
 ```python {title="hooks_model_retry.py"}
 from pydantic_ai import Agent, RunContext
@@ -412,11 +412,11 @@ print(result.output)
 #> success (no tool calls)
 ```
 
-## When to use `Hooks` vs `AbstractCapability`
+## 何时使用 `Hooks`，何时使用 `AbstractCapability`
 
-| Use [`Hooks`][pydantic_ai.capabilities.Hooks] | Use [`AbstractCapability`][pydantic_ai.capabilities.AbstractCapability] |
+| 使用 [`Hooks`][pydantic_ai.capabilities.Hooks] | 使用 [`AbstractCapability`][pydantic_ai.capabilities.AbstractCapability] |
 |---|---|
-| Application-level hooks (logging, metrics) | Reusable, packaged capabilities |
-| Quick one-off interceptors | Combined tools + hooks + instructions + settings |
-| No configuration state needed | Complex per-run state management |
-| Single-file scripts | Multi-agent shared behavior |
+| 应用层 hooks（日志、指标） | 可复用、可打包的 capabilities |
+| 快速的一次性拦截器 | 工具 + hooks + instructions + settings 的组合 |
+| 不需要配置状态 | 复杂的逐运行状态管理 |
+| 单文件脚本 | 多智能体共享行为 |
