@@ -1,44 +1,44 @@
-# Capabilities
+# Capabilities（能力） {#capabilities}
 
-A capability is a reusable, composable unit of agent behavior. Instead of threading multiple arguments through your `Agent` constructor — [instructions](agent.md#instructions) here, [model settings](agent.md#model-run-settings) there, a [toolset](toolsets.md) somewhere else, a [history processor](message-history.md#processing-message-history) on yet another parameter — you can bundle related behavior into a single capability and pass it via the [`capabilities`][pydantic_ai.agent.Agent.__init__] parameter.
+Capability 是 agent behavior 中可复用、可组合的单元。与其把多个 arguments 分散传入 `Agent` constructor，例如这里传 [instructions](agent.md#instructions)、那里传 [model settings](agent.md#model-run-settings)、另一个地方传 [toolset](toolsets.md)、再用其他 parameter 传 [history processor](message-history.md#processing-message-history)，你可以把相关行为打包进单个 capability，并通过 [`capabilities`][pydantic_ai.agent.Agent.__init__] parameter 传入。
 
-Capabilities can provide any combination of:
+Capabilities 可以提供以下能力的任意组合：
 
-* **Tools** — via [toolsets](toolsets.md) or [native tools](native-tools.md)
-* **Lifecycle hooks** — intercept and modify model requests, tool calls, and the overall run
-* **Instructions** — static or dynamic [instruction](agent.md#instructions) additions
-* **Model settings** — static or per-step [model settings](agent.md#model-run-settings)
+* **Tools**：通过 [toolsets](toolsets.md) 或 [native tools](native-tools.md)
+* **Lifecycle hooks**：拦截并修改 model requests、tool calls 和整体 run
+* **Instructions**：添加 static 或 dynamic [instruction](agent.md#instructions)
+* **Model settings**：static 或 per-step [model settings](agent.md#model-run-settings)
 
-This makes them the primary extension point for Pydantic AI. Whether you're building a memory system, a guardrail, a cost tracker, or an approval workflow, a capability is the right abstraction.
+这使 capabilities 成为 Pydantic AI 的主要扩展点。无论你在构建 memory system、guardrail、cost tracker 还是 approval workflow，capability 都是合适的抽象。
 
-## Native capabilities
+## 原生 Capabilities {#native-capabilities}
 
-Pydantic AI ships with several capabilities that cover common needs:
+Pydantic AI 随附了几个覆盖常见需求的 capabilities：
 
-| Capability | What it provides | Spec |
+| Capability | 提供内容 | Spec |
 |---|---|:---:|
-| [`Thinking`][pydantic_ai.capabilities.Thinking] | Enables model [thinking/reasoning](thinking.md) at configurable effort | Yes |
-| [`Hooks`][pydantic_ai.capabilities.Hooks] | Decorator-based [lifecycle hook](hooks.md) registration | — |
-| [`Instrumentation`][pydantic_ai.capabilities.Instrumentation] | OpenTelemetry/Logfire tracing — see [Debugging and Monitoring](logfire.md) | Yes |
-| [`WebSearch`][pydantic_ai.capabilities.WebSearch] | Web search — native when supported, [local fallback](common-tools.md#duckduckgo-search-tool) with [`duckduckgo` extra](install.md#slim-install) | Yes |
-| [`WebFetch`][pydantic_ai.capabilities.WebFetch] | URL fetching — native when supported, [local fallback](common-tools.md#web-fetch-tool) with [`web-fetch` extra](install.md#slim-install) | Yes |
-| [`ImageGeneration`][pydantic_ai.capabilities.ImageGeneration] | Image generation — native when supported, subagent fallback via `fallback_model` | Yes |
-| [`XSearch`][pydantic_ai.capabilities.XSearch] | X search — native on xAI, explicit subagent fallback via `fallback_model` | Yes |
-| [`MCP`][pydantic_ai.capabilities.MCP] | MCP server — native when supported, direct connection otherwise | Yes |
-| [`ToolSearch`][pydantic_ai.capabilities.ToolSearch] | Discovery of [deferred tools](tools-advanced.md#tool-search) — native when supported, local `search_tools` function tool otherwise | Yes |
-| [`PrepareTools`][pydantic_ai.capabilities.PrepareTools] | Filters or modifies function [tool definitions](tools.md) per step | — |
-| [`PrepareOutputTools`][pydantic_ai.capabilities.PrepareOutputTools] | Filters or modifies [output tool][pydantic_ai.output.ToolOutput] definitions per step | — |
-| [`PrefixTools`][pydantic_ai.capabilities.PrefixTools] | Wraps a capability and prefixes its tool names | Yes |
-| [`NativeTool`][pydantic_ai.capabilities.NativeTool] | Registers a [native tool](native-tools.md) with the agent | Yes |
-| [`Toolset`][pydantic_ai.capabilities.Toolset] | Wraps an [`AbstractToolset`][pydantic_ai.toolsets.AbstractToolset] | — |
-| [`IncludeToolReturnSchemas`][pydantic_ai.capabilities.IncludeToolReturnSchemas] | Includes return type schemas in tool definitions sent to the model | Yes |
-| [`SetToolMetadata`][pydantic_ai.capabilities.SetToolMetadata] | Merges metadata key-value pairs onto selected tools | Yes |
-| [`HandleDeferredToolCalls`][pydantic_ai.capabilities.HandleDeferredToolCalls] | Resolves [deferred tool calls](deferred-tools.md#resolving-deferred-calls-with-a-handler) inline with a handler function | — |
-| [`ProcessHistory`][pydantic_ai.capabilities.ProcessHistory] | Wraps a [history processor](message-history.md#processing-message-history) | — |
-| [`ProcessEventStream`][pydantic_ai.capabilities.ProcessEventStream] | Forwards agent stream events to a handler function | — |
-| [`ThreadExecutor`][pydantic_ai.capabilities.ThreadExecutor] | Uses a custom thread executor for [sync functions](tools-advanced.md#thread-executor-for-long-running-servers) | — |
+| [`Thinking`][pydantic_ai.capabilities.Thinking] | 以可配置 effort 启用模型 [thinking/reasoning](thinking.md) | Yes |
+| [`Hooks`][pydantic_ai.capabilities.Hooks] | 基于 decorator 的 [lifecycle hook](hooks.md) 注册 | — |
+| [`Instrumentation`][pydantic_ai.capabilities.Instrumentation] | OpenTelemetry/Logfire tracing，参见 [Debugging and Monitoring](logfire.md) | Yes |
+| [`WebSearch`][pydantic_ai.capabilities.WebSearch] | Web search；支持时使用 native，不支持时通过 [`duckduckgo` extra](install.md#slim-install) 使用 [local fallback](common-tools.md#duckduckgo-search-tool) | Yes |
+| [`WebFetch`][pydantic_ai.capabilities.WebFetch] | URL fetching；支持时使用 native，不支持时通过 [`web-fetch` extra](install.md#slim-install) 使用 [local fallback](common-tools.md#web-fetch-tool) | Yes |
+| [`ImageGeneration`][pydantic_ai.capabilities.ImageGeneration] | Image generation；支持时使用 native，否则通过 `fallback_model` 使用 subagent fallback | Yes |
+| [`XSearch`][pydantic_ai.capabilities.XSearch] | X search；在 xAI 上使用 native，否则通过 `fallback_model` 显式使用 subagent fallback | Yes |
+| [`MCP`][pydantic_ai.capabilities.MCP] | MCP server；支持时使用 native，否则直接连接 | Yes |
+| [`ToolSearch`][pydantic_ai.capabilities.ToolSearch] | 发现 [deferred tools](tools-advanced.md#tool-search)；支持时使用 native，否则使用本地 `search_tools` function tool | Yes |
+| [`PrepareTools`][pydantic_ai.capabilities.PrepareTools] | 按 step 过滤或修改 function [tool definitions](tools.md) | — |
+| [`PrepareOutputTools`][pydantic_ai.capabilities.PrepareOutputTools] | 按 step 过滤或修改 [output tool][pydantic_ai.output.ToolOutput] definitions | — |
+| [`PrefixTools`][pydantic_ai.capabilities.PrefixTools] | 包装 capability，并为其 tool names 添加前缀 | Yes |
+| [`NativeTool`][pydantic_ai.capabilities.NativeTool] | 给 agent 注册 [native tool](native-tools.md) | Yes |
+| [`Toolset`][pydantic_ai.capabilities.Toolset] | 包装 [`AbstractToolset`][pydantic_ai.toolsets.AbstractToolset] | — |
+| [`IncludeToolReturnSchemas`][pydantic_ai.capabilities.IncludeToolReturnSchemas] | 在发送给模型的 tool definitions 中包含 return type schemas | Yes |
+| [`SetToolMetadata`][pydantic_ai.capabilities.SetToolMetadata] | 把 metadata key-value pairs 合并到选定 tools 上 | Yes |
+| [`HandleDeferredToolCalls`][pydantic_ai.capabilities.HandleDeferredToolCalls] | 使用 handler function inline 解析 [deferred tool calls](deferred-tools.md#resolving-deferred-calls-with-a-handler) | — |
+| [`ProcessHistory`][pydantic_ai.capabilities.ProcessHistory] | 包装 [history processor](message-history.md#processing-message-history) | — |
+| [`ProcessEventStream`][pydantic_ai.capabilities.ProcessEventStream] | 把 agent stream events 转发给 handler function | — |
+| [`ThreadExecutor`][pydantic_ai.capabilities.ThreadExecutor] | 为 [sync functions](tools-advanced.md#thread-executor-for-long-running-servers) 使用自定义 thread executor | — |
 
-The **Spec** column indicates whether the capability can be used in [agent specs](agent-spec.md) (YAML/JSON). Capabilities marked **—** take non-serializable arguments (callables, toolset objects) and can only be used in Python code.
+**Spec** 列表示 capability 是否可用于 [agent specs](agent-spec.md)（YAML/JSON）。标记为 **—** 的 capabilities 接受不可序列化 arguments（callables、toolset objects），只能在 Python code 中使用。
 
 ```python {title="native_capabilities.py"}
 from pydantic_ai import Agent
@@ -54,11 +54,11 @@ agent = Agent(
 )
 ```
 
-[Instructions](agent.md#instructions) and [model settings](agent.md#model-run-settings) are configured directly via the `instructions` and `model_settings` parameters on `Agent` (or [`AgentSpec`][pydantic_ai.agent.spec.AgentSpec]). Capabilities are for behavior that goes beyond simple configuration — tools, lifecycle hooks, and custom extensions. They compose well, especially when you want to reuse the same configuration across multiple agents or load it from a [spec file](agent-spec.md).
+[Instructions](agent.md#instructions) 和 [model settings](agent.md#model-run-settings) 会直接通过 `Agent`（或 [`AgentSpec`][pydantic_ai.agent.spec.AgentSpec]）上的 `instructions` 和 `model_settings` parameters 配置。Capabilities 用于超出简单配置的 behavior：tools、lifecycle hooks 和 custom extensions。它们组合性很好，尤其适合在多个 agents 之间复用同一配置，或从 [spec file](agent-spec.md) 加载配置。
 
-### Thinking
+### Thinking（思考） {#thinking}
 
-The [`Thinking`][pydantic_ai.capabilities.Thinking] capability enables model [thinking/reasoning](thinking.md) at a configurable effort level. It's the simplest way to enable thinking across providers:
+[`Thinking`][pydantic_ai.capabilities.Thinking] capability 会以可配置 effort level 启用模型 [thinking/reasoning](thinking.md)。这是跨 providers 启用 thinking 的最简单方式：
 
 ```python {title="thinking_capability.py"}
 from pydantic_ai import Agent
@@ -70,20 +70,20 @@ print(result.output)
 #> The capital of France is Paris.
 ```
 
-See [Thinking](thinking.md) for provider-specific details and the [unified thinking settings](thinking.md#unified-thinking-settings).
+Provider-specific 细节和 [unified thinking settings](thinking.md#unified-thinking-settings) 请参阅 [Thinking](thinking.md)。
 
-### Compaction
+### Compaction（压缩） {#compaction}
 
-Provider-specific compaction capabilities manage conversation context size by compacting older messages into summaries:
+Provider-specific compaction capabilities 会把较早 messages 压缩成 summaries，以管理 conversation context size：
 
-| Provider | Capability | Details |
+| Provider | Capability | 详情 |
 |----------|-----------|---------|
-| OpenAI Responses API | [`OpenAICompaction`][pydantic_ai.models.openai.OpenAICompaction] | [OpenAI compaction](models/openai.md#message-compaction) |
-| Anthropic | [`AnthropicCompaction`][pydantic_ai.models.anthropic.AnthropicCompaction] | [Anthropic compaction](models/anthropic.md#message-compaction) |
+| OpenAI Responses API | [`OpenAICompaction`][pydantic_ai.models.openai.OpenAICompaction] | [OpenAI compaction（OpenAI 压缩）](models/openai.md#message-compaction) |
+| Anthropic | [`AnthropicCompaction`][pydantic_ai.models.anthropic.AnthropicCompaction] | [Anthropic compaction（Anthropic 压缩）](models/anthropic.md#message-compaction) |
 
-### ThreadExecutor
+### ThreadExecutor（线程执行器） {#threadexecutor}
 
-The [`ThreadExecutor`][pydantic_ai.capabilities.ThreadExecutor] capability provides a custom [`Executor`][concurrent.futures.Executor] for running sync tool functions and other sync callbacks in threads. This is useful in long-running servers (e.g. FastAPI) where the default ephemeral threads from [`anyio.to_thread.run_sync`][anyio.to_thread.run_sync] can accumulate under sustained load:
+[`ThreadExecutor`][pydantic_ai.capabilities.ThreadExecutor] capability 提供自定义 [`Executor`][concurrent.futures.Executor]，用于在线程中运行 sync tool functions 和其他 sync callbacks。在 long-running servers（例如 FastAPI）中，这很有用，因为来自 [`anyio.to_thread.run_sync`][anyio.to_thread.run_sync] 的默认临时 threads 可能在持续负载下不断累积：
 
 ```python {test="skip"}
 from concurrent.futures import ThreadPoolExecutor
@@ -95,10 +95,11 @@ executor = ThreadPoolExecutor(max_workers=16, thread_name_prefix='agent-worker')
 agent = Agent('openai:gpt-5.2', capabilities=[ThreadExecutor(executor)])
 ```
 
-See [Thread executor for long-running servers](tools-advanced.md#thread-executor-for-long-running-servers) for more details.
-### Hooks
+更多细节请参阅 [Thread executor for long-running servers](tools-advanced.md#thread-executor-for-long-running-servers)。
 
-The [`Hooks`][pydantic_ai.capabilities.Hooks] capability provides decorator-based [lifecycle hook](#hooking-into-the-lifecycle) registration — the easiest way to intercept model requests, tool calls, and other events without subclassing [`AbstractCapability`][pydantic_ai.capabilities.AbstractCapability]:
+### Hooks（钩子） {#hooks}
+
+[`Hooks`][pydantic_ai.capabilities.Hooks] capability 提供基于 decorator 的 [lifecycle hook](#hooking-into-the-lifecycle) 注册；这是不 subclass [`AbstractCapability`][pydantic_ai.capabilities.AbstractCapability] 就能拦截 model requests、tool calls 和其他 events 的最简单方式：
 
 ```python {test="skip" lint="skip"}
 from pydantic_ai import Agent, ModelRequestContext, RunContext
@@ -115,20 +116,20 @@ async def log_request(ctx: RunContext[None], request_context: ModelRequestContex
 agent = Agent('openai:gpt-5.2', name='my_agent', capabilities=[hooks])
 ```
 
-All hooks receive [`RunContext`][pydantic_ai.tools.RunContext], which provides access to the running agent via [`ctx.agent`][pydantic_ai.tools.RunContext.agent] — useful for logging, metrics, and other cross-cutting concerns that need to identify which agent is running.
+所有 hooks 都会接收 [`RunContext`][pydantic_ai.tools.RunContext]，它通过 [`ctx.agent`][pydantic_ai.tools.RunContext.agent] 提供对正在运行的 agent 的访问；这对 logging、metrics 以及需要识别当前运行 agent 的其他 cross-cutting concerns 很有用。
 
-Hooks can also push follow-up messages into the conversation via
-[`RunContext.enqueue`][pydantic_ai.tools.RunContext.enqueue] — useful for capability
-authors that need to surface an event to the model mid-run without rebuilding the
-cached system prompt. See [Injecting messages mid-run](message-history.md#injecting-messages-mid-run).
+Hooks 也可以通过 [`RunContext.enqueue`][pydantic_ai.tools.RunContext.enqueue]
+把 follow-up messages 推入 conversation。这适合 capability authors 在 mid-run
+向模型暴露事件，同时不重建 cached system prompt。参见
+[Injecting messages mid-run（在运行中注入消息）](message-history.md#injecting-messages-mid-run)。
 
-See the dedicated [Hooks](hooks.md) page for the full API: decorator and constructor registration, timeouts, tool filtering, wrap hooks, per-event hooks, and more.
+完整 API 请参阅专门的 [Hooks](hooks.md) 页面：decorator 和 constructor registration、timeouts、tool filtering、wrap hooks、per-event hooks 等。
 
-### Provider-adaptive tools
+### Provider-adaptive tools（提供商自适应工具） {#provider-adaptive-tools}
 
-[`WebSearch`][pydantic_ai.capabilities.WebSearch], [`WebFetch`][pydantic_ai.capabilities.WebFetch], [`ImageGeneration`][pydantic_ai.capabilities.ImageGeneration], [`XSearch`][pydantic_ai.capabilities.XSearch], and [`MCP`][pydantic_ai.capabilities.MCP] provide model-agnostic access to common tool types. When the model supports the tool natively (as a [native tool](native-tools.md)), it's used directly. When it doesn't, a local function tool handles it instead — so your agent works across providers without code changes.
+[`WebSearch`][pydantic_ai.capabilities.WebSearch]、[`WebFetch`][pydantic_ai.capabilities.WebFetch]、[`ImageGeneration`][pydantic_ai.capabilities.ImageGeneration]、[`XSearch`][pydantic_ai.capabilities.XSearch] 和 [`MCP`][pydantic_ai.capabilities.MCP] 为常见 tool types 提供 model-agnostic 访问。当模型原生支持该 tool（作为 [native tool](native-tools.md)）时，会直接使用原生能力；不支持时，则由本地 function tool 处理。因此你的 agent 可以跨 providers 工作，无需改代码。
 
-Each accepts `native` and `local` keyword arguments to control which side is used. [`ImageGeneration`][pydantic_ai.capabilities.ImageGeneration] and [`XSearch`][pydantic_ai.capabilities.XSearch] also accept `fallback_model` to enable their default subagent fallbacks:
+每个 capability 都接受 `native` 和 `local` keyword arguments 来控制使用哪一侧。[`ImageGeneration`][pydantic_ai.capabilities.ImageGeneration] 和 [`XSearch`][pydantic_ai.capabilities.XSearch] 还接受 `fallback_model`，用于启用默认 subagent fallbacks：
 
 ```python {title="provider_adaptive_tools.py" test="skip"}
 from pydantic_ai import Agent
@@ -152,21 +153,21 @@ agent = Agent(
 )
 ```
 
-[`XSearch`][pydantic_ai.capabilities.XSearch] is slightly different from [`WebSearch`][pydantic_ai.capabilities.WebSearch] and [`WebFetch`][pydantic_ai.capabilities.WebFetch]: there is no default non-xAI fallback. If your agent is not running on an xAI model, set `fallback_model` explicitly to an xAI model that supports [`XSearchTool`][pydantic_ai.native_tools.XSearchTool].
+[`XSearch`][pydantic_ai.capabilities.XSearch] 与 [`WebSearch`][pydantic_ai.capabilities.WebSearch] 和 [`WebFetch`][pydantic_ai.capabilities.WebFetch] 略有不同：它没有默认的 non-xAI fallback。如果你的 agent 没有运行在 xAI model 上，请把 `fallback_model` 显式设置为支持 [`XSearchTool`][pydantic_ai.native_tools.XSearchTool] 的 xAI model。
 
-To force native-only (errors on unsupported models instead of falling back to local):
+要强制 native-only（在不支持的模型上报错，而不是 fallback 到 local）：
 
 ```python {title="native_only.py" test="skip" lint="skip"}
 MCP(url='https://mcp.example.com/api', native=True, local=False)
 ```
 
-To force local-only (never use the native tool, even when the model supports it):
+要强制 local-only（即使模型支持，也永不使用 native tool）：
 
 ```python {title="local_only.py" test="skip" lint="skip"}
 MCP(url='https://mcp.example.com/api', native=False)
 ```
 
-Some constraint fields require the native tool because the local fallback can't enforce them. When these are set and the model doesn't support the native tool, a [`UserError`][pydantic_ai.exceptions.UserError] is raised. For example, [`WebSearch`][pydantic_ai.capabilities.WebSearch] domain constraints require the native tool, while [`WebFetch`][pydantic_ai.capabilities.WebFetch] enforces them locally:
+有些 constraint fields 需要 native tool，因为 local fallback 无法强制执行它们。当设置了这些字段但模型不支持 native tool 时，会 raise [`UserError`][pydantic_ai.exceptions.UserError]。例如，[`WebSearch`][pydantic_ai.capabilities.WebSearch] 的 domain constraints 需要 native tool，而 [`WebFetch`][pydantic_ai.capabilities.WebFetch] 会在本地强制执行它们：
 
 ```python {title="constraints.py" test="skip" lint="skip"}
 # Only search example.com — requires native support
@@ -176,7 +177,7 @@ WebSearch(allowed_domains=['example.com'])
 WebFetch(allowed_domains=['example.com'])
 ```
 
-All of these capabilities are subclasses of [`NativeOrLocalTool`][pydantic_ai.capabilities.NativeOrLocalTool], which you can use directly or subclass to build your own provider-adaptive tools. For example, to pair [`CodeExecutionTool`][pydantic_ai.native_tools.CodeExecutionTool] with a local fallback:
+所有这些 capabilities 都是 [`NativeOrLocalTool`][pydantic_ai.capabilities.NativeOrLocalTool] 的 subclasses；你可以直接使用它，也可以 subclass 它来构建自己的 provider-adaptive tools。例如，把 [`CodeExecutionTool`][pydantic_ai.native_tools.CodeExecutionTool] 与 local fallback 配对：
 
 ```python {title="custom_native_or_local.py" test="skip" lint="skip"}
 from pydantic_ai.native_tools import CodeExecutionTool
@@ -185,11 +186,11 @@ from pydantic_ai.capabilities import NativeOrLocalTool
 cap = NativeOrLocalTool(native=CodeExecutionTool(), local=my_local_executor)
 ```
 
-### ToolSearch
+### ToolSearch（工具搜索） {#toolsearch}
 
-The [`ToolSearch`][pydantic_ai.capabilities.ToolSearch] capability handles discovery of tools marked with `defer_loading=True`, so agents with large toolsets only pay tokens for the tools the model needs. Like the [provider-adaptive tools](#provider-adaptive-tools) above, it picks the best path for the active model — native server-executed search on Anthropic and OpenAI Responses, a local `search_tools` function tool elsewhere — and is auto-injected into every agent with zero overhead when no deferred tools exist.
+[`ToolSearch`][pydantic_ai.capabilities.ToolSearch] capability 负责发现标记为 `defer_loading=True` 的 tools，因此拥有大型 toolsets 的 agents 只会为模型所需 tools 支付 tokens。与上面的 [provider-adaptive tools](#provider-adaptive-tools) 一样，它会为当前模型选择最佳路径：在 Anthropic 和 OpenAI Responses 上使用 native server-executed search，其他位置使用本地 `search_tools` function tool；当不存在 deferred tools 时，它会以零开销自动注入每个 agent。
 
-Pass an explicit [`ToolSearch`][pydantic_ai.capabilities.ToolSearch] to pick a specific [`strategy`][pydantic_ai.capabilities.ToolSearch.strategy] (`'keywords'`, `'bm25'`, `'regex'`, or a custom callable) or tune the local fallback:
+传入显式 [`ToolSearch`][pydantic_ai.capabilities.ToolSearch] 可以选择特定 [`strategy`][pydantic_ai.capabilities.ToolSearch.strategy]（`'keywords'`、`'bm25'`、`'regex'` 或 custom callable），或调优 local fallback：
 
 ```python {title="tool_search_capability.py"}
 from pydantic_ai import Agent
@@ -198,11 +199,11 @@ from pydantic_ai.capabilities import ToolSearch
 agent = Agent('anthropic:claude-sonnet-4-6', capabilities=[ToolSearch(strategy='keywords')])
 ```
 
-See [Tool Search](tools-advanced.md#tool-search) for when to reach for it, the full strategy table, and provider support details.
+何时使用它、完整 strategy table 和 provider support 细节，请参阅 [Tool Search](tools-advanced.md#tool-search)。
 
-### PrepareTools and PrepareOutputTools
+### PrepareTools 和 PrepareOutputTools {#preparetools-and-prepareoutputtools}
 
-[`PrepareTools`][pydantic_ai.capabilities.PrepareTools] and [`PrepareOutputTools`][pydantic_ai.capabilities.PrepareOutputTools] wrap a [`ToolsPrepareFunc`][pydantic_ai.tools.ToolsPrepareFunc] as a capability, for filtering or modifying [tool definitions](tools.md) per step. `PrepareTools` handles function tools; `PrepareOutputTools` handles [output tools][pydantic_ai.output.ToolOutput]. The Agent constructor's [`prepare_tools`][pydantic_ai.tools.ToolsPrepareFunc] / [`prepare_output_tools`][pydantic_ai.tools.ToolsPrepareFunc] arguments are sugar that injects these capabilities automatically. Both capabilities follow the same return-value rules and `None` warning behavior as [`prepare_tools`](tools-advanced.md#prepare-tools).
+[`PrepareTools`][pydantic_ai.capabilities.PrepareTools] 和 [`PrepareOutputTools`][pydantic_ai.capabilities.PrepareOutputTools] 会把 [`ToolsPrepareFunc`][pydantic_ai.tools.ToolsPrepareFunc] 包装为 capability，用于按 step 过滤或修改 [tool definitions](tools.md)。`PrepareTools` 处理 function tools；`PrepareOutputTools` 处理 [output tools][pydantic_ai.output.ToolOutput]。Agent constructor 的 [`prepare_tools`][pydantic_ai.tools.ToolsPrepareFunc] / [`prepare_output_tools`][pydantic_ai.tools.ToolsPrepareFunc] arguments 是语法糖，会自动注入这些 capabilities。这两个 capabilities 遵循与 [`prepare_tools`](tools-advanced.md#prepare-tools) 相同的返回值规则和 `None` warning behavior。
 
 ```python {title="prepare_tools_native.py"}
 from pydantic_ai import Agent, RunContext, ToolDefinition
@@ -232,11 +233,11 @@ result = agent.run_sync('hello')
 # The model only sees `read_file`, not `delete_file`
 ```
 
-For more complex tool preparation logic, see [Tool preparation](#tool-preparation) under lifecycle hooks.
+更复杂的 tool preparation logic 请参阅 lifecycle hooks 下的 [Tool preparation](#tool-preparation)。
 
-### PrefixTools
+### PrefixTools（工具前缀） {#prefixtools}
 
-[`PrefixTools`][pydantic_ai.capabilities.PrefixTools] wraps another capability and prefixes all of its tool names, useful for namespacing when composing multiple capabilities that might have conflicting tool names:
+[`PrefixTools`][pydantic_ai.capabilities.PrefixTools] 会包装另一个 capability，并给它的所有 tool names 添加前缀。当组合多个可能存在 tool name 冲突的 capabilities 时，这对 namespacing 很有用：
 
 ```python {title="prefix_tools_example.py" test="skip" lint="skip"}
 from pydantic_ai import Agent
@@ -251,15 +252,15 @@ agent = Agent(
 )
 ```
 
-Every [`AbstractCapability`][pydantic_ai.capabilities.AbstractCapability] has a convenience method [`prefix_tools`][pydantic_ai.capabilities.AbstractCapability.prefix_tools] that returns a [`PrefixTools`][pydantic_ai.capabilities.PrefixTools] wrapper:
+每个 [`AbstractCapability`][pydantic_ai.capabilities.AbstractCapability] 都有一个便利 method [`prefix_tools`][pydantic_ai.capabilities.AbstractCapability.prefix_tools]，它会返回 [`PrefixTools`][pydantic_ai.capabilities.PrefixTools] wrapper：
 
 ```python {title="prefix_convenience.py" test="skip" lint="skip"}
 MCP(url='https://mcp.example.com/api', native=True).prefix_tools('mcp')
 ```
 
-### IncludeToolReturnSchemas
+### IncludeToolReturnSchemas（包含工具返回 schema） {#includetoolreturnschemas}
 
-[`IncludeToolReturnSchemas`][pydantic_ai.capabilities.IncludeToolReturnSchemas] includes return type schemas in tool definitions sent to the model. For models that natively support return schemas (e.g. Google Gemini), the schema is passed as a structured field in the API request. For other models, it is injected into the tool description as JSON text.
+[`IncludeToolReturnSchemas`][pydantic_ai.capabilities.IncludeToolReturnSchemas] 会在发送给模型的 tool definitions 中包含 return type schemas。对于原生支持 return schemas 的模型（例如 Google Gemini），schema 会作为 API request 中的 structured field 传入。对于其他模型，它会以 JSON text 形式注入 tool description。
 
 ```python {title="include_return_schemas.py" lint="skip"}
 from pydantic_ai import Agent
@@ -284,9 +285,9 @@ td = params.function_tools[0]
 assert td.include_return_schema is True
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-Use the `tools` parameter to select which tools should include return schemas. It accepts a list of tool names, a metadata dict for matching, or a callable predicate:
+使用 `tools` parameter 可以选择哪些 tools 应包含 return schemas。它接受 tool names list、用于匹配的 metadata dict，或 callable predicate：
 
 ```python {title="include_return_schemas_selective.py" lint="skip"}
 from pydantic_ai import Agent
@@ -322,13 +323,13 @@ assert temp_tool.include_return_schema is True
 assert greet_tool.include_return_schema is None
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-The same effect can be achieved at the toolset level using [`.include_return_schemas()`][pydantic_ai.toolsets.AbstractToolset.include_return_schemas] — see [toolset composition](toolsets.md#including-return-schemas).
+也可以在 toolset 层级使用 [`.include_return_schemas()`][pydantic_ai.toolsets.AbstractToolset.include_return_schemas] 达到同样效果；参见 [toolset composition](toolsets.md#including-return-schemas)。
 
-### SetToolMetadata
+### SetToolMetadata（设置工具 metadata） {#settoolmetadata}
 
-[`SetToolMetadata`][pydantic_ai.capabilities.SetToolMetadata] merges metadata key-value pairs onto selected tools. This is useful for tagging tools with configuration that other capabilities or custom logic can inspect:
+[`SetToolMetadata`][pydantic_ai.capabilities.SetToolMetadata] 会把 metadata key-value pairs 合并到选定 tools 上。这适合给 tools 添加可由其他 capabilities 或 custom logic 检查的配置标签：
 
 ```python {title="set_tool_metadata.py" lint="skip"}
 from pydantic_ai import Agent
@@ -364,15 +365,15 @@ assert search_tool.metadata is not None and search_tool.metadata.get('sensitive'
 assert greet_tool.metadata is None or greet_tool.metadata.get('sensitive') is None
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-The same effect can be achieved at the toolset level using [`.with_metadata()`][pydantic_ai.toolsets.AbstractToolset.with_metadata] — see [toolset composition](toolsets.md#setting-tool-metadata).
+也可以在 toolset 层级使用 [`.with_metadata()`][pydantic_ai.toolsets.AbstractToolset.with_metadata] 达到同样效果；参见 [toolset composition](toolsets.md#setting-tool-metadata)。
 
-### ReinjectSystemPrompt
+### ReinjectSystemPrompt（重新注入 system prompt） {#reinjectsystemprompt}
 
-[`ReinjectSystemPrompt`][pydantic_ai.capabilities.ReinjectSystemPrompt] ensures the agent's configured [`system_prompt`](agent.md#system-prompts) is at the head of the first [`ModelRequest`][pydantic_ai.messages.ModelRequest] on every model request. By default, if any [`SystemPromptPart`][pydantic_ai.messages.SystemPromptPart] is already present in the history, the capability is a no-op (so multi-agent handoff and user-managed system prompts remain authoritative). Set `replace_existing=True` to instead strip any existing `SystemPromptPart`s before prepending the agent's configured prompt — useful when the history comes from an untrusted source and the server's prompt must win.
+[`ReinjectSystemPrompt`][pydantic_ai.capabilities.ReinjectSystemPrompt] 会确保 agent 配置的 [`system_prompt`](agent.md#system-prompts) 位于每次 model request 中第一个 [`ModelRequest`][pydantic_ai.messages.ModelRequest] 的开头。默认情况下，如果 history 中已存在任何 [`SystemPromptPart`][pydantic_ai.messages.SystemPromptPart]，该 capability 会 no-op（因此 multi-agent handoff 和 user-managed system prompts 仍保持权威）。设置 `replace_existing=True` 后，会先移除任何现有 `SystemPromptPart`s，再把 agent 配置的 prompt 前置；当 history 来自不受信任来源且 server prompt 必须优先生效时，这很有用。
 
-Useful when `message_history` comes from a source that doesn't round-trip system prompts — UI frontends, database persistence layers, conversation compaction pipelines. Without this capability, an agent configured with a `system_prompt` will silently run without it if the history doesn't already include one.
+当 `message_history` 来自不会 round-trip system prompts 的来源时，这很有用，例如 UI frontends、database persistence layers、conversation compaction pipelines。没有这个 capability 时，如果 history 中尚未包含 system prompt，配置了 `system_prompt` 的 agent 会静默地在没有该 prompt 的情况下运行。
 
 ```python {title="reinject_system_prompt.py"}
 from pydantic_ai import Agent
@@ -395,17 +396,17 @@ assert isinstance(first_request, ModelRequest)
 assert first_request.parts[0].content == 'You are a helpful assistant.'
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-The [UI adapters](ui/ag-ui.md) (AG-UI, Vercel AI) automatically add this capability with `replace_existing=True` in their `manage_system_prompt='server'` mode.
+[UI adapters](ui/ag-ui.md)（AG-UI、Vercel AI）会在 `manage_system_prompt='server'` mode 中自动添加此 capability，并设置 `replace_existing=True`。
 
-## Building custom capabilities
+## 构建自定义 Capabilities {#building-custom-capabilities}
 
-To build your own capability, subclass [`AbstractCapability`][pydantic_ai.capabilities.AbstractCapability] and override the methods you need. There are two categories: **configuration methods** that are called at agent construction (except [`get_wrapper_toolset`][pydantic_ai.capabilities.AbstractCapability.get_wrapper_toolset] which is called per-run), and **lifecycle hooks** that fire during each run.
+要构建自己的 capability，请 subclass [`AbstractCapability`][pydantic_ai.capabilities.AbstractCapability] 并 override 所需 methods。它们分为两类：在 agent construction 时调用的 **configuration methods**（[`get_wrapper_toolset`][pydantic_ai.capabilities.AbstractCapability.get_wrapper_toolset] 例外，它按 run 调用），以及在每次 run 期间触发的 **lifecycle hooks**。
 
-### Providing tools
+### 提供 Tools {#providing-tools}
 
-A capability that provides tools returns a [toolset](toolsets.md) from [`get_toolset`][pydantic_ai.capabilities.AbstractCapability.get_toolset]. This can be a pre-built [`AbstractToolset`][pydantic_ai.toolsets.AbstractToolset] instance, or a callable that receives [`RunContext`][pydantic_ai.tools.RunContext] and returns one dynamically:
+提供 tools 的 capability 会从 [`get_toolset`][pydantic_ai.capabilities.AbstractCapability.get_toolset] 返回 [toolset](toolsets.md)。这可以是预先构建的 [`AbstractToolset`][pydantic_ai.toolsets.AbstractToolset] instance，也可以是接收 [`RunContext`][pydantic_ai.tools.RunContext] 并动态返回 toolset 的 callable：
 
 ```python {title="custom_capability_tools.py"}
 from dataclasses import dataclass
@@ -444,13 +445,13 @@ print(result.output)
 #> The answer is 5.0
 ```
 
-For [native tools](native-tools.md), override [`get_native_tools`][pydantic_ai.capabilities.AbstractCapability.get_native_tools] to return a sequence of [`AgentNativeTool`][pydantic_ai.tools.AgentNativeTool] instances (which includes both [`AbstractNativeTool`][pydantic_ai.native_tools.AbstractNativeTool] objects and callables that receive [`RunContext`][pydantic_ai.tools.RunContext]).
+对于 [native tools](native-tools.md)，请 override [`get_native_tools`][pydantic_ai.capabilities.AbstractCapability.get_native_tools]，返回 [`AgentNativeTool`][pydantic_ai.tools.AgentNativeTool] instances sequence（其中包含 [`AbstractNativeTool`][pydantic_ai.native_tools.AbstractNativeTool] objects，以及接收 [`RunContext`][pydantic_ai.tools.RunContext] 的 callables）。
 
-#### Toolset wrapping
+#### Toolset wrapping（工具集包装） {#toolset-wrapping}
 
-[`get_wrapper_toolset`][pydantic_ai.capabilities.AbstractCapability.get_wrapper_toolset] lets a capability wrap the agent's entire assembled toolset with a [`WrapperToolset`](toolsets.md#changing-tool-execution). This is more powerful than providing tools — it can intercept tool execution, add logging, or apply cross-cutting behavior.
+[`get_wrapper_toolset`][pydantic_ai.capabilities.AbstractCapability.get_wrapper_toolset] 允许 capability 用 [`WrapperToolset`](toolsets.md#changing-tool-execution) 包装 agent 已组装好的完整 toolset。这比提供 tools 更强大：它可以拦截 tool execution、添加 logging，或应用 cross-cutting behavior。
 
-The wrapper receives the combined non-output toolset (after the [`prepare_tools`](#tool-preparation) hook has wrapped it). Output tools are added separately and are not affected.
+wrapper 会接收合并后的 non-output toolset（在 [`prepare_tools`](#tool-preparation) hook 包装之后）。Output tools 会单独添加，不受影响。
 
 ```python {title="wrapper_toolset_example.py"}
 from dataclasses import dataclass
@@ -494,12 +495,12 @@ result = agent.run_sync('hello')
 # Tool calls are logged as they happen
 ```
 
-!!! note
-    `get_wrapper_toolset` wraps the non-output *toolset* once per run (during toolset assembly). The [`prepare_tools`](#tool-preparation) and [`prepare_output_tools`](#tool-preparation) hooks also flow through `PreparedToolset` wrappers, so all three integrate at the toolset level — `get_wrapper_toolset` runs around `prepare_tools` (it sees the prepared defs), and `prepare_output_tools` wraps the output toolset independently.
+!!! note "注意"
+    `get_wrapper_toolset` 每次 run 会包装 non-output *toolset* 一次（在 toolset assembly 期间）。[`prepare_tools`](#tool-preparation) 和 [`prepare_output_tools`](#tool-preparation) hooks 也会流经 `PreparedToolset` wrappers，因此三者都在 toolset 层级集成：`get_wrapper_toolset` 包在 `prepare_tools` 外侧（它看到 prepared defs），而 `prepare_output_tools` 会独立包装 output toolset。
 
-### Providing instructions
+### 提供 Instructions {#providing-instructions}
 
-[`get_instructions`][pydantic_ai.capabilities.AbstractCapability.get_instructions] adds [instructions](agent.md#instructions) to the agent. Since it's called once at agent construction, return a callable if you need dynamic values:
+[`get_instructions`][pydantic_ai.capabilities.AbstractCapability.get_instructions] 会给 agent 添加 [instructions](agent.md#instructions)。由于它在 agent construction 时调用一次，如果需要 dynamic values，请返回 callable：
 
 ```python {title="custom_capability_config.py"}
 from dataclasses import dataclass
@@ -527,13 +528,13 @@ print(result.output)
 #> The current time is 3:45 PM.
 ```
 
-Instructions can also use [template strings](agent-spec.md#template-strings) (`TemplateStr('Hello {{name}}')`) for Handlebars-style templates rendered against the agent's [dependencies](dependencies.md). In Python code, a callable with [`RunContext`][pydantic_ai.tools.RunContext] is generally preferred for IDE autocomplete.
+Instructions 也可以使用 [template strings](agent-spec.md#template-strings)（`TemplateStr('Hello {{name}}')`），以便针对 agent 的 [dependencies](dependencies.md) 渲染 Handlebars-style templates。在 Python code 中，通常更推荐使用带 [`RunContext`][pydantic_ai.tools.RunContext] 的 callable，以获得 IDE autocomplete。
 
-### Providing model settings
+### 提供 Model settings {#providing-model-settings}
 
-[`get_model_settings`][pydantic_ai.capabilities.AbstractCapability.get_model_settings] returns [model settings](agent.md#model-run-settings) as a dict or a callable for per-step settings.
+[`get_model_settings`][pydantic_ai.capabilities.AbstractCapability.get_model_settings] 会把 [model settings](agent.md#model-run-settings) 作为 dict 返回，或返回用于 per-step settings 的 callable。
 
-When model settings need to vary per step — for example, enabling thinking only on retry, or forcing a specific [`tool_choice`](tools-advanced.md#dynamic-tool-choice-via-capabilities) until a tool has been called — return a callable:
+当 model settings 需要按 step 变化时，例如只在 retry 时启用 thinking，或在某个 tool 被调用前强制指定 [`tool_choice`](tools-advanced.md#dynamic-tool-choice-via-capabilities)，请返回 callable：
 
 ```python {title="dynamic_settings.py"}
 from dataclasses import dataclass
@@ -561,54 +562,54 @@ print(result.output)
 #> Hello! How can I help you today?
 ```
 
-The callable receives a [`RunContext`][pydantic_ai.tools.RunContext] where `ctx.model_settings` contains the merged result of all layers resolved before this capability (model defaults and agent-level settings).
+该 callable 会接收 [`RunContext`][pydantic_ai.tools.RunContext]，其中 `ctx.model_settings` 包含在此 capability 之前已解析的所有层的合并结果（model defaults 和 agent-level settings）。
 
-### Configuration methods reference
+### Configuration methods reference（配置方法参考） {#configuration-methods-reference}
 
-| Method | Return type | Purpose |
+| Method | Return type | 目的 |
 |---|---|---|
-| [`get_toolset()`][pydantic_ai.capabilities.AbstractCapability.get_toolset] | [`AgentToolset`][pydantic_ai.toolsets.AgentToolset] ` \| None` | A [toolset](toolsets.md) to register (or a callable for [dynamic toolsets](toolsets.md#dynamically-building-a-toolset)) |
-| [`get_native_tools()`][pydantic_ai.capabilities.AbstractCapability.get_native_tools] | `Sequence[`[`AgentNativeTool`][pydantic_ai.tools.AgentNativeTool]`]` | [Native tools](native-tools.md) to register (including callables) |
-| [`get_wrapper_toolset()`][pydantic_ai.capabilities.AbstractCapability.get_wrapper_toolset] | [`AbstractToolset`][pydantic_ai.toolsets.AbstractToolset] ` \| None` | [Wrap the agent's assembled toolset](#toolset-wrapping) |
-| [`get_instructions()`][pydantic_ai.capabilities.AbstractCapability.get_instructions] | [`AgentInstructions`][pydantic_ai._instructions.AgentInstructions] ` \| None` | [Instructions](agent.md#instructions) (static strings, [template strings](agent-spec.md#template-strings), or callables) |
-| [`get_model_settings()`][pydantic_ai.capabilities.AbstractCapability.get_model_settings] | [`AgentModelSettings`][pydantic_ai.agent.abstract.AgentModelSettings] ` \| None` | [Model settings](agent.md#model-run-settings) dict, or a callable for per-step settings |
+| [`get_toolset()`][pydantic_ai.capabilities.AbstractCapability.get_toolset] | [`AgentToolset`][pydantic_ai.toolsets.AgentToolset] ` \| None` | 要注册的 [toolset](toolsets.md)（或用于 [dynamic toolsets](toolsets.md#dynamically-building-a-toolset) 的 callable） |
+| [`get_native_tools()`][pydantic_ai.capabilities.AbstractCapability.get_native_tools] | `Sequence[`[`AgentNativeTool`][pydantic_ai.tools.AgentNativeTool]`]` | 要注册的 [Native tools](native-tools.md)（包括 callables） |
+| [`get_wrapper_toolset()`][pydantic_ai.capabilities.AbstractCapability.get_wrapper_toolset] | [`AbstractToolset`][pydantic_ai.toolsets.AbstractToolset] ` \| None` | [包装 agent 已组装的 toolset](#toolset-wrapping) |
+| [`get_instructions()`][pydantic_ai.capabilities.AbstractCapability.get_instructions] | [`AgentInstructions`][pydantic_ai._instructions.AgentInstructions] ` \| None` | [Instructions](agent.md#instructions)（static strings、[template strings](agent-spec.md#template-strings) 或 callables） |
+| [`get_model_settings()`][pydantic_ai.capabilities.AbstractCapability.get_model_settings] | [`AgentModelSettings`][pydantic_ai.agent.abstract.AgentModelSettings] ` \| None` | [Model settings](agent.md#model-run-settings) dict，或用于 per-step settings 的 callable |
 
-### Hooking into the lifecycle
+### Hooking into the lifecycle（接入生命周期） {#hooking-into-the-lifecycle}
 
-Capabilities can hook into five lifecycle points, each with up to four variants:
+Capabilities 可以接入五个 lifecycle points，每个 point 最多有四种 variants：
 
-* **`before_*`** — fires before the action, can modify inputs
-* **`after_*`** — fires after the action succeeds (in reverse capability order), can modify outputs
-* **`wrap_*`** — full middleware control: receives a `handler` callable and decides whether/how to call it
-* **`on_*_error`** — fires when the action fails (after `wrap_*` has had its chance to recover), can observe, transform, or recover from errors
+* **`before_*`**：在 action 之前触发，可修改 inputs
+* **`after_*`**：在 action 成功后触发（按 capability 逆序），可修改 outputs
+* **`wrap_*`**：完整 middleware 控制：接收 `handler` callable，并决定是否/如何调用它
+* **`on_*_error`**：在 action 失败时触发（在 `wrap_*` 有机会 recover 之后），可观察、转换或从 errors 中 recover
 
-!!! tip
-    For quick, application-level hooks without subclassing, use the [`Hooks`](hooks.md) capability instead.
+!!! tip "提示"
+    如果需要快速添加 application-level hooks 且不想 subclass，请改用 [`Hooks`](hooks.md) capability。
 
-#### Run hooks
+#### Run hooks（运行钩子） {#run-hooks}
 
-| Hook | Signature | Purpose |
+| Hook | Signature | 目的 |
 |---|---|---|
-| [`before_run`][pydantic_ai.capabilities.AbstractCapability.before_run] | `(ctx: RunContext) -> None` | Observe-only notification that a run is starting |
-| [`after_run`][pydantic_ai.capabilities.AbstractCapability.after_run] | `(ctx: RunContext, *, result: AgentRunResult) -> AgentRunResult` | Modify the final result |
-| [`wrap_run`][pydantic_ai.capabilities.AbstractCapability.wrap_run] | `(ctx: RunContext, *, handler: WrapRunHandler) -> AgentRunResult` | Wrap the entire run |
-| [`on_run_error`][pydantic_ai.capabilities.AbstractCapability.on_run_error] | `(ctx: RunContext, *, error: BaseException) -> AgentRunResult` | Handle run errors (see [error hooks](#error-hooks)) |
+| [`before_run`][pydantic_ai.capabilities.AbstractCapability.before_run] | `(ctx: RunContext) -> None` | 仅观察 run 即将开始的通知 |
+| [`after_run`][pydantic_ai.capabilities.AbstractCapability.after_run] | `(ctx: RunContext, *, result: AgentRunResult) -> AgentRunResult` | 修改最终 result |
+| [`wrap_run`][pydantic_ai.capabilities.AbstractCapability.wrap_run] | `(ctx: RunContext, *, handler: WrapRunHandler) -> AgentRunResult` | 包装整个 run |
+| [`on_run_error`][pydantic_ai.capabilities.AbstractCapability.on_run_error] | `(ctx: RunContext, *, error: BaseException) -> AgentRunResult` | 处理 run errors（见 [error hooks](#error-hooks)） |
 
-`wrap_run` supports error recovery: if `handler()` raises and `wrap_run` catches the exception and returns a result instead, the error is suppressed and the recovery result is used. This works with both [`agent.run()`][pydantic_ai.agent.AbstractAgent.run] and [`agent.iter()`][pydantic_ai.agent.Agent.iter].
+`wrap_run` 支持 error recovery：如果 `handler()` raises，而 `wrap_run` 捕获 exception 并改为返回 result，则 error 会被抑制，并使用 recovery result。这同时适用于 [`agent.run()`][pydantic_ai.agent.AbstractAgent.run] 和 [`agent.iter()`][pydantic_ai.agent.Agent.iter]。
 
-#### Node hooks
+#### Node hooks（节点钩子） {#node-hooks}
 
-| Hook | Signature | Purpose |
+| Hook | Signature | 目的 |
 |---|---|---|
-| [`before_node_run`][pydantic_ai.capabilities.AbstractCapability.before_node_run] | `(ctx: RunContext, *, node: AgentNode) -> AgentNode` | Observe or replace the node before execution |
-| [`after_node_run`][pydantic_ai.capabilities.AbstractCapability.after_node_run] | `(ctx: RunContext, *, node: AgentNode, result: NodeResult) -> NodeResult` | Modify the result (next node or `End`) |
-| [`wrap_node_run`][pydantic_ai.capabilities.AbstractCapability.wrap_node_run] | `(ctx: RunContext, *, node: AgentNode, handler: WrapNodeRunHandler) -> NodeResult` | Wrap each graph node execution |
-| [`on_node_run_error`][pydantic_ai.capabilities.AbstractCapability.on_node_run_error] | `(ctx: RunContext, *, node: AgentNode, error: Exception) -> NodeResult` | Handle node errors (see [error hooks](#error-hooks)) |
+| [`before_node_run`][pydantic_ai.capabilities.AbstractCapability.before_node_run] | `(ctx: RunContext, *, node: AgentNode) -> AgentNode` | 在执行前观察或替换 node |
+| [`after_node_run`][pydantic_ai.capabilities.AbstractCapability.after_node_run] | `(ctx: RunContext, *, node: AgentNode, result: NodeResult) -> NodeResult` | 修改 result（下一个 node 或 `End`） |
+| [`wrap_node_run`][pydantic_ai.capabilities.AbstractCapability.wrap_node_run] | `(ctx: RunContext, *, node: AgentNode, handler: WrapNodeRunHandler) -> NodeResult` | 包装每个 graph node execution |
+| [`on_node_run_error`][pydantic_ai.capabilities.AbstractCapability.on_node_run_error] | `(ctx: RunContext, *, node: AgentNode, error: Exception) -> NodeResult` | 处理 node errors（见 [error hooks](#error-hooks)） |
 
-[`wrap_node_run`][pydantic_ai.capabilities.AbstractCapability.wrap_node_run] fires for every node in the [agent graph](agent.md#iterating-over-an-agents-graph) ([`UserPromptNode`][pydantic_ai.UserPromptNode], [`ModelRequestNode`][pydantic_ai.ModelRequestNode], [`CallToolsNode`][pydantic_ai.CallToolsNode]). Override this to observe node transitions, add per-step logging, or modify graph progression:
+[`wrap_node_run`][pydantic_ai.capabilities.AbstractCapability.wrap_node_run] 会针对 [agent graph](agent.md#iterating-over-an-agents-graph) 中的每个 node 触发（[`UserPromptNode`][pydantic_ai.UserPromptNode]、[`ModelRequestNode`][pydantic_ai.ModelRequestNode]、[`CallToolsNode`][pydantic_ai.CallToolsNode]）。Override 它可以观察 node transitions、添加 per-step logging，或修改 graph progression：
 
-!!! note
-    `wrap_node_run` hooks are called automatically by [`agent.run()`][pydantic_ai.agent.AbstractAgent.run], [`agent.run_stream()`][pydantic_ai.agent.AbstractAgent.run_stream], and [`agent_run.next()`][pydantic_ai.run.AgentRun.next]. However, they are **not** called when iterating with bare `async for node in agent_run:` over [`agent.iter()`][pydantic_ai.agent.Agent.iter], since that uses the graph run's internal iteration. Always use `agent_run.next(node)` to advance the run if you need `wrap_node_run` hooks to fire.
+!!! note "注意"
+    [`agent.run()`][pydantic_ai.agent.AbstractAgent.run]、[`agent.run_stream()`][pydantic_ai.agent.AbstractAgent.run_stream] 和 [`agent_run.next()`][pydantic_ai.run.AgentRun.next] 会自动调用 `wrap_node_run` hooks。不过，当使用裸 `async for node in agent_run:` 遍历 [`agent.iter()`][pydantic_ai.agent.Agent.iter] 时不会调用这些 hooks，因为它使用 graph run 的内部 iteration。如果需要触发 `wrap_node_run` hooks，请始终使用 `agent_run.next(node)` 推进 run。
 
 ```python {title="node_logging_example.py"}
 from __future__ import annotations
@@ -645,7 +646,7 @@ print(logger.nodes)
 #> ['UserPromptNode', 'ModelRequestNode', 'CallToolsNode']
 ```
 
-You can also use `wrap_node_run` to modify graph progression — for example, limiting the number of model requests per run:
+你也可以使用 `wrap_node_run` 修改 graph progression，例如限制每次 run 的 model requests 数量：
 
 ```python {title="node_modification_example.py" test="skip" lint="skip"}
 from dataclasses import dataclass
@@ -678,85 +679,85 @@ class MaxModelRequests(AbstractCapability[Any]):
         return await handler(node)
 ```
 
-See [Iterating Over an Agent's Graph](agent.md#iterating-over-an-agents-graph) for more about the agent graph and its node types.
+关于 agent graph 及其 node types 的更多信息，请参阅 [Iterating Over an Agent's Graph](agent.md#iterating-over-an-agents-graph)。
 
-#### Model request hooks
+#### Model request hooks（模型请求钩子） {#model-request-hooks}
 
-| Hook | Signature | Purpose |
+| Hook | Signature | 目的 |
 |---|---|---|
-| [`before_model_request`][pydantic_ai.capabilities.AbstractCapability.before_model_request] | `(ctx: RunContext, request_context: ModelRequestContext) -> ModelRequestContext` | Modify messages, settings, parameters, or model before the model call |
-| [`after_model_request`][pydantic_ai.capabilities.AbstractCapability.after_model_request] | `(ctx: RunContext, *, request_context: ModelRequestContext, response: ModelResponse) -> ModelResponse` | Modify the model's response |
-| [`wrap_model_request`][pydantic_ai.capabilities.AbstractCapability.wrap_model_request] | `(ctx: RunContext, *, request_context: ModelRequestContext, handler: WrapModelRequestHandler) -> ModelResponse` | Wrap the model call |
-| [`on_model_request_error`][pydantic_ai.capabilities.AbstractCapability.on_model_request_error] | `(ctx: RunContext, *, request_context: ModelRequestContext, error: Exception) -> ModelResponse` | Handle model request errors (see [error hooks](#error-hooks)) |
+| [`before_model_request`][pydantic_ai.capabilities.AbstractCapability.before_model_request] | `(ctx: RunContext, request_context: ModelRequestContext) -> ModelRequestContext` | 在 model call 前修改 messages、settings、parameters 或 model |
+| [`after_model_request`][pydantic_ai.capabilities.AbstractCapability.after_model_request] | `(ctx: RunContext, *, request_context: ModelRequestContext, response: ModelResponse) -> ModelResponse` | 修改模型的 response |
+| [`wrap_model_request`][pydantic_ai.capabilities.AbstractCapability.wrap_model_request] | `(ctx: RunContext, *, request_context: ModelRequestContext, handler: WrapModelRequestHandler) -> ModelResponse` | 包装 model call |
+| [`on_model_request_error`][pydantic_ai.capabilities.AbstractCapability.on_model_request_error] | `(ctx: RunContext, *, request_context: ModelRequestContext, error: Exception) -> ModelResponse` | 处理 model request errors（见 [error hooks](#error-hooks)） |
 
-[`ModelRequestContext`][pydantic_ai.models.ModelRequestContext] bundles `model`, `messages`, `model_settings`, and `model_request_parameters` into a single object, making the signature future-proof. To swap the model for a given request, set `request_context.model` to a different [`Model`][pydantic_ai.models.Model] instance.
+[`ModelRequestContext`][pydantic_ai.models.ModelRequestContext] 会把 `model`、`messages`、`model_settings` 和 `model_request_parameters` 打包到单个 object 中，使签名更 future-proof。要替换某个 request 使用的模型，请把 `request_context.model` 设置为不同的 [`Model`][pydantic_ai.models.Model] instance。
 
-To skip the model call entirely and provide a replacement response, raise [`SkipModelRequest(response)`][pydantic_ai.exceptions.SkipModelRequest] from `before_model_request` or `wrap_model_request`.
+要完全跳过 model call 并提供替代 response，请从 `before_model_request` 或 `wrap_model_request` raise [`SkipModelRequest(response)`][pydantic_ai.exceptions.SkipModelRequest]。
 
-#### Tool hooks
+#### Tool hooks（工具钩子） {#tool-hooks}
 
-Tool processing has two phases: **validation** (parsing and validating the model's JSON arguments against the tool's schema) and **execution** (running the tool function). Each phase has its own hooks.
+Tool processing 有两个阶段：**validation**（根据 tool schema 解析并验证模型的 JSON arguments）和 **execution**（运行 tool function）。每个阶段都有自己的 hooks。
 
-All tool hooks receive a `tool_def` parameter with the [`ToolDefinition`][pydantic_ai.tools.ToolDefinition].
+所有 tool hooks 都会接收带有 [`ToolDefinition`][pydantic_ai.tools.ToolDefinition] 的 `tool_def` parameter。
 
-**Validation hooks** — `args` is the raw `str | dict[str, Any]` from the model before validation, or the validated `dict[str, Any]` after:
+**Validation hooks**：`args` 是 validation 前来自模型的原始 `str | dict[str, Any]`，或 validation 后的 `dict[str, Any]`：
 
-| Hook | Signature | Purpose |
+| Hook | Signature | 目的 |
 |---|---|---|
-| [`before_tool_validate`][pydantic_ai.capabilities.AbstractCapability.before_tool_validate] | `(ctx: RunContext, *, call: ToolCallPart, tool_def: ToolDefinition, args: RawToolArgs) -> RawToolArgs` | Modify raw args before validation (e.g. JSON repair) |
-| [`after_tool_validate`][pydantic_ai.capabilities.AbstractCapability.after_tool_validate] | `(ctx: RunContext, *, call: ToolCallPart, tool_def: ToolDefinition, args: ValidatedToolArgs) -> ValidatedToolArgs` | Modify validated args |
-| [`wrap_tool_validate`][pydantic_ai.capabilities.AbstractCapability.wrap_tool_validate] | `(ctx: RunContext, *, call: ToolCallPart, tool_def: ToolDefinition, args: RawToolArgs, handler: WrapToolValidateHandler) -> ValidatedToolArgs` | Wrap the validation step |
-| [`on_tool_validate_error`][pydantic_ai.capabilities.AbstractCapability.on_tool_validate_error] | `(ctx: RunContext, *, call: ToolCallPart, tool_def: ToolDefinition, args: RawToolArgs, error: Exception) -> ValidatedToolArgs` | Handle validation errors (see [error hooks](#error-hooks)) |
+| [`before_tool_validate`][pydantic_ai.capabilities.AbstractCapability.before_tool_validate] | `(ctx: RunContext, *, call: ToolCallPart, tool_def: ToolDefinition, args: RawToolArgs) -> RawToolArgs` | 在 validation 前修改 raw args（例如 JSON repair） |
+| [`after_tool_validate`][pydantic_ai.capabilities.AbstractCapability.after_tool_validate] | `(ctx: RunContext, *, call: ToolCallPart, tool_def: ToolDefinition, args: ValidatedToolArgs) -> ValidatedToolArgs` | 修改 validated args |
+| [`wrap_tool_validate`][pydantic_ai.capabilities.AbstractCapability.wrap_tool_validate] | `(ctx: RunContext, *, call: ToolCallPart, tool_def: ToolDefinition, args: RawToolArgs, handler: WrapToolValidateHandler) -> ValidatedToolArgs` | 包装 validation step |
+| [`on_tool_validate_error`][pydantic_ai.capabilities.AbstractCapability.on_tool_validate_error] | `(ctx: RunContext, *, call: ToolCallPart, tool_def: ToolDefinition, args: RawToolArgs, error: Exception) -> ValidatedToolArgs` | 处理 validation errors（见 [error hooks](#error-hooks)） |
 
-To skip validation and provide pre-validated args, raise [`SkipToolValidation(args)`][pydantic_ai.exceptions.SkipToolValidation] from `before_tool_validate` or `wrap_tool_validate`.
+要跳过 validation 并提供 pre-validated args，请从 `before_tool_validate` 或 `wrap_tool_validate` raise [`SkipToolValidation(args)`][pydantic_ai.exceptions.SkipToolValidation]。
 
-**Execution hooks** — `args` is always the validated `dict[str, Any]`:
+**Execution hooks**：`args` 始终是 validated `dict[str, Any]`：
 
-| Hook | Signature | Purpose |
+| Hook | Signature | 目的 |
 |---|---|---|
-| [`before_tool_execute`][pydantic_ai.capabilities.AbstractCapability.before_tool_execute] | `(ctx: RunContext, *, call: ToolCallPart, tool_def: ToolDefinition, args: ValidatedToolArgs) -> ValidatedToolArgs` | Modify args before execution |
-| [`after_tool_execute`][pydantic_ai.capabilities.AbstractCapability.after_tool_execute] | `(ctx: RunContext, *, call: ToolCallPart, tool_def: ToolDefinition, args: ValidatedToolArgs, result: Any) -> Any` | Modify execution result |
-| [`wrap_tool_execute`][pydantic_ai.capabilities.AbstractCapability.wrap_tool_execute] | `(ctx: RunContext, *, call: ToolCallPart, tool_def: ToolDefinition, args: ValidatedToolArgs, handler: WrapToolExecuteHandler) -> Any` | Wrap execution |
-| [`on_tool_execute_error`][pydantic_ai.capabilities.AbstractCapability.on_tool_execute_error] | `(ctx: RunContext, *, call: ToolCallPart, tool_def: ToolDefinition, args: ValidatedToolArgs, error: Exception) -> Any` | Handle execution errors (see [error hooks](#error-hooks)) |
+| [`before_tool_execute`][pydantic_ai.capabilities.AbstractCapability.before_tool_execute] | `(ctx: RunContext, *, call: ToolCallPart, tool_def: ToolDefinition, args: ValidatedToolArgs) -> ValidatedToolArgs` | 在 execution 前修改 args |
+| [`after_tool_execute`][pydantic_ai.capabilities.AbstractCapability.after_tool_execute] | `(ctx: RunContext, *, call: ToolCallPart, tool_def: ToolDefinition, args: ValidatedToolArgs, result: Any) -> Any` | 修改 execution result |
+| [`wrap_tool_execute`][pydantic_ai.capabilities.AbstractCapability.wrap_tool_execute] | `(ctx: RunContext, *, call: ToolCallPart, tool_def: ToolDefinition, args: ValidatedToolArgs, handler: WrapToolExecuteHandler) -> Any` | 包装 execution |
+| [`on_tool_execute_error`][pydantic_ai.capabilities.AbstractCapability.on_tool_execute_error] | `(ctx: RunContext, *, call: ToolCallPart, tool_def: ToolDefinition, args: ValidatedToolArgs, error: Exception) -> Any` | 处理 execution errors（见 [error hooks](#error-hooks)） |
 
-To skip execution and provide a replacement result, raise [`SkipToolExecution(result)`][pydantic_ai.exceptions.SkipToolExecution] from `before_tool_execute` or `wrap_tool_execute`.
+要跳过 execution 并提供替代 result，请从 `before_tool_execute` 或 `wrap_tool_execute` raise [`SkipToolExecution(result)`][pydantic_ai.exceptions.SkipToolExecution]。
 
-#### Output hooks
+#### Output hooks（输出钩子） {#output-hooks}
 
-Like tool processing, [output](output.md) processing has two phases: **validation** (parsing the model's raw output against the output schema) and **processing** (extracting the value and calling any [output function](output.md#output-functions)). Each phase has its own hooks.
+与 tool processing 一样，[output](output.md) processing 也有两个阶段：**validation**（根据 output schema 解析模型的 raw output）和 **processing**（提取 value，并调用任何 [output function](output.md#output-functions)）。每个阶段都有自己的 hooks。
 
-All output hooks receive an `output_context` parameter with [`OutputContext`][pydantic_ai.capabilities.OutputContext] (mode, output type, schema info, and tool call details for [tool output](output.md#tool-output)).
+所有 output hooks 都会接收带有 [`OutputContext`][pydantic_ai.capabilities.OutputContext] 的 `output_context` parameter（包含 mode、output type、schema info，以及 [tool output](output.md#tool-output) 的 tool call details）。
 
-**Validate hooks** fire only for structured output that requires parsing (prompted, native, tool, union output). They do not fire for plain text or image output. **Process hooks** fire for **all output types** including text, structured, and image output. For [tool output](output.md#tool-output), only output hooks fire — tool hooks are skipped entirely.
+**Validate hooks** 只会针对需要 parsing 的 structured output 触发（prompted、native、tool、union output）。它们不会针对 plain text 或 image output 触发。**Process hooks** 会针对**所有 output types** 触发，包括 text、structured 和 image output。对于 [tool output](output.md#tool-output)，只会触发 output hooks，tool hooks 会完全跳过。
 
-**Validation hooks** — fire for structured output only; `output` is `str` (raw text) or `dict` (tool args):
+**Validation hooks**：只针对 structured output 触发；`output` 是 `str`（raw text）或 `dict`（tool args）：
 
-| Hook | Signature | Purpose |
+| Hook | Signature | 目的 |
 |---|---|---|
-| [`before_output_validate`][pydantic_ai.capabilities.AbstractCapability.before_output_validate] | `(ctx, *, output_context, output: RawOutput) -> RawOutput` | Modify raw output before validation (e.g. JSON repair) |
-| [`after_output_validate`][pydantic_ai.capabilities.AbstractCapability.after_output_validate] | `(ctx, *, output_context, output: Any) -> Any` | Modify validated output |
-| [`wrap_output_validate`][pydantic_ai.capabilities.AbstractCapability.wrap_output_validate] | `(ctx, *, output_context, output: RawOutput, handler) -> Any` | Wrap the validation step |
-| [`on_output_validate_error`][pydantic_ai.capabilities.AbstractCapability.on_output_validate_error] | `(ctx, *, output_context, output: RawOutput, error: ValidationError \| ModelRetry) -> Any` | Handle validation errors (see [error hooks](#error-hooks)) |
+| [`before_output_validate`][pydantic_ai.capabilities.AbstractCapability.before_output_validate] | `(ctx, *, output_context, output: RawOutput) -> RawOutput` | 在 validation 前修改 raw output（例如 JSON repair） |
+| [`after_output_validate`][pydantic_ai.capabilities.AbstractCapability.after_output_validate] | `(ctx, *, output_context, output: Any) -> Any` | 修改 validated output |
+| [`wrap_output_validate`][pydantic_ai.capabilities.AbstractCapability.wrap_output_validate] | `(ctx, *, output_context, output: RawOutput, handler) -> Any` | 包装 validation step |
+| [`on_output_validate_error`][pydantic_ai.capabilities.AbstractCapability.on_output_validate_error] | `(ctx, *, output_context, output: RawOutput, error: ValidationError \| ModelRetry) -> Any` | 处理 validation errors（见 [error hooks](#error-hooks)） |
 
-**Processing hooks** — fire for all output types; `output` is the validated/raw output. Output validators ([`@agent.output_validator`][pydantic_ai.Agent.output_validator]) run inside the processing pipeline (within `wrap_output_process`), so `after_output_process` sees the fully validated result:
+**Processing hooks**：针对所有 output types 触发；`output` 是 validated/raw output。Output validators（[`@agent.output_validator`][pydantic_ai.Agent.output_validator]）在 processing pipeline 内运行（位于 `wrap_output_process` 内），因此 `after_output_process` 会看到完全验证后的 result：
 
-| Hook | Signature | Purpose |
+| Hook | Signature | 目的 |
 |---|---|---|
-| [`before_output_process`][pydantic_ai.capabilities.AbstractCapability.before_output_process] | `(ctx, *, output_context, output: Any) -> Any` | Modify output before processing |
-| [`after_output_process`][pydantic_ai.capabilities.AbstractCapability.after_output_process] | `(ctx, *, output_context, output: Any) -> Any` | Modify processed result |
-| [`wrap_output_process`][pydantic_ai.capabilities.AbstractCapability.wrap_output_process] | `(ctx, *, output_context, output: Any, handler) -> Any` | Wrap processing |
-| [`on_output_process_error`][pydantic_ai.capabilities.AbstractCapability.on_output_process_error] | `(ctx, *, output_context, output: Any, error: Exception) -> Any` | Handle processing errors (see [error hooks](#error-hooks)) |
+| [`before_output_process`][pydantic_ai.capabilities.AbstractCapability.before_output_process] | `(ctx, *, output_context, output: Any) -> Any` | 在 processing 前修改 output |
+| [`after_output_process`][pydantic_ai.capabilities.AbstractCapability.after_output_process] | `(ctx, *, output_context, output: Any) -> Any` | 修改 processed result |
+| [`wrap_output_process`][pydantic_ai.capabilities.AbstractCapability.wrap_output_process] | `(ctx, *, output_context, output: Any, handler) -> Any` | 包装 processing |
+| [`on_output_process_error`][pydantic_ai.capabilities.AbstractCapability.on_output_process_error] | `(ctx, *, output_context, output: Any, error: Exception) -> Any` | 处理 processing errors（见 [error hooks](#error-hooks)） |
 
-Output validate and process hooks can raise [`ModelRetry`][pydantic_ai.exceptions.ModelRetry] to ask the model to try again with a custom message — the same pattern used in [output functions](output.md#output-functions) and [output validators](output.md#output-validator-functions). See [Triggering retries with `ModelRetry`](hooks.md#triggering-retries-with-modelretry) for the full pattern.
+Output validate 和 process hooks 可以 raise [`ModelRetry`][pydantic_ai.exceptions.ModelRetry]，要求模型用 custom message 重试；这与 [output functions](output.md#output-functions) 和 [output validators](output.md#output-validator-functions) 使用的模式相同。完整模式请参阅 [Triggering retries with `ModelRetry`](hooks.md#triggering-retries-with-modelretry)。
 
-#### Tool preparation
+#### Tool preparation（工具准备） {#tool-preparation}
 
-Capabilities can filter or modify which tool definitions the model sees on each step via two hooks:
+Capabilities 可以通过两个 hooks 过滤或修改模型在每一步看到的 tool definitions：
 
-- [`prepare_tools`][pydantic_ai.capabilities.AbstractCapability.prepare_tools] — receives **function** tools only. Use this for filtering or modifications to tools the model can call directly.
-- [`prepare_output_tools`][pydantic_ai.capabilities.AbstractCapability.prepare_output_tools] — receives [output tools][pydantic_ai.output.ToolOutput] only, with `ctx.retry`/`ctx.max_retries` reflecting the **output** side of the agent retry budget, matching the [output hook](#output-hooks) lifecycle.
+- [`prepare_tools`][pydantic_ai.capabilities.AbstractCapability.prepare_tools]：只接收 **function** tools。用于过滤或修改模型可直接调用的 tools。
+- [`prepare_output_tools`][pydantic_ai.capabilities.AbstractCapability.prepare_output_tools]：只接收 [output tools][pydantic_ai.output.ToolOutput]，其中 `ctx.retry`/`ctx.max_retries` 反映 agent retry budget 的 **output** 侧，与 [output hook](#output-hooks) lifecycle 匹配。
 
-Both hooks operate at the toolset level — the result flows into both the model's request parameters and `ToolManager.tools`, so filtering also blocks tool execution.
+两个 hooks 都在 toolset 层级运行；结果会同时流入模型的 request parameters 和 `ToolManager.tools`，因此过滤也会阻止 tool execution。
 
 ```python {title="prepare_tools_example.py"}
 from dataclasses import dataclass
@@ -797,15 +798,15 @@ result = agent.run_sync('hello')
 # The model only sees `read_file`, not `delete_file`
 ```
 
-For simple cases, the built-in [`PrepareTools`][pydantic_ai.capabilities.PrepareTools] / [`PrepareOutputTools`][pydantic_ai.capabilities.PrepareOutputTools] capabilities wrap a callable without a custom subclass.
+对于简单场景，内置 [`PrepareTools`][pydantic_ai.capabilities.PrepareTools] / [`PrepareOutputTools`][pydantic_ai.capabilities.PrepareOutputTools] capabilities 可以包装 callable，而无需自定义 subclass。
 
-#### Event stream hook
+#### Event stream hook（事件流钩子） {#event-stream-hook}
 
-For runs with event streaming ([`run_stream_events`][pydantic_ai.agent.AbstractAgent.run_stream_events], [`event_stream_handler`][pydantic_ai.agent.Agent.__init__], [UI event streams](ui/overview.md)), capabilities can observe or transform the event stream:
+对于带 event streaming 的 runs（[`run_stream_events`][pydantic_ai.agent.AbstractAgent.run_stream_events]、[`event_stream_handler`][pydantic_ai.agent.Agent.__init__]、[UI event streams](ui/overview.md)），capabilities 可以观察或转换 event stream：
 
-| Hook | Signature | Purpose |
+| Hook | Signature | 目的 |
 |---|---|---|
-| [`wrap_run_event_stream`][pydantic_ai.capabilities.AbstractCapability.wrap_run_event_stream] | `(ctx: RunContext, *, stream: AsyncIterable[AgentStreamEvent]) -> AsyncIterable[AgentStreamEvent]` | Observe, filter, or transform streamed events |
+| [`wrap_run_event_stream`][pydantic_ai.capabilities.AbstractCapability.wrap_run_event_stream] | `(ctx: RunContext, *, stream: AsyncIterable[AgentStreamEvent]) -> AsyncIterable[AgentStreamEvent]` | 观察、过滤或转换 streamed events |
 
 ```python {title="event_stream_example.py"}
 from collections.abc import AsyncIterable
@@ -842,16 +843,16 @@ class StreamAuditor(AbstractCapability[Any]):
             yield event
 ```
 
-Matching against [`ToolCallEvent`][pydantic_ai.messages.ToolCallEvent] and [`ToolResultEvent`][pydantic_ai.messages.ToolResultEvent] handles both function tool calls ([`FunctionToolCallEvent`][pydantic_ai.messages.FunctionToolCallEvent] / [`FunctionToolResultEvent`][pydantic_ai.messages.FunctionToolResultEvent]) and output tool calls ([`OutputToolCallEvent`][pydantic_ai.messages.OutputToolCallEvent] / [`OutputToolResultEvent`][pydantic_ai.messages.OutputToolResultEvent]). Match against the specific subclass when you need to treat them differently.
+匹配 [`ToolCallEvent`][pydantic_ai.messages.ToolCallEvent] 和 [`ToolResultEvent`][pydantic_ai.messages.ToolResultEvent] 可同时处理 function tool calls（[`FunctionToolCallEvent`][pydantic_ai.messages.FunctionToolCallEvent] / [`FunctionToolResultEvent`][pydantic_ai.messages.FunctionToolResultEvent]）和 output tool calls（[`OutputToolCallEvent`][pydantic_ai.messages.OutputToolCallEvent] / [`OutputToolResultEvent`][pydantic_ai.messages.OutputToolResultEvent]）。需要区别处理它们时，请匹配具体 subclass。
 
-!!! note "Migration from `FunctionToolCallEvent` / `FunctionToolResultEvent`"
-    For output tool calls, match `OutputToolCallEvent` / `OutputToolResultEvent` (or the shared `ToolCallEvent` / `ToolResultEvent` bases). `FunctionToolCallEvent` / `FunctionToolResultEvent` will stop firing for output tool calls in v2.
+!!! note "从 `FunctionToolCallEvent` / `FunctionToolResultEvent` 迁移"
+    对于 output tool calls，请匹配 `OutputToolCallEvent` / `OutputToolResultEvent`（或共享基类 `ToolCallEvent` / `ToolResultEvent`）。`FunctionToolCallEvent` / `FunctionToolResultEvent` 会在 v2 中停止为 output tool calls 触发。
 
-For building web UIs that transform streamed events into protocol-specific formats (like SSE), see the [UI event streams](ui/overview.md) documentation and the [`UIEventStream`][pydantic_ai.ui.UIEventStream] base class.
+如果要构建把 streamed events 转换为 protocol-specific formats（如 SSE）的 web UIs，请参阅 [UI event streams](ui/overview.md) 文档和 [`UIEventStream`][pydantic_ai.ui.UIEventStream] base class。
 
-#### Error hooks
+#### Error hooks（错误钩子） {#error-hooks}
 
-Each lifecycle point has an `on_*_error` hook — the error counterpart to `after_*`. While `after_*` hooks fire on success, `on_*_error` hooks fire on failure (after `wrap_*` has had its chance to recover):
+每个 lifecycle point 都有一个 `on_*_error` hook；它是 `after_*` 的 error counterpart。`after_*` hooks 在成功时触发，而 `on_*_error` hooks 在失败时触发（在 `wrap_*` 有机会 recover 之后）：
 
 ```
 before_X → wrap_X(handler)
@@ -861,21 +862,21 @@ before_X → wrap_X(handler)
         └─ recover ───→ after_X (modify recovered result)
 ```
 
-Error hooks use **raise-to-propagate, return-to-recover** semantics:
+Error hooks 使用 **raise-to-propagate, return-to-recover** semantics：
 
-- **Raise the original error** — propagates the error unchanged *(default)*
-- **Raise a different exception** — transforms the error
-- **Return a result** — suppresses the error and uses the returned value
+- **Raise original error**：原样传播 error（*默认*）
+- **Raise different exception**：转换 error
+- **Return result**：抑制 error，并使用返回值
 
-| Hook | Fires when | Recovery type |
+| Hook | 触发时机 | Recovery type |
 |---|---|---|
-| [`on_run_error`][pydantic_ai.capabilities.AbstractCapability.on_run_error] | Agent run fails | Return [`AgentRunResult`][pydantic_ai.run.AgentRunResult] |
-| [`on_node_run_error`][pydantic_ai.capabilities.AbstractCapability.on_node_run_error] | Graph node fails | Return next node or [`End`][pydantic_graph.basenode.End] |
-| [`on_model_request_error`][pydantic_ai.capabilities.AbstractCapability.on_model_request_error] | Model request fails | Return [`ModelResponse`][pydantic_ai.messages.ModelResponse] |
-| [`on_tool_validate_error`][pydantic_ai.capabilities.AbstractCapability.on_tool_validate_error] | Tool validation fails | Return validated args `dict` |
-| [`on_tool_execute_error`][pydantic_ai.capabilities.AbstractCapability.on_tool_execute_error] | Tool execution fails | Return any tool result |
-| [`on_output_validate_error`][pydantic_ai.capabilities.AbstractCapability.on_output_validate_error] | Output validation fails | Return validated output |
-| [`on_output_process_error`][pydantic_ai.capabilities.AbstractCapability.on_output_process_error] | Output execution fails | Return any output result |
+| [`on_run_error`][pydantic_ai.capabilities.AbstractCapability.on_run_error] | Agent run 失败 | 返回 [`AgentRunResult`][pydantic_ai.run.AgentRunResult] |
+| [`on_node_run_error`][pydantic_ai.capabilities.AbstractCapability.on_node_run_error] | Graph node 失败 | 返回下一个 node 或 [`End`][pydantic_graph.basenode.End] |
+| [`on_model_request_error`][pydantic_ai.capabilities.AbstractCapability.on_model_request_error] | Model request 失败 | 返回 [`ModelResponse`][pydantic_ai.messages.ModelResponse] |
+| [`on_tool_validate_error`][pydantic_ai.capabilities.AbstractCapability.on_tool_validate_error] | Tool validation 失败 | 返回 validated args `dict` |
+| [`on_tool_execute_error`][pydantic_ai.capabilities.AbstractCapability.on_tool_execute_error] | Tool execution 失败 | 返回任意 tool result |
+| [`on_output_validate_error`][pydantic_ai.capabilities.AbstractCapability.on_output_validate_error] | Output validation 失败 | 返回 validated output |
+| [`on_output_process_error`][pydantic_ai.capabilities.AbstractCapability.on_output_process_error] | Output execution 失败 | 返回任意 output result |
 
 ```python {title="error_hooks_example.py" test="skip" lint="skip"}
 from dataclasses import dataclass, field
@@ -906,21 +907,21 @@ class ErrorLogger(AbstractCapability[Any]):
         raise error  # Re-raise to let the normal retry flow handle it
 ```
 
-#### Deferred tool calls
+#### Deferred tool calls（延迟工具调用） {#deferred-tool-calls}
 
-Capabilities can resolve [deferred tool calls](deferred-tools.md) — calls that require approval, or that are executed externally — directly from the agent run, without ending the run and waiting for a follow-up:
+Capabilities 可以直接在 agent run 中解析 [deferred tool calls](deferred-tools.md)，即需要 approval 或在外部执行的 calls，而无需结束 run 并等待 follow-up：
 
-| Hook | Signature | Purpose |
+| Hook | Signature | 目的 |
 |---|---|---|
-| [`handle_deferred_tool_calls`][pydantic_ai.capabilities.AbstractCapability.handle_deferred_tool_calls] | `(ctx: RunContext, *, requests: DeferredToolRequests) -> DeferredToolResults \| None` | Resolve some or all pending approval/external calls inline |
+| [`handle_deferred_tool_calls`][pydantic_ai.capabilities.AbstractCapability.handle_deferred_tool_calls] | `(ctx: RunContext, *, requests: DeferredToolRequests) -> DeferredToolResults \| None` | Inline 解析部分或全部 pending approval/external calls |
 
-Multiple capabilities can each handle a subset: dispatch accumulates results across the chain, passing only the still-unresolved requests to the next capability. Returning `None` (or a [`DeferredToolResults`][pydantic_ai.tools.DeferredToolResults] with no entries) declines handling. Anything still unresolved bubbles up as a [`DeferredToolRequests`][pydantic_ai.output.DeferredToolRequests] output for the caller to handle.
+多个 capabilities 可以各自处理一个 subset：dispatch 会跨 chain 累积 results，并且只把仍未解析的 requests 传给下一个 capability。返回 `None`（或没有 entries 的 [`DeferredToolResults`][pydantic_ai.tools.DeferredToolResults]）表示拒绝处理。任何仍未解析的内容都会作为 [`DeferredToolRequests`][pydantic_ai.output.DeferredToolRequests] output 冒泡给 caller 处理。
 
-For application code that just needs to plug in a handler, use the dedicated [`HandleDeferredToolCalls`][pydantic_ai.capabilities.HandleDeferredToolCalls] capability — see [Resolving deferred calls with a handler](deferred-tools.md#resolving-deferred-calls-with-a-handler).
+如果 application code 只是需要接入 handler，请使用专门的 [`HandleDeferredToolCalls`][pydantic_ai.capabilities.HandleDeferredToolCalls] capability；参见 [Resolving deferred calls with a handler](deferred-tools.md#resolving-deferred-calls-with-a-handler)。
 
-### Wrapping capabilities
+### 包装 Capabilities {#wrapping-capabilities}
 
-[`WrapperCapability`][pydantic_ai.capabilities.WrapperCapability] wraps another capability and delegates all methods to it — similar to [`WrapperToolset`][pydantic_ai.toolsets.WrapperToolset] for toolsets. Subclass it to override specific methods while delegating the rest:
+[`WrapperCapability`][pydantic_ai.capabilities.WrapperCapability] 会包装另一个 capability，并把所有 methods 委托给它；这类似于 toolsets 的 [`WrapperToolset`][pydantic_ai.toolsets.WrapperToolset]。Subclass 它可以在委托其余 methods 的同时 override 特定 methods：
 
 ```python {title="wrapper_capability_example.py" test="skip" lint="skip"}
 from dataclasses import dataclass
@@ -941,11 +942,11 @@ class AuditedCapability(WrapperCapability[Any]):
         return await super().before_model_request(ctx, request_context)
 ```
 
-The built-in [`PrefixTools`][pydantic_ai.capabilities.PrefixTools] is an example of a `WrapperCapability` — it wraps another capability and prefixes its tool names.
+内置 [`PrefixTools`][pydantic_ai.capabilities.PrefixTools] 就是 `WrapperCapability` 的示例；它包装另一个 capability，并为其 tool names 添加前缀。
 
-### Per-run state isolation
+### Per-run state isolation（按运行隔离状态） {#per-run-state-isolation}
 
-By default, a capability instance is shared across all runs of an agent. If your capability accumulates mutable state that should not leak between runs, override [`for_run`][pydantic_ai.capabilities.AbstractCapability.for_run] to return a fresh instance:
+默认情况下，capability instance 会在 agent 的所有 runs 之间共享。如果你的 capability 会累积不应在 runs 之间泄漏的 mutable state，请 override [`for_run`][pydantic_ai.capabilities.AbstractCapability.for_run] 返回 fresh instance：
 
 ```python {title="per_run_state.py"}
 from dataclasses import dataclass
@@ -981,11 +982,11 @@ print(counter.count)
 #> 0
 ```
 
-### Dynamically building a capability
+### 动态构建 Capability {#dynamically-building-a-capability}
 
-Capabilities can be built dynamically ahead of each agent run using a function that takes the agent [`RunContext`][pydantic_ai.tools.RunContext] and returns a capability or `None`. This is useful when the capability — its instructions, model settings, hooks, or contributed toolset — depends on information specific to a run, like its [dependencies](./dependencies.md).
+Capabilities 可以在每次 agent run 前用函数动态构建；该函数接收 agent [`RunContext`][pydantic_ai.tools.RunContext]，并返回 capability 或 `None`。当 capability（其 instructions、model settings、hooks 或贡献的 toolset）依赖特定于 run 的信息（例如其 [dependencies](./dependencies.md)）时，这很有用。
 
-To register a dynamic capability, pass a function that takes [`RunContext`][pydantic_ai.tools.RunContext] to the `capabilities` argument of the [`Agent`][pydantic_ai.Agent] constructor or [`agent.run()`][pydantic_ai.Agent.run]. Sync and async functions are both supported. The function is called once per run and the returned capability replaces it for the rest of the run, so its instructions, model settings, toolsets, native tools, and hooks all flow through normally.
+要注册 dynamic capability，请把接收 [`RunContext`][pydantic_ai.tools.RunContext] 的函数传给 [`Agent`][pydantic_ai.Agent] constructor 或 [`agent.run()`][pydantic_ai.Agent.run] 的 `capabilities` argument。Sync 和 async functions 都受支持。该函数每次 run 调用一次，返回的 capability 会在该 run 剩余期间替代它，因此其 instructions、model settings、toolsets、native tools 和 hooks 都会正常流动。
 
 ```python {title="dynamic_capability.py"}
 from dataclasses import dataclass
@@ -1025,31 +1026,31 @@ print(result.all_messages()[0].instructions)
 #> You can use the refunds skill (role: admin).
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-To return more than one capability from a single factory, wrap them in a [`CombinedCapability`][pydantic_ai.capabilities.CombinedCapability].
+要从单个 factory 返回多个 capabilities，请用 [`CombinedCapability`][pydantic_ai.capabilities.CombinedCapability] 包装它们。
 
-!!! note "Durable execution (Temporal, DBOS, Prefect)"
+!!! note "Durable execution（持久执行：Temporal、DBOS、Prefect）"
 
-    A dynamic capability whose resolved capability contributes only instructions, model settings, native tools, hooks, or `prepare_tools`/`get_wrapper_toolset` (i.e. no `get_toolset()` of its own) works seamlessly with durable execution — the factory runs in the workflow alongside the rest of the agent loop. This covers the common "load this user's skill from the database and add its instructions" pattern.
+    如果 dynamic capability 解析出的 capability 只贡献 instructions、model settings、native tools、hooks，或 `prepare_tools`/`get_wrapper_toolset`（即没有自己的 `get_toolset()`），它可以与 durable execution 无缝协作；factory 会在 workflow 中与 agent loop 的其他部分一起运行。这覆盖了常见的"从数据库加载此用户的 skill 并添加其 instructions"模式。
 
-    However, dynamic capabilities that contribute their own toolset via `get_toolset()` are not yet supported with durable execution. The toolset is only known at run time, so it bypasses the durable wrapper's construction-time toolset registration and would attempt I/O directly inside the workflow. As a workaround, register the toolsets statically via `Agent(toolsets=[...])` (where they get wrapped properly) and have the dynamic capability reference them indirectly — e.g. via [`prepare_tools`][pydantic_ai.capabilities.AbstractCapability.prepare_tools] to scope which tools are visible per-run, rather than constructing the toolset inside the factory. Full support is tracked in [#5253](https://github.com/pydantic/pydantic-ai/issues/5253).
+    不过，通过 `get_toolset()` 贡献自有 toolset 的 dynamic capabilities 尚不支持 durable execution。该 toolset 只有在 run time 才知道，因此会绕过 durable wrapper 的 construction-time toolset registration，并试图直接在 workflow 内执行 I/O。作为 workaround，请通过 `Agent(toolsets=[...])` 静态注册 toolsets（这样它们会被正确包装），并让 dynamic capability 间接引用它们，例如通过 [`prepare_tools`][pydantic_ai.capabilities.AbstractCapability.prepare_tools] 限定每次 run 可见的 tools，而不是在 factory 内构造 toolset。完整支持在 [#5253](https://github.com/pydantic/pydantic-ai/issues/5253) 跟踪。
 
-### Composition and middleware semantics
+### Composition 和 middleware semantics {#composition-and-middleware-semantics}
 
-When multiple capabilities are passed to an agent, they are composed into a single [`CombinedCapability`][pydantic_ai.capabilities.CombinedCapability] that follows **middleware semantics** — the same pattern used by web frameworks like Django and Starlette:
+当多个 capabilities 传给 agent 时，它们会组合成单个 [`CombinedCapability`][pydantic_ai.capabilities.CombinedCapability]，并遵循 **middleware semantics**；这与 Django 和 Starlette 等 web frameworks 使用的模式相同：
 
-* **Configuration** is merged: instructions concatenate, model settings merge additively (later capabilities override earlier ones), toolsets combine, native tools collect.
-* **`before_*`** hooks fire in capability order (outermost to innermost): `cap1 → cap2 → cap3`.
-* **`after_*`** hooks fire in reverse order (innermost to outermost): `cap3 → cap2 → cap1`.
-* **`wrap_*`** hooks nest as middleware: `cap1` wraps `cap2` wraps `cap3` wraps the actual operation. The first capability is the **outermost** layer.
-* **`get_wrapper_toolset`** follows the same nesting: the first capability's wrapper is outermost.
+* **Configuration** 会合并：instructions 连接起来，model settings 以加法方式合并（后面的 capabilities 覆盖前面的），toolsets 组合起来，native tools 收集起来。
+* **`before_*`** hooks 按 capability 顺序触发（从 outermost 到 innermost）：`cap1 → cap2 → cap3`。
+* **`after_*`** hooks 按反向顺序触发（从 innermost 到 outermost）：`cap3 → cap2 → cap1`。
+* **`wrap_*`** hooks 作为 middleware 嵌套：`cap1` 包装 `cap2`，`cap2` 包装 `cap3`，`cap3` 包装实际操作。第一个 capability 是 **outermost** layer。
+* **`get_wrapper_toolset`** 遵循相同嵌套：第一个 capability 的 wrapper 位于 outermost。
 
-This means the first capability in the list has the first and last say on the operation — it sees the original input before any other capability, and it sees the final output after all inner capabilities have processed it.
+这意味着 list 中的第一个 capability 对操作有最先和最后的发言权：它会在任何其他 capability 之前看到原始 input，也会在所有 inner capabilities 处理后看到最终 output。
 
-### Ordering
+### Ordering（排序） {#ordering}
 
-By default, capabilities are composed in the order you list them. When a capability needs to be at a specific position regardless of where the user lists it, override [`get_ordering`][pydantic_ai.capabilities.AbstractCapability.get_ordering] to return a [`CapabilityOrdering`][pydantic_ai.capabilities.CapabilityOrdering]:
+默认情况下，capabilities 会按你列出的顺序组合。当某个 capability 需要固定在特定位置，而不受用户列出位置影响时，请 override [`get_ordering`][pydantic_ai.capabilities.AbstractCapability.get_ordering]，返回 [`CapabilityOrdering`][pydantic_ai.capabilities.CapabilityOrdering]：
 
 ```python {title="capability_ordering_example.py"}
 from dataclasses import dataclass
@@ -1080,16 +1081,16 @@ combined = CombinedCapability([PlainCapability(), InstrumentationCapability()])
 assert type(combined.capabilities[0]) is InstrumentationCapability
 ```
 
-The available constraints are:
+可用 constraints 包括：
 
-* **`position`** — `'outermost'` or `'innermost'`. Places the capability in a tier before (or after) all capabilities without that position. Multiple capabilities can share a tier; original list order breaks ties within it.
-* **`wraps`** — list of capabilities this one wraps around (is outside of). Each entry can be a capability **type** (matches all instances via `issubclass`) or a specific **instance** (matches by identity). Use when your capability needs to see the output of another: `CapabilityOrdering(wraps=[OtherCapability])`.
-* **`wrapped_by`** — list of capabilities that wrap around this one (are outside of it). Accepts types or instances, like `wraps`. The inverse of `wraps`.
-* **`requires`** — list of capability types that must be present. Raises [`UserError`][pydantic_ai.exceptions.UserError] if any are missing. Does not imply ordering.
+* **`position`**：`'outermost'` 或 `'innermost'`。把 capability 放入一个 tier，位于所有没有该 position 的 capabilities 之前（或之后）。多个 capabilities 可以共享一个 tier；原始 list order 用于打破同 tier 内的平局。
+* **`wraps`**：此 capability 要包装的 capabilities list（也就是位于它们外侧）。每个 entry 可以是 capability **type**（通过 `issubclass` 匹配所有 instances），也可以是特定 **instance**（按 identity 匹配）。当你的 capability 需要看到另一个 capability 的 output 时使用：`CapabilityOrdering(wraps=[OtherCapability])`。
+* **`wrapped_by`**：包装此 capability 的 capabilities list（也就是位于它外侧）。和 `wraps` 一样，接受 types 或 instances。它是 `wraps` 的反向。
+* **`requires`**：必须存在的 capability types list。如果缺少任何一个，会 raise [`UserError`][pydantic_ai.exceptions.UserError]。这并不隐含 ordering。
 
-When constraints are declared, [`CombinedCapability`][pydantic_ai.capabilities.CombinedCapability] topologically sorts its children at construction time, preserving user-provided order as a tiebreaker.
+声明 constraints 后，[`CombinedCapability`][pydantic_ai.capabilities.CombinedCapability] 会在 construction time 对其 children 进行拓扑排序，并保留用户提供的顺序作为 tie-breaker。
 
-[`Hooks`][pydantic_ai.capabilities.Hooks] supports ordering via the `ordering` parameter, so you can declare ordering constraints without subclassing:
+[`Hooks`][pydantic_ai.capabilities.Hooks] 通过 `ordering` parameter 支持 ordering，因此你可以不 subclass 也声明 ordering constraints：
 
 ```python {title="hooks_ordering_example.py"}
 from pydantic_ai.capabilities import CapabilityOrdering, CombinedCapability, Hooks
@@ -1103,11 +1104,11 @@ assert combined.capabilities[0] is logging_hooks
 assert combined.capabilities[1] is rate_limit_hooks
 ```
 
-## Examples
+## 示例 {#examples}
 
-### Guardrail (PII redaction)
+### Guardrail（PII 脱敏） {#guardrail-pii-redaction}
 
-A guardrail is a capability that intercepts model requests or responses to enforce safety rules. Here's one that scans model responses for potential PII and redacts it:
+Guardrail 是拦截 model requests 或 responses 以强制执行 safety rules 的 capability。下面这个 guardrail 会扫描 model responses 中潜在的 PII 并进行 redaction：
 
 ```python {title="guardrail_example.py"}
 import re
@@ -1153,9 +1154,9 @@ print(result.output)
 #> You can reach Jane at [EMAIL REDACTED] or [PHONE REDACTED].
 ```
 
-### Logging middleware
+### Logging middleware（日志中间件） {#logging-middleware}
 
-The `wrap_*` pattern is useful when you need to observe or time both the input and output of an operation. Here's a capability that logs every model request and tool call:
+当你需要观察或计时某个操作的 input 和 output 时，`wrap_*` pattern 很有用。下面是一个记录每个 model request 和 tool call 的 capability：
 
 ```python {title="logging_middleware_example.py"}
 from dataclasses import dataclass
@@ -1209,55 +1210,55 @@ print(f'Output: {result.output}')
 #> Output: Hello! How can I help you today?
 ```
 
-## Pydantic AI Harness
+## Pydantic AI Harness（能力库） {#pydantic-ai-harness}
 
-[**Pydantic AI Harness**](harness/overview.md) is the official capability library for Pydantic AI -- standalone capabilities like memory, guardrails, context management, and [code mode](https://github.com/pydantic/pydantic-ai-harness/tree/main/pydantic_ai_harness/code_mode) live there rather than in core. See [What goes where?](harness/overview.md#what-goes-where) for the full breakdown, or jump to the [capability matrix](https://github.com/pydantic/pydantic-ai-harness#capability-matrix).
+[**Pydantic AI Harness**](harness/overview.md) 是 Pydantic AI 的官方 capability library；memory、guardrails、context management 和 [code mode](https://github.com/pydantic/pydantic-ai-harness/tree/main/pydantic_ai_harness/code_mode) 等 standalone capabilities 位于其中，而不在 core 中。完整拆分请参阅 [What goes where?](harness/overview.md#what-goes-where)，也可以直接查看 [capability matrix](https://github.com/pydantic/pydantic-ai-harness#capability-matrix)。
 
-## Third-party capabilities
+## 第三方 Capabilities {#third-party-capabilities}
 
-Capabilities are the recommended way for third-party packages to extend Pydantic AI, since they can bundle tools with hooks, instructions, and model settings. See [Extensibility](extensibility.md) for the full ecosystem, including [third-party toolsets](toolsets.md#third-party-toolsets) that can also be wrapped as capabilities.
+Capabilities 是第三方 packages 扩展 Pydantic AI 的推荐方式，因为它们可以把 tools 与 hooks、instructions 和 model settings 打包在一起。完整生态请参阅 [Extensibility](extensibility.md)，其中也包括可包装为 capabilities 的 [third-party toolsets](toolsets.md#third-party-toolsets)。
 
-### Task Management
+### Task Management（任务管理） {#task-management}
 
-Capabilities for task planning and progress tracking help agents organize complex work:
+用于 task planning 和 progress tracking 的 capabilities 可帮助 agents 组织复杂工作：
 
-* [`pydantic-ai-todo`](https://github.com/vstorm-co/pydantic-ai-todo) - `TodoCapability` with `add_todo`, `read_todos`, `write_todos`, `update_todo_status`, and `remove_todo` tools. Supports subtasks, dependencies, and PostgreSQL persistence. Also available as a lower-level `TodoToolset`.
+* [`pydantic-ai-todo`](https://github.com/vstorm-co/pydantic-ai-todo) - 带有 `add_todo`、`read_todos`、`write_todos`、`update_todo_status` 和 `remove_todo` tools 的 `TodoCapability`。支持 subtasks、dependencies 和 PostgreSQL persistence。也提供较低层级的 `TodoToolset`。
 
-### Context Management
+### Context Management（上下文管理） {#context-management}
 
-Capabilities for managing long conversations help agents stay within context limits:
+用于管理长 conversations 的 capabilities 可帮助 agents 保持在 context limits 内：
 
-* [`summarization-pydantic-ai`](https://github.com/vstorm-co/summarization-pydantic-ai) - Four capabilities for managing long conversations: `ContextManagerCapability` (real-time token tracking, auto-compression at a configurable threshold, and large tool-output truncation); `SummarizationCapability` (LLM-powered history compression); `SlidingWindowCapability` (zero-cost message trimming); `LimitWarnerCapability` (injects a finish-soon hint before hard context limits). Also available as standalone `history_processors`: `SummarizationProcessor`, `SlidingWindowProcessor`, and `LimitWarnerProcessor`.
+* [`summarization-pydantic-ai`](https://github.com/vstorm-co/summarization-pydantic-ai) - 用于管理长 conversations 的四个 capabilities：`ContextManagerCapability`（real-time token tracking、在可配置阈值自动 compression，以及大型 tool-output truncation）；`SummarizationCapability`（LLM-powered history compression）；`SlidingWindowCapability`（零成本 message trimming）；`LimitWarnerCapability`（在 hard context limits 前注入 finish-soon hint）。也提供 standalone `history_processors`：`SummarizationProcessor`、`SlidingWindowProcessor` 和 `LimitWarnerProcessor`。
 
-### Multi-Agent Orchestration
+### Multi-Agent Orchestration（多智能体编排） {#multi-agent-orchestration}
 
-Capabilities for spawning and delegating to specialized subagents help agents tackle complex, parallelizable work:
+用于 spawning 和 delegating 到专门 subagents 的 capabilities 可帮助 agents 处理复杂且可并行的工作：
 
-* [`subagents-pydantic-ai`](https://github.com/vstorm-co/subagents-pydantic-ai) - `SubAgentCapability` adds tools for multi-agent delegation: `task` (spawn a subagent), `check_task`, `wait_tasks`, `list_active_tasks`, `soft_cancel_task`, `hard_cancel_task`, and `answer_subagent`. Supports sync, async, and auto execution modes, nested subagents, and runtime agent creation. Also available as a lower-level toolset via `create_subagent_toolset`.
+* [`subagents-pydantic-ai`](https://github.com/vstorm-co/subagents-pydantic-ai) - `SubAgentCapability` 添加用于 multi-agent delegation 的 tools：`task`（spawn subagent）、`check_task`、`wait_tasks`、`list_active_tasks`、`soft_cancel_task`、`hard_cancel_task` 和 `answer_subagent`。支持 sync、async 和 auto execution modes、nested subagents 以及 runtime agent creation。也通过 `create_subagent_toolset` 提供较低层级的 toolset。
 
-### Guardrails & Safety
+### Guardrails & Safety（护栏与安全） {#guardrails-safety}
 
-Capabilities for cost control, input/output filtering, and tool permissions help keep agents safe and within budget:
+用于 cost control、input/output filtering 和 tool permissions 的 capabilities 可帮助 agents 保持安全并处于预算内：
 
-* [`pydantic-ai-shields`](https://github.com/vstorm-co/pydantic-ai-shields) - Ready-to-use guardrail capabilities: `CostTracking` (tracks token usage and USD cost per run, raises `BudgetExceededError` on budget overrun); `ToolGuard` (block or require approval for specific tools); `InputGuard` and `OutputGuard` (custom sync or async validation functions); `PromptInjection`, `PiiDetector`, `SecretRedaction`, `BlockedKeywords`, and `NoRefusals` content shields.
+* [`pydantic-ai-shields`](https://github.com/vstorm-co/pydantic-ai-shields) - 开箱即用的 guardrail capabilities：`CostTracking`（按 run 跟踪 token usage 和 USD cost，预算超支时 raise `BudgetExceededError`）；`ToolGuard`（阻止特定 tools 或要求 approval）；`InputGuard` 和 `OutputGuard`（custom sync 或 async validation functions）；以及 `PromptInjection`、`PiiDetector`、`SecretRedaction`、`BlockedKeywords` 和 `NoRefusals` content shields。
 
-### File Operations & Sandboxing
+### File Operations & Sandboxing（文件操作与沙箱） {#file-operations-sandboxing}
 
-Capabilities for filesystem access and sandboxed code execution help agents work with files and run code safely:
+用于 filesystem access 和 sandboxed code execution 的 capabilities 可帮助 agents 安全地处理文件和运行代码：
 
-* [`pydantic-ai-backend`](https://github.com/vstorm-co/pydantic-ai-backend) - `ConsoleCapability` registers `ls`, `read_file`, `write_file`, `edit_file`, `glob`, `grep`, and `execute` tools with a fine-grained permission system. Backends include `StateBackend` (in-memory, for testing), `LocalBackend` (real filesystem), `DockerSandbox` (isolated container execution), and `CompositeBackend` (routing across backends). Also available as a lower-level `ConsoleToolset`.
+* [`pydantic-ai-backend`](https://github.com/vstorm-co/pydantic-ai-backend) - `ConsoleCapability` 使用 fine-grained permission system 注册 `ls`、`read_file`、`write_file`、`edit_file`、`glob`、`grep` 和 `execute` tools。Backends 包括 `StateBackend`（in-memory，用于 testing）、`LocalBackend`（real filesystem）、`DockerSandbox`（isolated container execution）和 `CompositeBackend`（跨 backends routing）。也提供较低层级的 `ConsoleToolset`。
 
-### Agent Skills
+### Agent Skills（Agent 技能） {#agent-skills}
 
-Capabilities that implement [Agent Skills](https://agentskills.io) support help agents efficiently discover and perform specific tasks:
+实现 [Agent Skills](https://agentskills.io) 支持的 capabilities 可帮助 agents 高效发现并执行特定任务：
 
-* [`pydantic-ai-skills`](https://github.com/DougTrajano/pydantic-ai-skills) - `SkillsCapability` implements Agent Skills support with progressive disclosure (load skills on-demand to reduce tokens). Supports filesystem and programmatic skills; compatible with [agentskills.io](https://agentskills.io).
+* [`pydantic-ai-skills`](https://github.com/DougTrajano/pydantic-ai-skills) - `SkillsCapability` 通过 progressive disclosure 实现 Agent Skills 支持（按需加载 skills 以减少 tokens）。支持 filesystem 和 programmatic skills；兼容 [agentskills.io](https://agentskills.io)。
 
-To add your package to this page, open a pull request.
+如需把你的 package 添加到此页面，请打开 pull request。
 
-## Publishing capabilities
+## 发布 Capabilities {#publishing-capabilities}
 
-To make a custom capability usable in [agent specs](agent-spec.md), it needs a [`get_serialization_name`][pydantic_ai.capabilities.AbstractCapability.get_serialization_name] (defaults to the class name) and a constructor that accepts serializable arguments. The default [`from_spec`][pydantic_ai.capabilities.AbstractCapability.from_spec] implementation calls `cls(*args, **kwargs)`, so for simple dataclasses no override is needed:
+要让 custom capability 可用于 [agent specs](agent-spec.md)，它需要 [`get_serialization_name`][pydantic_ai.capabilities.AbstractCapability.get_serialization_name]（默认是 class name），并且 constructor 必须接受 serializable arguments。默认 [`from_spec`][pydantic_ai.capabilities.AbstractCapability.from_spec] implementation 会调用 `cls(*args, **kwargs)`，因此简单 dataclasses 不需要 override：
 
 ```python {title="custom_spec_capability.py"}
 from dataclasses import dataclass
@@ -1282,9 +1283,9 @@ agent = Agent.from_spec(
 )
 ```
 
-Users register custom capability types via the `custom_capability_types` parameter on [`Agent.from_spec`][pydantic_ai.Agent.from_spec] or [`Agent.from_file`][pydantic_ai.Agent.from_file].
+用户通过 [`Agent.from_spec`][pydantic_ai.Agent.from_spec] 或 [`Agent.from_file`][pydantic_ai.Agent.from_file] 上的 `custom_capability_types` parameter 注册 custom capability types。
 
-Override [`from_spec`][pydantic_ai.capabilities.AbstractCapability.from_spec] when the constructor takes types that can't be represented in YAML/JSON. The spec fields should mirror the dataclass fields, but with serializable types:
+当 constructor 接收无法用 YAML/JSON 表示的类型时，请 override [`from_spec`][pydantic_ai.capabilities.AbstractCapability.from_spec]。Spec fields 应镜像 dataclass fields，但使用 serializable types：
 
 ```python {title="from_spec_override_example.py" test="skip" lint="skip"}
 from collections.abc import Callable
@@ -1315,6 +1316,6 @@ class ConditionalTools(AbstractCapability[Any]):
         return tool_defs
 ```
 
-In YAML this would be `- ConditionalTools: {hidden_tools: [dangerous_tool]}`. In Python code, the full constructor is available: `ConditionalTools(condition=my_check, hidden_tools=['dangerous_tool'])`.
+在 YAML 中，这会写作 `- ConditionalTools: {hidden_tools: [dangerous_tool]}`。在 Python code 中，可以使用完整 constructor：`ConditionalTools(condition=my_check, hidden_tools=['dangerous_tool'])`。
 
-See [Extensibility](extensibility.md) for packaging conventions and the broader extension ecosystem.
+Packaging conventions 和更广泛的 extension ecosystem 请参阅 [Extensibility](extensibility.md)。
