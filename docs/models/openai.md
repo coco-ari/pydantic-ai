@@ -1,26 +1,26 @@
 # OpenAI
 
-## Install
+## 安装 {#install}
 
-To use OpenAI models or OpenAI-compatible APIs, you need to either install `pydantic-ai`, or install `pydantic-ai-slim` with the `openai` optional group:
+要使用 OpenAI models 或 OpenAI-compatible APIs，你需要安装 `pydantic-ai`，或安装带 `openai` 可选组的 `pydantic-ai-slim`：
 
 ```bash
 pip/uv-add "pydantic-ai-slim[openai]"
 ```
 
-## Configuration
+## 配置 {#configuration}
 
-To use `OpenAIChatModel` with the OpenAI API, go to [platform.openai.com](https://platform.openai.com/) and follow your nose until you find the place to generate an API key.
+要通过 OpenAI API 使用 `OpenAIChatModel`，请前往 [platform.openai.com](https://platform.openai.com/) 并找到生成 API key 的位置。
 
-## Environment variable
+## 环境变量 {#environment-variable}
 
-Once you have the API key, you can set it as an environment variable:
+拿到 API key 后，可以将其设置为环境变量：
 
 ```bash
 export OPENAI_API_KEY='your-api-key'
 ```
 
-You can then use `OpenAIChatModel` by name:
+然后你可以按名称使用 `OpenAIChatModel`：
 
 ```python
 from pydantic_ai import Agent
@@ -29,7 +29,7 @@ agent = Agent('openai:gpt-5.2')
 ...
 ```
 
-Or initialise the model directly with just the model name:
+或者只用模型名称直接初始化模型：
 
 ```python
 from pydantic_ai import Agent
@@ -40,12 +40,12 @@ agent = Agent(model)
 ...
 ```
 
-By default, the `OpenAIChatModel` uses the `OpenAIProvider` with the `base_url` set to `https://api.openai.com/v1`.
+默认情况下，`OpenAIChatModel` 使用 `OpenAIProvider`，其 `base_url` 设置为 `https://api.openai.com/v1`。
 
-## Configure the provider
+## 配置 provider {#configure-the-provider}
 
-If you want to pass parameters in code to the provider, you can programmatically instantiate the
-[OpenAIProvider][pydantic_ai.providers.openai.OpenAIProvider] and pass it to the model:
+如果你想在代码中向 provider 传入参数，可以以编程方式实例化
+[OpenAIProvider][pydantic_ai.providers.openai.OpenAIProvider] 并传给 model：
 
 ```python
 from pydantic_ai import Agent
@@ -57,9 +57,9 @@ agent = Agent(model)
 ...
 ```
 
-## Custom OpenAI Client
+## 自定义 OpenAI Client {#custom-openai-client}
 
-`OpenAIProvider` also accepts a custom `AsyncOpenAI` client via the `openai_client` parameter, so you can customise the `organization`, `project`, `base_url` etc. as defined in the [OpenAI API docs](https://platform.openai.com/docs/api-reference).
+`OpenAIProvider` 也接受通过 `openai_client` 参数传入自定义 `AsyncOpenAI` client，因此你可以按 [OpenAI API docs](https://platform.openai.com/docs/api-reference) 中的定义自定义 `organization`、`project`、`base_url` 等。
 
 ```python {title="custom_openai_client.py"}
 from openai import AsyncOpenAI
@@ -74,8 +74,8 @@ agent = Agent(model)
 ...
 ```
 
-You could also use the [`AsyncAzureOpenAI`](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/switching-endpoints) client
-to use the Azure OpenAI API. Note that the `AsyncAzureOpenAI` is a subclass of `AsyncOpenAI`.
+你也可以使用 [`AsyncAzureOpenAI`](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/switching-endpoints) client
+来使用 Azure OpenAI API。注意，`AsyncAzureOpenAI` 是 `AsyncOpenAI` 的子类。
 
 ```python
 from openai import AsyncAzureOpenAI
@@ -98,9 +98,9 @@ agent = Agent(model)
 ...
 ```
 
-## Model settings
+## 模型设置 {#model-settings}
 
-You can customize model behavior using [`OpenAIChatModelSettings`][pydantic_ai.models.openai.OpenAIChatModelSettings]:
+你可以使用 [`OpenAIChatModelSettings`][pydantic_ai.models.openai.OpenAIChatModelSettings] 定制模型行为：
 
 ```python
 from pydantic_ai import Agent
@@ -115,14 +115,14 @@ agent = Agent(model, model_settings=settings)
 ...
 ```
 
-### Service tier
+### 服务层级 {#service-tier}
 
-OpenAI supports controlling the [service tier](https://platform.openai.com/docs/api-reference/chat/create#chat-create-service_tier) to trade off latency and cost.
-You can use the unified [`service_tier`][pydantic_ai.settings.ModelSettings.service_tier] field or the provider-specific [`openai_service_tier`][pydantic_ai.models.openai.OpenAIChatModelSettings.openai_service_tier] field. Both accept `'auto'`, `'default'`, `'flex'`, and `'priority'`, passed through unchanged. `openai_service_tier` takes precedence over the unified field when both are set.
+OpenAI 支持控制 [service tier](https://platform.openai.com/docs/api-reference/chat/create#chat-create-service_tier)，用于在延迟和成本之间权衡。
+你可以使用统一的 [`service_tier`][pydantic_ai.settings.ModelSettings.service_tier] 字段，或 provider 专用的 [`openai_service_tier`][pydantic_ai.models.openai.OpenAIChatModelSettings.openai_service_tier] 字段。两者都接受 `'auto'`、`'default'`、`'flex'` 和 `'priority'`，并原样传递。当两者同时设置时，`openai_service_tier` 优先于统一字段。
 
-## OpenAI Responses API
+## OpenAI Responses API {#openai-responses-api}
 
-Pydantic AI also supports OpenAI's [Responses API](https://platform.openai.com/docs/api-reference/responses) through [`OpenAIResponsesModel`][pydantic_ai.models.openai.OpenAIResponsesModel]:
+Pydantic AI 还通过 [`OpenAIResponsesModel`][pydantic_ai.models.openai.OpenAIResponsesModel] 支持 OpenAI 的 [Responses API](https://platform.openai.com/docs/api-reference/responses)：
 
 ```python
 from pydantic_ai import Agent
@@ -132,12 +132,12 @@ agent = Agent('openai-responses:gpt-5.2')
 ```
 
 !!! note "v2 default change"
-    In Pydantic AI v2, the bare `'openai:'` prefix will resolve to `OpenAIResponsesModel` instead of `OpenAIChatModel`. Before v2, `pydantic-ai` emits a `PydanticAIDeprecationWarning` whenever bare `'openai:'` is used; pick an explicit prefix to silence the warning and pin behavior:
+    在 Pydantic AI v2 中，裸 `'openai:'` prefix 会解析为 `OpenAIResponsesModel`，而不是 `OpenAIChatModel`。在 v2 之前，只要使用裸 `'openai:'`，`pydantic-ai` 就会发出 `PydanticAIDeprecationWarning`；请选择显式 prefix 以静默警告并固定行为：
 
-    - `'openai-chat:gpt-5.2'` keeps the Chat Completions routing.
-    - `'openai-responses:gpt-5.2'` opts in to the Responses API today (and matches the upcoming v2 default).
+    - `'openai-chat:gpt-5.2'` 保持 Chat Completions routing。
+    - `'openai-responses:gpt-5.2'` 现在就选择 Responses API（并匹配即将到来的 v2 默认行为）。
 
-Or initialise the model directly with just the model name:
+或者只用模型名称直接初始化模型：
 
 ```python
 from pydantic_ai import Agent
@@ -148,21 +148,21 @@ agent = Agent(model)
 ...
 ```
 
-You can learn more about the differences between the Responses API and Chat Completions API in the [OpenAI API docs](https://platform.openai.com/docs/guides/migrate-to-responses).
+你可以在 [OpenAI API docs](https://platform.openai.com/docs/guides/migrate-to-responses) 中了解 Responses API 与 Chat Completions API 的区别。
 
-### Native tools
+### 原生工具 {#native-tools}
 
-The Responses API has native tools that you can use instead of building your own:
+Responses API 提供可直接使用的 native tools，无需自己构建：
 
-- [Web search](https://platform.openai.com/docs/guides/tools-web-search): allow models to search the web for the latest information before generating a response.
-- [Code interpreter](https://platform.openai.com/docs/guides/tools-code-interpreter): allow models to write and run Python code in a sandboxed environment before generating a response.
-- [Image generation](https://platform.openai.com/docs/guides/tools-image-generation): allow models to generate images based on a text prompt.
-- [File search](https://platform.openai.com/docs/guides/tools-file-search): allow models to search your files for relevant information before generating a response.
-- [Computer use](https://platform.openai.com/docs/guides/tools-computer-use): allow models to use a computer to perform tasks on your behalf.
+- [Web search](https://platform.openai.com/docs/guides/tools-web-search)：允许 models 在生成响应前搜索 web 以获取最新信息。
+- [Code interpreter](https://platform.openai.com/docs/guides/tools-code-interpreter)：允许 models 在生成响应前，在 sandboxed environment 中编写并运行 Python code。
+- [Image generation](https://platform.openai.com/docs/guides/tools-image-generation)：允许 models 基于 text prompt 生成 images。
+- [File search](https://platform.openai.com/docs/guides/tools-file-search)：允许 models 在生成响应前搜索你的 files 以获取相关信息。
+- [Computer use](https://platform.openai.com/docs/guides/tools-computer-use)：允许 models 代表你使用 computer 执行 tasks。
 
-Web search, Code interpreter, Image generation, and File search are natively supported through the [Native tools](../native-tools.md) feature.
+Web search、Code interpreter、Image generation 和 File search 通过 [Native tools](../native-tools.md) 功能获得原生支持。
 
-Computer use can be enabled by passing an [`openai.types.responses.ComputerToolParam`](https://github.com/openai/openai-python/blob/main/src/openai/types/responses/computer_tool_param.py) in the `openai_native_tools` setting on [`OpenAIResponsesModelSettings`][pydantic_ai.models.openai.OpenAIResponsesModelSettings]. It doesn't currently generate [`NativeToolCallPart`][pydantic_ai.messages.NativeToolCallPart] or [`NativeToolReturnPart`][pydantic_ai.messages.NativeToolReturnPart] parts in the message history, or streamed events; please submit an issue if you need native support for this native tool.
+Computer use 可以通过在 [`OpenAIResponsesModelSettings`][pydantic_ai.models.openai.OpenAIResponsesModelSettings] 的 `openai_native_tools` 设置中传入 [`openai.types.responses.ComputerToolParam`](https://github.com/openai/openai-python/blob/main/src/openai/types/responses/computer_tool_param.py) 来启用。它目前不会在 message history 或 streamed events 中生成 [`NativeToolCallPart`][pydantic_ai.messages.NativeToolCallPart] 或 [`NativeToolReturnPart`][pydantic_ai.messages.NativeToolReturnPart] parts；如果你需要对此 native tool 的原生支持，请提交 issue。
 
 ```python {title="computer_use_tool.py" test="skip"}
 from openai.types.responses import ComputerToolParam
@@ -184,12 +184,12 @@ result = agent.run_sync('Open a new browser tab')
 print(result.output)
 ```
 
-#### Referencing earlier responses
+#### 引用较早的 responses {#referencing-earlier-responses}
 
-The Responses API supports referencing earlier model responses in a new request using a `previous_response_id` parameter, to ensure the full [conversation state](https://platform.openai.com/docs/guides/conversation-state?api-mode=responses#passing-context-from-the-previous-response) including [reasoning items](https://platform.openai.com/docs/guides/reasoning#keeping-reasoning-items-in-context) is kept in context without having to resend it. This is available through the [`openai_previous_response_id`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_previous_response_id] field in
-[`OpenAIResponsesModelSettings`][pydantic_ai.models.openai.OpenAIResponsesModelSettings].
+Responses API 支持在新请求中通过 `previous_response_id` 参数引用较早的 model responses，从而确保完整的 [conversation state](https://platform.openai.com/docs/guides/conversation-state?api-mode=responses#passing-context-from-the-previous-response)，包括 [reasoning items](https://platform.openai.com/docs/guides/reasoning#keeping-reasoning-items-in-context)，保留在上下文中，而无需重新发送它。这可以通过
+[`OpenAIResponsesModelSettings`][pydantic_ai.models.openai.OpenAIResponsesModelSettings] 中的 [`openai_previous_response_id`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_previous_response_id] 字段使用。
 
-When the field is set to `'auto'`, Pydantic AI automatically selects the most recent `provider_response_id` from the message history and omits messages that came before it, letting the OpenAI API reconstruct them from server-side state. The same chaining is applied inside a run across tool-call continuations and retries, so OpenAI never sees duplicate copies of the same messages.
+当该字段设置为 `'auto'` 时，Pydantic AI 会自动从 message history 中选择最近的 `provider_response_id`，并省略它之前的 messages，让 OpenAI API 根据 server-side state 重建它们。相同的 chaining 也会在一次 run 内跨 tool-call continuations 和 retries 应用，因此 OpenAI 不会看到相同 messages 的重复副本。
 
 ```python
 from pydantic_ai import Agent
@@ -212,7 +212,7 @@ print(result2.output)
 #> This is an excellent joke invented by Samuel Colvin, it needs no explanation.
 ```
 
-As an alternative to passing `message_history`, you can pass a concrete `provider_response_id` from an earlier run as the seed. Pydantic AI uses the seed for the first request in the new run, then automatically chains to the response returned for that request on any subsequent in-run calls — so the chain still extends correctly if the run includes tool-call continuations or retries.
+作为传入 `message_history` 的替代方案，你可以将较早 run 中的具体 `provider_response_id` 作为 seed 传入。Pydantic AI 会在新 run 的第一个请求中使用该 seed，然后在任何后续 run 内 calls 中自动 chain 到该请求返回的 response；因此即使 run 包含 tool-call continuations 或 retries，chain 仍会正确延伸。
 
 ```python
 from pydantic_ai import Agent
@@ -231,11 +231,11 @@ print(result.output)
 ```
 
 !!! note
-    Referencing a stored response requires the response to have actually been stored. OpenAI stores responses by default; if you've disabled storage via [`openai_store=False`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_store] or your organization has Zero Data Retention enabled, chaining is unavailable and the full message history must be sent on every request.
+    引用已存储 response 要求该 response 确实已被存储。OpenAI 默认会存储 responses；如果你通过 [`openai_store=False`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_store] 禁用了 storage，或你的 organization 启用了 Zero Data Retention，则 chaining 不可用，每个请求都必须发送完整 message history。
 
-#### Using durable conversations
+#### 使用持久对话 {#using-durable-conversations}
 
-OpenAI's [Conversations API](https://platform.openai.com/docs/guides/conversation-state?api-mode=responses#using-the-conversations-api) works with the Responses API to persist conversation state in a durable conversation object. If you already have an OpenAI conversation ID, pass it with [`openai_conversation_id`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_conversation_id]:
+OpenAI 的 [Conversations API](https://platform.openai.com/docs/guides/conversation-state?api-mode=responses#using-the-conversations-api) 与 Responses API 配合使用，将 conversation state 持久化到 durable conversation object 中。如果你已经有 OpenAI conversation ID，请通过 [`openai_conversation_id`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_conversation_id] 传入：
 
 ```python {test="skip"}
 from pydantic_ai import Agent
@@ -249,9 +249,9 @@ result = agent.run_sync('What did we discuss last time?', model_settings=model_s
 print(result.output)
 ```
 
-When a response belongs to a conversation, Pydantic AI stores the returned ID in `ModelResponse.provider_details['conversation_id']`. Setting `openai_conversation_id='auto'` uses the most recent same-provider conversation ID from the message history and sends only the new input items after that response.
+当 response 属于某个 conversation 时，Pydantic AI 会把返回的 ID 存储在 `ModelResponse.provider_details['conversation_id']` 中。设置 `openai_conversation_id='auto'` 会从 message history 中使用最近的同 provider conversation ID，并且只发送该 response 之后的新 input items。
 
-When message-level [`conversation_id`][pydantic_ai.messages.ModelResponse.conversation_id] values are available, `auto` only reuses an OpenAI conversation from the current Pydantic AI conversation; pass a concrete OpenAI conversation ID to reuse one explicitly:
+当 message-level [`conversation_id`][pydantic_ai.messages.ModelResponse.conversation_id] values 可用时，`auto` 只会复用当前 Pydantic AI conversation 中的 OpenAI conversation；如果要显式复用某个 OpenAI conversation ID，请传入具体值：
 
 ```python {test="skip"}
 from pydantic_ai import Agent
@@ -272,13 +272,13 @@ result2 = agent.run_sync(
 print(result2.output)
 ```
 
-Pydantic AI does not create OpenAI conversations for you. Use the OpenAI client to create the conversation, then pass its ID to `openai_conversation_id`. The `conversation` and `previous_response_id` parameters are mutually exclusive in the OpenAI API, so `openai_conversation_id` cannot be combined with [`openai_previous_response_id`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_previous_response_id].
+Pydantic AI 不会替你创建 OpenAI conversations。请使用 OpenAI client 创建 conversation，然后把其 ID 传给 `openai_conversation_id`。OpenAI API 中的 `conversation` 和 `previous_response_id` 参数互斥，因此 `openai_conversation_id` 不能与 [`openai_previous_response_id`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_previous_response_id] 组合。
 
-#### Message Compaction
+#### Message Compaction {#message-compaction}
 
-The Responses API supports [compacting message history](https://developers.openai.com/api/docs/guides/compaction) to reduce token usage in long conversations. Compaction produces an encrypted summary that replaces older messages while preserving context.
+Responses API 支持[压缩 message history](https://developers.openai.com/api/docs/guides/compaction)，以减少长对话中的 token usage。Compaction 会生成一个 encrypted summary，用其替换较旧 messages，同时保留上下文。
 
-The easiest way to enable compaction is with the [`OpenAICompaction`][pydantic_ai.models.openai.OpenAICompaction] capability:
+启用 compaction 最简单的方法是使用 [`OpenAICompaction`][pydantic_ai.models.openai.OpenAICompaction] capability：
 
 ```python {title="openai_compaction.py" test="skip"}
 from pydantic_ai import Agent
@@ -290,9 +290,9 @@ agent = Agent(
 )
 ```
 
-By default, `OpenAICompaction` runs in **stateful mode**: it configures OpenAI's server-side auto-compaction via the `context_management` field on the regular `/responses` request, and OpenAI triggers compaction whenever the input token count crosses a threshold it manages for you. This mode is compatible with [`openai_previous_response_id='auto'`](#referencing-earlier-responses) and [`openai_conversation_id`](#using-durable-conversations).
+默认情况下，`OpenAICompaction` 以 **stateful mode** 运行：它通过普通 `/responses` 请求上的 `context_management` 字段配置 OpenAI 的 server-side auto-compaction，并且当 input token count 跨过 OpenAI 为你管理的阈值时触发 compaction。此模式兼容 [`openai_previous_response_id='auto'`](#referencing-earlier-responses) 和 [`openai_conversation_id`](#using-durable-conversations)。
 
-To override the threshold, pass [`token_threshold`][pydantic_ai.models.openai.OpenAICompaction]:
+要覆盖阈值，请传入 [`token_threshold`][pydantic_ai.models.openai.OpenAICompaction]：
 
 ```python {title="openai_compaction_token_threshold.py" test="skip"}
 from pydantic_ai import Agent
@@ -304,7 +304,7 @@ agent = Agent(
 )
 ```
 
-As an alternative, `OpenAICompaction` supports a **stateless mode** (`stateless=True`) that calls the stateless `/responses/compact` endpoint via a `before_model_request` hook. Use this in [ZDR](https://openai.com/enterprise-privacy/) environments where OpenAI must not retain conversation data, when using [`openai_store=False`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_store], or when you need explicit out-of-band control over when compaction runs. Stateless mode requires you to specify either a [`message_count_threshold`][pydantic_ai.models.openai.OpenAICompaction] or a custom `trigger` callable:
+作为替代方案，`OpenAICompaction` 支持 **stateless mode**（`stateless=True`），它会通过 `before_model_request` hook 调用 stateless `/responses/compact` endpoint。在 [ZDR](https://openai.com/enterprise-privacy/) environments、使用 [`openai_store=False`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_store] 时，或你需要明确的 out-of-band control 来决定何时运行 compaction 时使用此模式。Stateless mode 要求你指定 [`message_count_threshold`][pydantic_ai.models.openai.OpenAICompaction] 或自定义 `trigger` callable：
 
 ```python {title="openai_compaction_stateless.py" test="skip"}
 from pydantic_ai import Agent
@@ -316,19 +316,19 @@ agent = Agent(
 )
 ```
 
-The mode is inferred from which parameters you pass: supplying `message_count_threshold` or `trigger` implies stateless mode, otherwise stateful mode is used. You can also pass `stateless=True` or `stateless=False` explicitly. Mixing parameters from different modes raises [`UserError`][pydantic_ai.exceptions.UserError].
+模式会根据你传入的参数推断：提供 `message_count_threshold` 或 `trigger` 表示 stateless mode，否则使用 stateful mode。你也可以显式传入 `stateless=True` 或 `stateless=False`。混用不同模式的参数会引发 [`UserError`][pydantic_ai.exceptions.UserError]。
 
 !!! tip
-    Stateful compaction pairs especially well with [`openai_previous_response_id='auto'`](#referencing-earlier-responses) or [`openai_conversation_id`](#using-durable-conversations). Both rely on OpenAI's server-side conversation state, so OpenAI can use a previously compacted context as the starting point for the next turn without you having to resend it.
+    Stateful compaction 与 [`openai_previous_response_id='auto'`](#referencing-earlier-responses) 或 [`openai_conversation_id`](#using-durable-conversations) 尤其搭配良好。二者都依赖 OpenAI 的 server-side conversation state，因此 OpenAI 可以用先前 compacted context 作为下一轮的起点，而无需你重新发送。
 
-For lower-level use cases, you can call [`compact_messages`][pydantic_ai.models.openai.OpenAIResponsesModel.compact_messages] directly on the model.
+对于更底层的用例，你可以直接在 model 上调用 [`compact_messages`][pydantic_ai.models.openai.OpenAIResponsesModel.compact_messages]。
 
-## OpenAI-compatible Models
+## OpenAI-compatible Models {#openai-compatible-models}
 
-Many providers and models are compatible with the OpenAI API, and can be used with `OpenAIChatModel` in Pydantic AI.
-Before getting started, check the [installation and configuration](#install) instructions above.
+许多 providers 和 models 与 OpenAI API 兼容，可以在 Pydantic AI 中与 `OpenAIChatModel` 搭配使用。
+开始前，请查看上面的[安装和配置](#install)说明。
 
-To use another OpenAI-compatible API, you can set the `OPENAI_BASE_URL` and `OPENAI_API_KEY` environment variables, or make use of the `base_url` and `api_key` arguments from [`OpenAIProvider`][pydantic_ai.providers.openai.OpenAIProvider]:
+要使用另一个 OpenAI-compatible API，你可以设置 `OPENAI_BASE_URL` 和 `OPENAI_API_KEY` 环境变量，或使用 [`OpenAIProvider`][pydantic_ai.providers.openai.OpenAIProvider] 的 `base_url` 和 `api_key` 参数：
 
 ```python
 from pydantic_ai import Agent
@@ -345,15 +345,15 @@ agent = Agent(model)
 ...
 ```
 
-Various providers also have their own provider classes so that you don't need to specify the base URL yourself and you can use the standard `<PROVIDER>_API_KEY` environment variable to set the API key.
-When a provider has its own provider class, you can use the `Agent("<provider>:<model>")` shorthand, e.g. `Agent("deepseek:deepseek-chat")` or `Agent("moonshotai:kimi-k2-0711-preview")`, instead of building the `OpenAIChatModel` explicitly. Similarly, you can pass the provider name as a string to the `provider` argument on `OpenAIChatModel` instead of instantiating the provider class explicitly.
+多种 providers 也有自己的 provider classes，因此你无需自己指定 base URL，并且可以使用标准 `<PROVIDER>_API_KEY` 环境变量设置 API key。
+当 provider 有自己的 provider class 时，你可以使用 `Agent("<provider>:<model>")` 简写，例如 `Agent("deepseek:deepseek-chat")` 或 `Agent("moonshotai:kimi-k2-0711-preview")`，而不是显式构建 `OpenAIChatModel`。同样，你也可以把 provider name 作为字符串传给 `OpenAIChatModel` 上的 `provider` 参数，而不是显式实例化 provider class。
 
-### Model Profile
+### Model Profile {#model-profile}
 
-Sometimes, the provider or model you're using will have slightly different requirements than OpenAI's API or models, like having different restrictions on JSON schemas for tool definitions, or not supporting tool definitions to be marked as strict.
+有时，你使用的 provider 或 model 会与 OpenAI API 或 models 有细微不同的要求，例如对 tool definitions 的 JSON schemas 有不同限制，或不支持将 tool definitions 标记为 strict。
 
-When using an alternative provider class provided by Pydantic AI, an appropriate model profile is typically selected automatically based on the model name.
-If the model you're using is not working correctly out of the box, you can tweak various aspects of how model requests are constructed by providing your own [`ModelProfile`][pydantic_ai.profiles.ModelProfile] (for behaviors shared among all model classes) or [`OpenAIModelProfile`][pydantic_ai.profiles.openai.OpenAIModelProfile] (for behaviors specific to `OpenAIChatModel`):
+使用 Pydantic AI 提供的替代 provider class 时，通常会根据 model name 自动选择合适的 model profile。
+如果你使用的模型开箱后不能正常工作，可以通过提供自己的 [`ModelProfile`][pydantic_ai.profiles.ModelProfile]（用于所有 model classes 共享的行为）或 [`OpenAIModelProfile`][pydantic_ai.profiles.openai.OpenAIModelProfile]（用于 `OpenAIChatModel` 专属行为）来调整 model requests 构造方式的各个方面：
 
 ```py
 from pydantic_ai import Agent, InlineDefsJsonSchemaTransformer
@@ -377,9 +377,9 @@ agent = Agent(model)
 
 ### DeepSeek
 
-To use the [DeepSeek](https://deepseek.com) provider, first create an API key by following the [Quick Start guide](https://api-docs.deepseek.com/).
+要使用 [DeepSeek](https://deepseek.com) provider，请先按照 [Quick Start guide](https://api-docs.deepseek.com/) 创建 API key。
 
-You can then set the `DEEPSEEK_API_KEY` environment variable and use [`DeepSeekProvider`][pydantic_ai.providers.deepseek.DeepSeekProvider] by name:
+然后你可以设置 `DEEPSEEK_API_KEY` 环境变量，并按名称使用 [`DeepSeekProvider`][pydantic_ai.providers.deepseek.DeepSeekProvider]：
 
 ```python
 from pydantic_ai import Agent
@@ -388,7 +388,7 @@ agent = Agent('deepseek:deepseek-chat')
 ...
 ```
 
-Or initialise the model and provider directly:
+或者直接初始化 model 和 provider：
 
 ```python
 from pydantic_ai import Agent
@@ -403,7 +403,7 @@ agent = Agent(model)
 ...
 ```
 
-You can also customize any provider with a custom `http_client`:
+你也可以用自定义 `http_client` 定制任何 provider：
 
 ```python
 from httpx import AsyncClient
@@ -425,7 +425,7 @@ agent = Agent(model)
 
 ### Alibaba Cloud Model Studio (DashScope)
 
-To use Qwen models via [Alibaba Cloud Model Studio (DashScope)](https://www.alibabacloud.com/en/product/modelstudio), you can set the `ALIBABA_API_KEY` (or `DASHSCOPE_API_KEY`) environment variable and use [`AlibabaProvider`][pydantic_ai.providers.alibaba.AlibabaProvider] by name:
+要通过 [Alibaba Cloud Model Studio (DashScope)](https://www.alibabacloud.com/en/product/modelstudio) 使用 Qwen models，可以设置 `ALIBABA_API_KEY`（或 `DASHSCOPE_API_KEY`）环境变量，并按名称使用 [`AlibabaProvider`][pydantic_ai.providers.alibaba.AlibabaProvider]：
 
 ```python
 from pydantic_ai import Agent
@@ -434,7 +434,7 @@ agent = Agent('alibaba:qwen-max')
 ...
 ```
 
-Or initialise the model and provider directly:
+或者直接初始化 model 和 provider：
 
 ```python
 from pydantic_ai import Agent
@@ -449,7 +449,7 @@ agent = Agent(model)
 ...
 ```
 
-The `AlibabaProvider` uses the international DashScope compatible endpoint `https://dashscope-intl.aliyuncs.com/compatible-mode/v1` by default. You can override this by passing a custom `base_url`:
+`AlibabaProvider` 默认使用国际版 DashScope compatible endpoint `https://dashscope-intl.aliyuncs.com/compatible-mode/v1`。你可以传入自定义 `base_url` 覆盖它：
 
 ```python
 from pydantic_ai import Agent
@@ -469,11 +469,11 @@ agent = Agent(model)
 
 ### Ollama
 
-See [Ollama](ollama.md) for dedicated Ollama documentation, including structured output and Ollama Cloud limitations.
+有关 structured output 和 Ollama Cloud limitations 等专门 Ollama 文档，请参阅 [Ollama](ollama.md)。
 
 ### Azure AI Foundry
 
-To use [Azure AI Foundry](https://ai.azure.com/) as your provider, set `AZURE_OPENAI_ENDPOINT` to a URL whose path ends in `/v1` (for example `https://<resource>.openai.azure.com/openai/v1/` or `https://<resource>.services.ai.azure.com/openai/v1/`), set `AZURE_OPENAI_API_KEY`, and use [`AzureProvider`][pydantic_ai.providers.azure.AzureProvider] by name:
+要使用 [Azure AI Foundry](https://ai.azure.com/) 作为 provider，请将 `AZURE_OPENAI_ENDPOINT` 设置为路径以 `/v1` 结尾的 URL（例如 `https://<resource>.openai.azure.com/openai/v1/` 或 `https://<resource>.services.ai.azure.com/openai/v1/`），设置 `AZURE_OPENAI_API_KEY`，并按名称使用 [`AzureProvider`][pydantic_ai.providers.azure.AzureProvider]：
 
 ```python
 from pydantic_ai import Agent
@@ -482,7 +482,7 @@ agent = Agent('azure:gpt-5.2')
 ...
 ```
 
-Or initialise the model and provider directly:
+或者直接初始化 model 和 provider：
 
 ```python
 from pydantic_ai import Agent
@@ -500,13 +500,13 @@ agent = Agent(model)
 ...
 ```
 
-This targets the [Azure OpenAI v1 API](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/api-version-lifecycle), which Microsoft recommends for all new projects. It also pairs naturally with the Responses API — see [Using Azure with the Responses API](#using-azure-with-the-responses-api) below.
+这会指向 Microsoft 建议所有新项目使用的 [Azure OpenAI v1 API](https://learn.microsoft.com/en-us/azure/ai-foundry/openai/api-version-lifecycle)。它也自然适配 Responses API；见下面的[将 Azure 与 Responses API 搭配使用](#using-azure-with-the-responses-api)。
 
-[`AzureProvider`][pydantic_ai.providers.azure.AzureProvider] also recognises [Azure AI Foundry serverless model deployments](https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/concepts/endpoints) at `https://<model>.<region>.models.ai.azure.com` and connects to them the same way.
+[`AzureProvider`][pydantic_ai.providers.azure.AzureProvider] 也能识别位于 `https://<model>.<region>.models.ai.azure.com` 的 [Azure AI Foundry serverless model deployments](https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/concepts/endpoints)，并以相同方式连接。
 
-#### Connecting to an existing `api-version`-based deployment
+#### 连接到现有基于 `api-version` 的 deployment {#connecting-to-an-existing-api-version-based-deployment}
 
-If your resource still uses the dated `api-version` API, pass `api_version` (or set the `OPENAI_API_VERSION` environment variable) and point `azure_endpoint` at the resource root instead:
+如果你的 resource 仍使用带日期的 `api-version` API，请传入 `api_version`（或设置 `OPENAI_API_VERSION` 环境变量），并将 `azure_endpoint` 指向 resource root：
 
 ```python
 from pydantic_ai import Agent
@@ -525,11 +525,11 @@ agent = Agent(model)
 ...
 ```
 
-#### Using Azure with the Responses API
+#### 将 Azure 与 Responses API 搭配使用 {#using-azure-with-the-responses-api}
 
-Azure AI Foundry also supports the OpenAI Responses API through [`OpenAIResponsesModel`][pydantic_ai.models.openai.OpenAIResponsesModel]. This is particularly recommended when working with document inputs ([`DocumentUrl`][pydantic_ai.DocumentUrl] and [`BinaryContent`][pydantic_ai.BinaryContent]), as Azure's Chat Completions API does not support these input types.
+Azure AI Foundry 也通过 [`OpenAIResponsesModel`][pydantic_ai.models.openai.OpenAIResponsesModel] 支持 OpenAI Responses API。当处理 document inputs（[`DocumentUrl`][pydantic_ai.DocumentUrl] 和 [`BinaryContent`][pydantic_ai.BinaryContent]）时尤其推荐，因为 Azure 的 Chat Completions API 不支持这些 input types。
 
-??? example "Document processing with Azure using Responses API"
+??? example "使用 Responses API 通过 Azure 处理文档"
     ```python
     from pydantic_ai import Agent, BinaryContent
     from pydantic_ai.models.openai import OpenAIResponsesModel
@@ -553,9 +553,9 @@ Azure AI Foundry also supports the OpenAI Responses API through [`OpenAIResponse
 
 ### Vercel AI Gateway
 
-To use [Vercel's AI Gateway](https://vercel.com/docs/ai-gateway), first follow the [documentation](https://vercel.com/docs/ai-gateway) instructions on obtaining an API key or OIDC token.
+要使用 [Vercel's AI Gateway](https://vercel.com/docs/ai-gateway)，请先按照 [documentation](https://vercel.com/docs/ai-gateway) 说明获取 API key 或 OIDC token。
 
-You can set the `VERCEL_AI_GATEWAY_API_KEY` and `VERCEL_OIDC_TOKEN` environment variables and use [`VercelProvider`][pydantic_ai.providers.vercel.VercelProvider] by name:
+你可以设置 `VERCEL_AI_GATEWAY_API_KEY` 和 `VERCEL_OIDC_TOKEN` 环境变量，并按名称使用 [`VercelProvider`][pydantic_ai.providers.vercel.VercelProvider]：
 
 ```python
 from pydantic_ai import Agent
@@ -564,7 +564,7 @@ agent = Agent('vercel:anthropic/claude-sonnet-4-5')
 ...
 ```
 
-Or initialise the model and provider directly:
+或者直接初始化 model 和 provider：
 
 ```python
 from pydantic_ai import Agent
@@ -581,9 +581,9 @@ agent = Agent(model)
 
 ### MoonshotAI
 
-Create an API key in the [Moonshot Console](https://platform.moonshot.ai/console).
+在 [Moonshot Console](https://platform.moonshot.ai/console) 中创建 API key。
 
-You can set the `MOONSHOTAI_API_KEY` environment variable and use [`MoonshotAIProvider`][pydantic_ai.providers.moonshotai.MoonshotAIProvider] by name:
+你可以设置 `MOONSHOTAI_API_KEY` 环境变量，并按名称使用 [`MoonshotAIProvider`][pydantic_ai.providers.moonshotai.MoonshotAIProvider]：
 
 ```python
 from pydantic_ai import Agent
@@ -592,7 +592,7 @@ agent = Agent('moonshotai:kimi-k2-0711-preview')
 ...
 ```
 
-Or initialise the model and provider directly:
+或者直接初始化 model 和 provider：
 
 ```python
 from pydantic_ai import Agent
@@ -609,9 +609,9 @@ agent = Agent(model)
 
 ### GitHub Models
 
-To use [GitHub Models](https://docs.github.com/en/github-models), you'll need a GitHub personal access token with the `models: read` permission.
+要使用 [GitHub Models](https://docs.github.com/en/github-models)，你需要具有 `models: read` permission 的 GitHub personal access token。
 
-You can set the `GITHUB_API_KEY` environment variable and use [`GitHubProvider`][pydantic_ai.providers.github.GitHubProvider] by name:
+你可以设置 `GITHUB_API_KEY` 环境变量，并按名称使用 [`GitHubProvider`][pydantic_ai.providers.github.GitHubProvider]：
 
 ```python
 from pydantic_ai import Agent
@@ -620,7 +620,7 @@ agent = Agent('github:xai/grok-3-mini')
 ...
 ```
 
-Or initialise the model and provider directly:
+或者直接初始化 model 和 provider：
 
 ```python
 from pydantic_ai import Agent
@@ -635,12 +635,12 @@ agent = Agent(model)
 ...
 ```
 
-GitHub Models supports various model families with different prefixes. You can see the full list on the [GitHub Marketplace](https://github.com/marketplace?type=models) or the public [catalog endpoint](https://models.github.ai/catalog/models).
+GitHub Models 支持具有不同 prefixes 的多种 model families。你可以在 [GitHub Marketplace](https://github.com/marketplace?type=models) 或 public [catalog endpoint](https://models.github.ai/catalog/models) 上查看完整列表。
 
 ### Perplexity
 
-Follow the Perplexity [getting started](https://docs.perplexity.ai/guides/getting-started)
-guide to create an API key, then initialise the model and provider directly:
+按照 Perplexity [getting started](https://docs.perplexity.ai/guides/getting-started)
+guide 创建 API key，然后直接初始化 model 和 provider：
 
 ```python
 from pydantic_ai import Agent
@@ -660,9 +660,9 @@ agent = Agent(model)
 
 ### Fireworks AI
 
-Go to [Fireworks.AI](https://fireworks.ai/) and create an API key in your account settings.
+前往 [Fireworks.AI](https://fireworks.ai/) 并在账户设置中创建 API key。
 
-You can set the `FIREWORKS_API_KEY` environment variable and use [`FireworksProvider`][pydantic_ai.providers.fireworks.FireworksProvider] by name:
+你可以设置 `FIREWORKS_API_KEY` 环境变量，并按名称使用 [`FireworksProvider`][pydantic_ai.providers.fireworks.FireworksProvider]：
 
 ```python
 from pydantic_ai import Agent
@@ -671,7 +671,7 @@ agent = Agent('fireworks:accounts/fireworks/models/qwq-32b')
 ...
 ```
 
-Or initialise the model and provider directly:
+或者直接初始化 model 和 provider：
 
 ```python
 from pydantic_ai import Agent
@@ -688,9 +688,9 @@ agent = Agent(model)
 
 ### Together AI
 
-Go to [Together.ai](https://www.together.ai/) and create an API key in your account settings.
+前往 [Together.ai](https://www.together.ai/) 并在账户设置中创建 API key。
 
-You can set the `TOGETHER_API_KEY` environment variable and use [`TogetherProvider`][pydantic_ai.providers.together.TogetherProvider] by name:
+你可以设置 `TOGETHER_API_KEY` 环境变量，并按名称使用 [`TogetherProvider`][pydantic_ai.providers.together.TogetherProvider]：
 
 ```python
 from pydantic_ai import Agent
@@ -699,7 +699,7 @@ agent = Agent('together:meta-llama/Llama-3.3-70B-Instruct-Turbo-Free')
 ...
 ```
 
-Or initialise the model and provider directly:
+或者直接初始化 model 和 provider：
 
 ```python
 from pydantic_ai import Agent
@@ -716,9 +716,9 @@ agent = Agent(model)
 
 ### Heroku AI
 
-To use [Heroku AI](https://www.heroku.com/ai), first create an API key.
+要使用 [Heroku AI](https://www.heroku.com/ai)，请先创建 API key。
 
-You can set the `HEROKU_INFERENCE_KEY` and (optionally) `HEROKU_INFERENCE_URL` environment variables and use [`HerokuProvider`][pydantic_ai.providers.heroku.HerokuProvider] by name:
+你可以设置 `HEROKU_INFERENCE_KEY` 和（可选的）`HEROKU_INFERENCE_URL` 环境变量，并按名称使用 [`HerokuProvider`][pydantic_ai.providers.heroku.HerokuProvider]：
 
 ```python
 from pydantic_ai import Agent
@@ -727,7 +727,7 @@ agent = Agent('heroku:claude-sonnet-4-5')
 ...
 ```
 
-Or initialise the model and provider directly:
+或者直接初始化 model 和 provider：
 
 ```python
 from pydantic_ai import Agent
@@ -744,11 +744,11 @@ agent = Agent(model)
 
 ### LiteLLM
 
-To use [LiteLLM](https://www.litellm.ai/), set the configs as outlined in the [doc](https://docs.litellm.ai/docs/set_keys). In `LiteLLMProvider`, you can pass `api_base` and `api_key`. The value of these configs will depend on your setup. For example, if you are using OpenAI models, then you need to pass `https://api.openai.com/v1` as the `api_base` and your OpenAI API key as the `api_key`. If you are using a LiteLLM proxy server running on your local machine, then you need to pass `http://localhost:<port>` as the `api_base` and your LiteLLM API key (or a placeholder) as the `api_key`.
+要使用 [LiteLLM](https://www.litellm.ai/)，请按 [doc](https://docs.litellm.ai/docs/set_keys) 中说明设置 configs。在 `LiteLLMProvider` 中，你可以传入 `api_base` 和 `api_key`。这些 configs 的值取决于你的 setup。例如，如果你使用 OpenAI models，则需要把 `https://api.openai.com/v1` 作为 `api_base`，并把你的 OpenAI API key 作为 `api_key`。如果你使用在本机运行的 LiteLLM proxy server，则需要把 `http://localhost:<port>` 作为 `api_base`，并把你的 LiteLLM API key（或 placeholder）作为 `api_key`。
 
-To use custom LLMs, use `custom/` prefix in the model name.
+要使用自定义 LLMs，请在 model name 中使用 `custom/` prefix。
 
-Once you have the configs, use the [`LiteLLMProvider`][pydantic_ai.providers.litellm.LiteLLMProvider] as follows:
+拿到 configs 后，按如下方式使用 [`LiteLLMProvider`][pydantic_ai.providers.litellm.LiteLLMProvider]：
 
 ```python
 from pydantic_ai import Agent
@@ -772,9 +772,9 @@ print(result.output)
 
 ### Nebius AI Studio
 
-Go to [Nebius AI Studio](https://studio.nebius.com/) and create an API key.
+前往 [Nebius AI Studio](https://studio.nebius.com/) 并创建 API key。
 
-You can set the `NEBIUS_API_KEY` environment variable and use [`NebiusProvider`][pydantic_ai.providers.nebius.NebiusProvider] by name:
+你可以设置 `NEBIUS_API_KEY` 环境变量，并按名称使用 [`NebiusProvider`][pydantic_ai.providers.nebius.NebiusProvider]：
 
 ```python
 from pydantic_ai import Agent
@@ -785,7 +785,7 @@ print(result.output)
 #> The capital of France is Paris.
 ```
 
-Or initialise the model and provider directly:
+或者直接初始化 model 和 provider：
 
 ```python
 from pydantic_ai import Agent
@@ -804,11 +804,11 @@ print(result.output)
 
 ### OVHcloud AI Endpoints
 
-To use OVHcloud AI Endpoints, you need to create a new API key. To do so, go to the [OVHcloud manager](https://ovh.com/manager), then in Public Cloud > AI Endpoints > API keys. Click on `Create a new API key` and copy your new key.
+要使用 OVHcloud AI Endpoints，你需要创建新的 API key。为此，请前往 [OVHcloud manager](https://ovh.com/manager)，然后进入 Public Cloud > AI Endpoints > API keys。点击 `Create a new API key` 并复制新 key。
 
-You can explore the [catalog](https://endpoints.ai.cloud.ovh.net/catalog) to find which models are available.
+你可以浏览 [catalog](https://endpoints.ai.cloud.ovh.net/catalog) 查看可用 models。
 
-You can set the `OVHCLOUD_API_KEY` environment variable and use [`OVHcloudProvider`][pydantic_ai.providers.ovhcloud.OVHcloudProvider] by name:
+你可以设置 `OVHCLOUD_API_KEY` 环境变量，并按名称使用 [`OVHcloudProvider`][pydantic_ai.providers.ovhcloud.OVHcloudProvider]：
 
 ```python
 from pydantic_ai import Agent
@@ -819,7 +819,7 @@ print(result.output)
 #> The capital of France is Paris.
 ```
 
-If you need to configure the provider, you can use the [`OVHcloudProvider`][pydantic_ai.providers.ovhcloud.OVHcloudProvider] class:
+如果需要配置 provider，可以使用 [`OVHcloudProvider`][pydantic_ai.providers.ovhcloud.OVHcloudProvider] 类：
 
 ```python
 from pydantic_ai import Agent
@@ -838,11 +838,11 @@ print(result.output)
 
 ### SambaNova
 
-To use [SambaNova Cloud](https://cloud.sambanova.ai/), you need to obtain an API key from the [SambaNova Cloud dashboard](https://cloud.sambanova.ai/dashboard).
+要使用 [SambaNova Cloud](https://cloud.sambanova.ai/)，你需要从 [SambaNova Cloud dashboard](https://cloud.sambanova.ai/dashboard) 获取 API key。
 
-SambaNova provides access to multiple model families including Meta Llama, DeepSeek, Qwen, and Mistral models with fast inference speeds.
+SambaNova 提供对多个 model families 的访问，包括 Meta Llama、DeepSeek、Qwen 和 Mistral models，并提供快速 inference speeds。
 
-You can set the `SAMBANOVA_API_KEY` environment variable and use [`SambaNovaProvider`][pydantic_ai.providers.sambanova.SambaNovaProvider] by name:
+你可以设置 `SAMBANOVA_API_KEY` 环境变量，并按名称使用 [`SambaNovaProvider`][pydantic_ai.providers.sambanova.SambaNovaProvider]：
 
 ```python
 from pydantic_ai import Agent
@@ -853,7 +853,7 @@ print(result.output)
 #> The capital of France is Paris.
 ```
 
-Or initialise the model and provider directly:
+或者直接初始化 model 和 provider：
 
 ```python
 from pydantic_ai import Agent
@@ -870,9 +870,9 @@ print(result.output)
 #> The capital of France is Paris.
 ```
 
-For a complete list of available models, see the [SambaNova supported models documentation](https://docs.sambanova.ai/docs/en/models/sambacloud-models).
+完整可用模型列表请参阅 [SambaNova supported models documentation](https://docs.sambanova.ai/docs/en/models/sambacloud-models)。
 
-You can customize the base URL if needed:
+如果需要，你可以自定义 base URL：
 
 ```python
 from pydantic_ai import Agent
