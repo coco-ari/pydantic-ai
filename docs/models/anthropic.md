@@ -1,28 +1,28 @@
 # Anthropic
 
-## Install
+## 安装 {#install}
 
-To use `AnthropicModel` models, you need to either install `pydantic-ai`, or install `pydantic-ai-slim` with the `anthropic` optional group:
+要使用 `AnthropicModel` 模型，你需要安装 `pydantic-ai`，或者安装带 `anthropic` 可选组的 `pydantic-ai-slim`：
 
 ```bash
 pip/uv-add "pydantic-ai-slim[anthropic]"
 ```
 
-## Configuration
+## 配置 {#configuration}
 
-To use [Anthropic](https://anthropic.com) through their API, go to [console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys) to generate an API key.
+要通过 [Anthropic](https://anthropic.com) API 使用 Anthropic，请前往 [console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys) 生成 API key。
 
-`AnthropicModelName` contains a list of available Anthropic models.
+`AnthropicModelName` 包含可用 Anthropic 模型列表。
 
-## Environment variable
+## 环境变量 {#environment-variable}
 
-Once you have the API key, you can set it as an environment variable:
+拿到 API key 后，可以将其设置为环境变量：
 
 ```bash
 export ANTHROPIC_API_KEY='your-api-key'
 ```
 
-You can then use `AnthropicModel` by name:
+然后你可以按名称使用 `AnthropicModel`：
 
 ```python
 from pydantic_ai import Agent
@@ -31,7 +31,7 @@ agent = Agent('anthropic:claude-sonnet-4-6')
 ...
 ```
 
-Or initialise the model directly with just the model name:
+或者只用模型名称直接初始化模型：
 
 ```python
 from pydantic_ai import Agent
@@ -43,13 +43,13 @@ agent = Agent(model)
 ```
 
 !!! note "Claude Opus 4.7 / 4.8 migration"
-    Anthropic's [Claude Opus migration guide](https://platform.claude.com/docs/en/about-claude/models/migration-guide) recommends removing `temperature`, `top_p`, and `top_k` from Opus 4.7 and 4.8 requests. Pydantic AI drops those keys automatically for `claude-opus-4-7` and `claude-opus-4-8`, including `extra_body` overrides.
+    Anthropic 的 [Claude Opus migration guide](https://platform.claude.com/docs/en/about-claude/models/migration-guide) 建议从 Opus 4.7 和 4.8 请求中移除 `temperature`、`top_p` 和 `top_k`。Pydantic AI 会针对 `claude-opus-4-7` 和 `claude-opus-4-8` 自动丢弃这些 keys，包括 `extra_body` overrides。
 
-    The same guide also recommends re-evaluating `max_tokens` and any token-count assumptions when migrating from Opus 4.6, since Opus 4.7 introduced updated tokenization (carried into 4.8). If you rely on `count_tokens()` or `count_tokens_before_request`, verify your thresholds against the new model.
+    同一指南还建议从 Opus 4.6 迁移时重新评估 `max_tokens` 和任何 token 计数假设，因为 Opus 4.7 引入了更新后的 tokenization（延续到 4.8）。如果你依赖 `count_tokens()` 或 `count_tokens_before_request`，请根据新模型验证你的阈值。
 
-## `provider` argument
+## `provider` 参数 {#provider-argument}
 
-You can provide a custom `Provider` via the `provider` argument:
+你可以通过 `provider` 参数提供自定义 `Provider`：
 
 ```python
 from pydantic_ai import Agent
@@ -63,9 +63,9 @@ agent = Agent(model)
 ...
 ```
 
-## Custom HTTP Client
+## 自定义 HTTP Client {#custom-http-client}
 
-You can customize the `AnthropicProvider` with a custom `httpx.AsyncClient`:
+你可以使用自定义 `httpx.AsyncClient` 来定制 `AnthropicProvider`：
 
 ```python
 from httpx import AsyncClient
@@ -83,9 +83,9 @@ agent = Agent(model)
 ...
 ```
 
-## Model settings
+## 模型设置 {#model-settings}
 
-You can customize model behavior using [`AnthropicModelSettings`][pydantic_ai.models.anthropic.AnthropicModelSettings]:
+你可以使用 [`AnthropicModelSettings`][pydantic_ai.models.anthropic.AnthropicModelSettings] 定制模型行为：
 
 ```python
 from pydantic_ai import Agent
@@ -100,24 +100,24 @@ agent = Agent(model, model_settings=settings)
 ...
 ```
 
-### Service tier
+### 服务层级 {#service-tier}
 
-Anthropic supports controlling the [service tier](https://docs.anthropic.com/en/docs/build-with-claude/latency-and-throughput) to manage latency and throughput.
-You can use the unified [`service_tier`][pydantic_ai.settings.ModelSettings.service_tier] field or the provider-specific [`anthropic_service_tier`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_service_tier] field. `anthropic_service_tier` takes precedence over the unified field when both are set, and accepts Anthropic's native values (`'auto'` or `'standard_only'`).
+Anthropic 支持控制 [service tier](https://docs.anthropic.com/en/docs/build-with-claude/latency-and-throughput) 来管理延迟和吞吐量。
+你可以使用统一的 [`service_tier`][pydantic_ai.settings.ModelSettings.service_tier] 字段，或 provider 专用的 [`anthropic_service_tier`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_service_tier] 字段。当两者同时设置时，`anthropic_service_tier` 优先于统一字段，并接受 Anthropic 的原生值（`'auto'` 或 `'standard_only'`）。
 
-The unified field maps as follows for Anthropic:
+Anthropic 的统一字段映射如下：
 
-- `'auto'`: passed through as `'auto'` (Anthropic's native value — uses priority capacity when available).
-- `'default'`: maps to `'standard_only'` (forces the standard tier, opting out of priority capacity).
-- `'flex'` and `'priority'` are not part of Anthropic's tier model and are silently ignored.
+- `'auto'`：原样传递为 `'auto'`（Anthropic 的原生值，会在可用时使用 priority capacity）。
+- `'default'`：映射为 `'standard_only'`（强制使用 standard tier，不使用 priority capacity）。
+- `'flex'` 和 `'priority'` 不属于 Anthropic 的 tier model，会被静默忽略。
 
-## Cloud Platform Integrations
+## 云平台集成 {#cloud-platform-integrations}
 
-You can use Anthropic models through cloud platforms by passing a custom client to [`AnthropicProvider`][pydantic_ai.providers.anthropic.AnthropicProvider].
+你可以通过向 [`AnthropicProvider`][pydantic_ai.providers.anthropic.AnthropicProvider] 传入自定义 client，经由云平台使用 Anthropic 模型。
 
-### AWS Bedrock
+### AWS Bedrock {#aws-bedrock}
 
-To use Claude models via [AWS Bedrock](https://aws.amazon.com/bedrock/claude/), follow the [Anthropic documentation](https://platform.claude.com/docs/en/build-with-claude/claude-in-amazon-bedrock) on how to set up a Bedrock client and then pass it to `AnthropicProvider`. Both the newer `AsyncAnthropicBedrockMantle` client (recommended by Anthropic, using the Messages API) and the legacy `AsyncAnthropicBedrock` client (using the `InvokeModel` API with ARN-versioned model IDs) are supported:
+要通过 [AWS Bedrock](https://aws.amazon.com/bedrock/claude/) 使用 Claude 模型，请按照 [Anthropic documentation](https://platform.claude.com/docs/en/build-with-claude/claude-in-amazon-bedrock) 设置 Bedrock client，然后将其传给 `AnthropicProvider`。较新的 `AsyncAnthropicBedrockMantle` client（Anthropic 推荐，使用 Messages API）和旧版 `AsyncAnthropicBedrock` client（使用带 ARN-versioned model IDs 的 `InvokeModel` API）均受支持：
 
 ```python {test="skip"}
 from anthropic import AsyncAnthropicBedrockMantle
@@ -134,14 +134,14 @@ agent = Agent(model)
 ```
 
 !!! note "Bedrock vs BedrockConverseModel"
-    This approach uses Anthropic's SDK with AWS Bedrock credentials. For an alternative using AWS SDK (boto3) directly, see [`BedrockConverseModel`](bedrock.md).
+    此方法使用 Anthropic 的 SDK 和 AWS Bedrock 凭据。如需直接使用 AWS SDK (boto3) 的替代方案，请参阅 [`BedrockConverseModel`](bedrock.md)。
 
-!!! note "Tool search on the legacy `AsyncAnthropicBedrock` client"
-    The legacy `InvokeModel` API doesn't support the `bm25` [tool search](../tools-advanced.md#tool-search) variant, so [`ToolSearch`][pydantic_ai.capabilities.ToolSearch] defaults to `'regex'` on the `AsyncAnthropicBedrock` client (instead of `'bm25'`), and passing `ToolSearch(strategy='bm25')` raises a `UserError`.
+!!! note "旧版 `AsyncAnthropicBedrock` client 上的工具搜索"
+    旧版 `InvokeModel` API 不支持 `bm25` [工具搜索](../tools-advanced.md#tool-search)变体，因此 [`ToolSearch`][pydantic_ai.capabilities.ToolSearch] 在 `AsyncAnthropicBedrock` client 上默认使用 `'regex'`（而不是 `'bm25'`），传入 `ToolSearch(strategy='bm25')` 会引发 `UserError`。
 
-### Google Cloud
+### Google Cloud {#google-cloud}
 
-To use Claude models via [Google Cloud Vertex AI](https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/use-claude), follow the [Anthropic documentation](https://docs.anthropic.com/en/api/claude-on-vertex-ai) on how to set up an `AsyncAnthropicVertex` client and then pass it to `AnthropicProvider`:
+要通过 [Google Cloud Vertex AI](https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/use-claude) 使用 Claude 模型，请按照 [Anthropic documentation](https://docs.anthropic.com/en/api/claude-on-vertex-ai) 设置 `AsyncAnthropicVertex` client，然后将其传给 `AnthropicProvider`：
 
 ```python {test="skip"}
 from anthropic import AsyncAnthropicVertex
@@ -157,9 +157,9 @@ agent = Agent(model)
 ...
 ```
 
-### Microsoft Foundry
+### Microsoft Foundry {#microsoft-foundry}
 
-To use Claude models via [Microsoft Foundry](https://ai.azure.com/), follow the [Anthropic documentation](https://platform.claude.com/docs/en/build-with-claude/claude-in-microsoft-foundry) on how to set up an `AsyncAnthropicFoundry` client and then pass it to `AnthropicProvider`:
+要通过 [Microsoft Foundry](https://ai.azure.com/) 使用 Claude 模型，请按照 [Anthropic documentation](https://platform.claude.com/docs/en/build-with-claude/claude-in-microsoft-foundry) 设置 `AsyncAnthropicFoundry` client，然后将其传给 `AnthropicProvider`：
 
 ```python {test="skip"}
 from anthropic import AsyncAnthropicFoundry
@@ -178,13 +178,13 @@ agent = Agent(model)
 ...
 ```
 
-See [Anthropic's Microsoft Foundry documentation](https://platform.claude.com/docs/en/build-with-claude/claude-in-microsoft-foundry) for setup instructions including Entra ID authentication.
+有关包括 Entra ID authentication 在内的设置说明，请参阅 [Anthropic's Microsoft Foundry documentation](https://platform.claude.com/docs/en/build-with-claude/claude-in-microsoft-foundry)。
 
-## Task Budgets (Beta)
+## 任务预算（Beta） {#task-budgets-beta}
 
-Anthropic's [task budgets](https://platform.claude.com/docs/en/build-with-claude/task-budgets) let you give Claude an advisory token budget for a full agentic loop — including thinking, tool calls, tool results, and output — so the model can pace itself and finish gracefully as the budget is consumed. Configure them with [`AnthropicModelSettings.anthropic_task_budget`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_task_budget], which takes an [`AnthropicTaskBudget`][pydantic_ai.models.anthropic.AnthropicTaskBudget] payload and maps to `output_config.task_budget`.
+Anthropic 的 [task budgets](https://platform.claude.com/docs/en/build-with-claude/task-budgets) 允许你为完整 agentic loop 提供一个建议性 token budget，包括 thinking、tool calls、tool results 和 output，从而让模型随着预算消耗调整节奏并优雅完成。通过 [`AnthropicModelSettings.anthropic_task_budget`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_task_budget] 配置它们；该字段接受 [`AnthropicTaskBudget`][pydantic_ai.models.anthropic.AnthropicTaskBudget] payload，并映射到 `output_config.task_budget`。
 
-Pydantic AI automatically enables Anthropic's required `task-budgets-2026-03-13` beta when this setting is present. Support is currently limited to native Anthropic `claude-opus-4-7` and `claude-opus-4-8` requests, not Bedrock, Vertex, or Microsoft Foundry Anthropic model IDs.
+当此设置存在时，Pydantic AI 会自动启用 Anthropic 所需的 `task-budgets-2026-03-13` beta。当前支持仅限原生 Anthropic `claude-opus-4-7` 和 `claude-opus-4-8` 请求，不支持 Bedrock、Vertex 或 Microsoft Foundry Anthropic model IDs。
 
 ```python {title="anthropic_task_budget.py"}
 from pydantic_ai import Agent
@@ -198,27 +198,27 @@ agent = Agent(model, model_settings=settings)
 ...
 ```
 
-Task budgets compose with [`anthropic_effort`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_effort]: effort tunes per-step reasoning depth, while task budgets cap total work across the loop. Both fields end up under the same `output_config` object.
+Task budgets 可以与 [`anthropic_effort`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_effort] 组合：effort 调整每一步的推理深度，而 task budgets 限制整个 loop 的总工作量。两个字段最终都会位于同一个 `output_config` 对象下。
 
 !!! note
-    Task budgets are advisory, not a hard cap; pair them with [`max_tokens`][pydantic_ai.settings.ModelSettings.max_tokens] for an enforced ceiling.
+    Task budgets 是建议性的，而不是硬性上限；请配合 [`max_tokens`][pydantic_ai.settings.ModelSettings.max_tokens] 使用，以获得强制 ceiling。
 
-### Carrying budgets across compaction
+### 跨 compaction 携带预算 {#carrying-budgets-across-compaction}
 
-If you use [`AnthropicCompaction`][pydantic_ai.models.anthropic.AnthropicCompaction] for server-side compaction, you can skip this section: the server tracks the countdown itself, so leave `remaining` unset and let `total` self-regulate.
+如果你使用 [`AnthropicCompaction`][pydantic_ai.models.anthropic.AnthropicCompaction] 进行 server-side compaction，可以跳过本节：服务器会自行跟踪倒计时，因此让 `remaining` 保持未设置，并让 `total` 自我调节即可。
 
-The `remaining` field on `task_budget` is for *client-side* compaction patterns where you summarize earlier turns yourself between requests, so the server has no memory of how much budget was spent before the rewrite. Pydantic AI does not track `remaining` for you — accumulate token usage across requests yourself (e.g. from [`RunUsage`][pydantic_ai.usage.RunUsage] on each run) and pass the updated value on the next request so the countdown continues from where you left off rather than resetting to `total`. Setting `remaining` also invalidates any prompt-cache prefix that contains the budget, so if you want to preserve caching, set `total` once and let the server self-regulate against the running countdown.
+`task_budget` 上的 `remaining` 字段适用于 *client-side* compaction 模式，即你在请求之间自行总结早期轮次，因此服务器不知道 rewrite 之前已经花费了多少预算。Pydantic AI 不会替你跟踪 `remaining`；请自行跨请求累计 token usage（例如从每次 run 的 [`RunUsage`][pydantic_ai.usage.RunUsage] 获取），并在下一次请求中传入更新后的值，让倒计时从上次停止的位置继续，而不是重置为 `total`。设置 `remaining` 还会使包含预算的任何 prompt-cache prefix 失效，因此如果你想保留 caching，请只设置一次 `total`，并让服务器按运行中的倒计时自我调节。
 
 !!! warning
-    `task_budget.remaining` is mutually exclusive with [`AnthropicCompaction`][pydantic_ai.models.anthropic.AnthropicCompaction]: Anthropic rejects requests that combine the two because server-side compaction tracks the budget itself. Pydantic AI raises a [`UserError`][pydantic_ai.exceptions.UserError] before sending the request when this combination is configured. Choose one: `remaining` for client-side budget tracking, or [`AnthropicCompaction`][pydantic_ai.models.anthropic.AnthropicCompaction] for server-side compaction.
+    `task_budget.remaining` 与 [`AnthropicCompaction`][pydantic_ai.models.anthropic.AnthropicCompaction] 互斥：Anthropic 会拒绝将两者组合的请求，因为 server-side compaction 会自行跟踪预算。当配置了这种组合时，Pydantic AI 会在发送请求前引发 [`UserError`][pydantic_ai.exceptions.UserError]。请选择其一：使用 `remaining` 进行 client-side budget tracking，或使用 [`AnthropicCompaction`][pydantic_ai.models.anthropic.AnthropicCompaction] 进行 server-side compaction。
 
-## Prompt Caching
+## Prompt Caching {#prompt-caching}
 
-Anthropic supports [prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) to reduce costs by caching parts of your prompts. Pydantic AI supports automatic caching, per-block message caching, and explicit cache breakpoints:
+Anthropic 支持 [prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching)，可通过缓存部分 prompts 来降低成本。Pydantic AI 支持 automatic caching、per-block message caching 和 explicit cache breakpoints：
 
-### Automatic Caching
+### Automatic Caching {#automatic-caching}
 
-The simplest way to enable prompt caching is with [`AnthropicModelSettings.anthropic_cache`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_cache]. This uses Anthropic's [automatic caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching#automatic-caching), passing a top-level `cache_control` parameter so the server automatically applies a cache breakpoint to the last cacheable block in each request:
+启用 prompt caching 的最简单方式是使用 [`AnthropicModelSettings.anthropic_cache`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_cache]。这会使用 Anthropic 的 [automatic caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching#automatic-caching)，传入顶层 `cache_control` 参数，让服务器自动对每个请求中最后一个可缓存 block 应用 cache breakpoint：
 
 ```python {test="skip"}
 from pydantic_ai import Agent
@@ -241,14 +241,14 @@ print(f'Cache write: {result1.usage.cache_write_tokens}')
 print(f'Cache read: {result2.usage.cache_read_tokens}')
 ```
 
-This is ideal for multi-turn conversations where the cache breakpoint should move forward as the conversation grows. You can also specify a custom TTL with `anthropic_cache='1h'`.
+这非常适合多轮对话，因为 cache breakpoint 应随着对话增长向前移动。你也可以用 `anthropic_cache='1h'` 指定自定义 TTL。
 
-!!! note "Bedrock and Vertex"
-    Bedrock and Vertex [do not yet support automatic caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching#automatic-caching). On these platforms, `anthropic_cache` falls back to per-block caching on the last user message, providing the same benefit for multi-turn conversations.
+!!! note "Bedrock 和 Vertex"
+    Bedrock 和 Vertex [尚不支持 automatic caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching#automatic-caching)。在这些平台上，`anthropic_cache` 会回退为在最后一条 user message 上进行 per-block caching，从而为多轮对话提供相同收益。
 
-### Per-block Message Caching
+### Per-block Message Caching {#per-block-message-caching}
 
-As an alternative to `anthropic_cache`, [`AnthropicModelSettings.anthropic_cache_messages`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_cache_messages] adds per-block `cache_control` to the last content block of the final message instead of using Anthropic's top-level automatic caching parameter. Use this with Anthropic-compatible gateways and proxies (such as MiniMax, OpenRouter, or LiteLLM) that accept the Anthropic message format but don't support top-level automatic caching:
+作为 `anthropic_cache` 的替代方案，[`AnthropicModelSettings.anthropic_cache_messages`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_cache_messages] 会把 per-block `cache_control` 添加到最后一条 message 的最后一个 content block，而不是使用 Anthropic 的顶层 automatic caching 参数。对于接受 Anthropic message format 但不支持顶层 automatic caching 的 Anthropic-compatible gateways 和 proxies（例如 MiniMax、OpenRouter 或 LiteLLM），请使用此方式：
 
 ```python {test="skip"}
 from anthropic import AsyncAnthropic
@@ -277,20 +277,20 @@ result = agent.run_sync('What is the capital of France?')
 print(result.output)
 ```
 
-You can also specify a custom TTL with `anthropic_cache_messages='1h'`. `anthropic_cache_messages` cannot be combined with `anthropic_cache`.
+你也可以用 `anthropic_cache_messages='1h'` 指定自定义 TTL。`anthropic_cache_messages` 不能与 `anthropic_cache` 组合使用。
 
-### Explicit Cache Breakpoints
+### 显式 Cache Breakpoints {#explicit-cache-breakpoints}
 
-In addition to automatic caching, Pydantic AI provides several ways to place cache breakpoints on specific content:
+除 automatic caching 外，Pydantic AI 还提供了几种在特定内容上放置 cache breakpoints 的方式：
 
-1. **Cache User Messages with [`CachePoint`][pydantic_ai.messages.CachePoint]**: Insert a `CachePoint` marker in your user messages to cache everything before it
-2. **Cache the Final Message Block**: Set [`AnthropicModelSettings.anthropic_cache_messages`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_cache_messages] to `True` (uses 5m TTL by default) or specify `'5m'` / `'1h'` directly
-3. **Cache System Instructions**: Set [`AnthropicModelSettings.anthropic_cache_instructions`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_cache_instructions] to `True` (uses 5m TTL by default) or specify `'5m'` / `'1h'` directly
-4. **Cache Tool Definitions**: Set [`AnthropicModelSettings.anthropic_cache_tool_definitions`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_cache_tool_definitions] to `True` (uses 5m TTL by default) or specify `'5m'` / `'1h'` directly
+1. **使用 [`CachePoint`][pydantic_ai.messages.CachePoint] 缓存 User Messages**：在 user messages 中插入 `CachePoint` 标记，以缓存其之前的所有内容
+2. **缓存最终 Message Block**：将 [`AnthropicModelSettings.anthropic_cache_messages`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_cache_messages] 设置为 `True`（默认使用 5m TTL），或直接指定 `'5m'` / `'1h'`
+3. **缓存 System Instructions**：将 [`AnthropicModelSettings.anthropic_cache_instructions`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_cache_instructions] 设置为 `True`（默认使用 5m TTL），或直接指定 `'5m'` / `'1h'`
+4. **缓存 Tool Definitions**：将 [`AnthropicModelSettings.anthropic_cache_tool_definitions`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_cache_tool_definitions] 设置为 `True`（默认使用 5m TTL），或直接指定 `'5m'` / `'1h'`
 
-#### Example: Comprehensive Caching Strategy
+#### 示例：综合 Caching 策略 {#example-comprehensive-caching-strategy}
 
-Combine automatic caching with explicit breakpoints for maximum savings. Automatic caching handles the conversation, while explicit breakpoints pin system instructions and tool definitions:
+将 automatic caching 与 explicit breakpoints 组合以最大化节省。Automatic caching 处理对话，而 explicit breakpoints 固定 system instructions 和 tool definitions：
 
 ```python {test="skip"}
 from pydantic_ai import Agent, RunContext
@@ -316,11 +316,11 @@ result = agent.run_sync('Search for Python best practices')
 print(result.output)
 ```
 
-### Smart Instruction Caching
+### 智能 Instruction Caching {#smart-instruction-caching}
 
-When you use `anthropic_cache_instructions` with both static and dynamic [instructions](../agent.md#instructions), Pydantic AI automatically places the cache boundary at the optimal point. Static instructions (from `Agent(instructions=...)`) are sorted before dynamic instructions (from `@agent.instructions` functions or [toolsets](../toolsets.md)), and the cache point is placed after the last static instruction block.
+当你对静态和动态 [instructions](../agent.md#instructions) 同时使用 `anthropic_cache_instructions` 时，Pydantic AI 会自动把 cache boundary 放到最佳位置。静态 instructions（来自 `Agent(instructions=...)`）会排在动态 instructions（来自 `@agent.instructions` 函数或 [toolsets](../toolsets.md)）之前，cache point 会放在最后一个静态 instruction block 之后。
 
-This means your stable, static instructions are cached efficiently, while dynamic instructions (which may change between requests) remain outside the cache boundary and don't cause cache invalidation.
+这意味着稳定的静态 instructions 会被高效缓存，而动态 instructions（可能在请求之间变化）会保留在 cache boundary 之外，不会导致 cache invalidation。
 
 ```python {test="skip"}
 from datetime import date
@@ -347,13 +347,13 @@ result = agent.run_sync('What is your return policy?', deps='Alice')
 print(result.output)
 ```
 
-1. Static instructions are cached across requests.
-2. Enables smart cache placement at the static/dynamic boundary.
-3. Dynamic instructions change per-request and are not cached.
+1. 静态 instructions 会跨请求缓存。
+2. 在 static/dynamic boundary 启用智能 cache placement。
+3. 动态 instructions 每次请求都会变化，不会被缓存。
 
-### Fine-Grained Control with CachePoint
+### 使用 CachePoint 进行细粒度控制 {#fine-grained-control-with-cachepoint}
 
-Use manual `CachePoint` markers to control cache locations precisely:
+使用手动 `CachePoint` markers 精确控制 cache locations：
 
 ```python {test="skip"}
 from pydantic_ai import Agent, CachePoint
@@ -372,9 +372,9 @@ result = agent.run_sync([
 print(result.output)
 ```
 
-### Accessing Cache Usage Statistics
+### 访问 Cache Usage 统计 {#accessing-cache-usage-statistics}
 
-Access cache usage statistics via `result.usage`:
+通过 `result.usage` 访问 cache usage statistics：
 
 ```python {test="skip"}
 from pydantic_ai import Agent
@@ -394,25 +394,25 @@ print(f'Cache write tokens: {usage.cache_write_tokens}')
 print(f'Cache read tokens: {usage.cache_read_tokens}')
 ```
 
-### Cache Point Limits
+### Cache Point 限制 {#cache-point-limits}
 
-Anthropic enforces a maximum of 4 cache points per request. Pydantic AI automatically manages this limit to ensure your requests always comply without errors.
+Anthropic 对每个请求最多强制 4 个 cache points。Pydantic AI 会自动管理此限制，确保你的请求始终合规且不会出错。
 
-#### How Cache Points Are Allocated
+#### Cache Points 如何分配 {#how-cache-points-are-allocated}
 
-Cache points can come from several sources:
+Cache points 可能来自多个来源：
 
-1. **Automatic caching**: Via `anthropic_cache` (the server applies 1 cache point to the last cacheable block)
-2. **Final message block**: Via `anthropic_cache_messages` setting (adds cache point to last message content block)
-3. **System Prompt**: Via `anthropic_cache_instructions` setting (adds cache point to last system prompt block)
-4. **Tool Definitions**: Via `anthropic_cache_tool_definitions` setting (adds cache point to last tool definition)
-5. **Messages**: Via `CachePoint` markers (adds cache points to message content)
+1. **Automatic caching**：通过 `anthropic_cache`（服务器向最后一个可缓存 block 应用 1 个 cache point）
+2. **Final message block**：通过 `anthropic_cache_messages` 设置（向最后一条 message content block 添加 cache point）
+3. **System Prompt**：通过 `anthropic_cache_instructions` 设置（向最后一个 system prompt block 添加 cache point）
+4. **Tool Definitions**：通过 `anthropic_cache_tool_definitions` 设置（向最后一个 tool definition 添加 cache point）
+5. **Messages**：通过 `CachePoint` markers（向 message content 添加 cache points）
 
-Each setting uses **at most 1 cache point**, but you can combine them — except `anthropic_cache` and `anthropic_cache_messages`, which are mutually exclusive. If the total exceeds 4, Pydantic AI automatically trims excess cache points from older messages.
+每个设置**最多使用 1 个 cache point**，但你可以组合它们；例外是 `anthropic_cache` 和 `anthropic_cache_messages` 互斥。如果总数超过 4，Pydantic AI 会自动从较旧的 messages 中裁剪多余 cache points。
 
-#### Example: Combining Automatic and Explicit Caching
+#### 示例：组合 Automatic 和 Explicit Caching {#example-combining-automatic-and-explicit-caching}
 
-Define an agent with automatic caching plus explicit breakpoints:
+定义一个带 automatic caching 和 explicit breakpoints 的智能体：
 
 ```python {test="skip"}
 from pydantic_ai import Agent, CachePoint
@@ -445,11 +445,11 @@ print(f'Cache write tokens: {usage.cache_write_tokens}')
 print(f'Cache read tokens: {usage.cache_read_tokens}')
 ```
 
-#### Automatic Cache Point Limiting
+#### 自动 Cache Point 限制 {#automatic-cache-point-limiting}
 
-When explicit cache points from all sources (settings + `CachePoint` markers) exceed the available budget, Pydantic AI automatically removes excess cache points from **older message content** (keeping the most recent ones).
+当来自所有来源（settings + `CachePoint` markers）的 explicit cache points 超过可用预算时，Pydantic AI 会自动从**较旧的 message content** 中移除多余 cache points（保留最近的）。
 
-Define an agent with 2 explicit cache points from settings:
+定义一个由 settings 提供 2 个 explicit cache points 的智能体：
 
 ```python {test="skip"}
 from pydantic_ai import Agent, CachePoint
@@ -483,15 +483,15 @@ print(f'Cache write tokens: {usage.cache_write_tokens}')
 print(f'Cache read tokens: {usage.cache_read_tokens}')
 ```
 
-**Key Points**:
-- System and tool cache points are **always preserved**
-- `anthropic_cache` counts as 1 cache point, just like `anthropic_cache_instructions` and `anthropic_cache_tool_definitions`
-- Excess `CachePoint` markers in messages are removed from oldest to newest when the limit is exceeded
-- This ensures critical caching (instructions/tools) is maintained while still benefiting from message-level caching
+**关键点**：
+- System 和 tool cache points **始终保留**
+- `anthropic_cache` 与 `anthropic_cache_instructions` 和 `anthropic_cache_tool_definitions` 一样计为 1 个 cache point
+- 当超出限制时，message 中多余的 `CachePoint` markers 会按从旧到新的顺序移除
+- 这确保 critical caching（instructions/tools）得以保留，同时仍能受益于 message-level caching
 
-## Fast mode
+## Fast mode {#fast-mode}
 
-Fast mode provides higher output tokens per second and is currently supported on **Claude Opus 4.6**, **Claude Opus 4.7**, and **Claude Opus 4.8**. It is a research preview. Set [`anthropic_speed`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_speed] to `'fast'` to enable it; Pydantic AI automatically adds the required `fast-mode-2026-02-01` beta. On unsupported models, `anthropic_speed='fast'` is ignored with a `UserWarning`. For pricing, rate limits, and the latest list of supported models, see the [Anthropic fast mode docs](https://platform.claude.com/docs/en/build-with-claude/fast-mode).
+Fast mode 提供更高的每秒输出 tokens，当前支持 **Claude Opus 4.6**、**Claude Opus 4.7** 和 **Claude Opus 4.8**。它是一个 research preview。将 [`anthropic_speed`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_speed] 设置为 `'fast'` 即可启用；Pydantic AI 会自动添加所需的 `fast-mode-2026-02-01` beta。在不支持的模型上，`anthropic_speed='fast'` 会被忽略并发出 `UserWarning`。关于价格、速率限制和最新支持模型列表，请参阅 [Anthropic fast mode docs](https://platform.claude.com/docs/en/build-with-claude/fast-mode)。
 
 ```python
 from pydantic_ai import Agent
@@ -505,16 +505,16 @@ agent = Agent(
 ```
 
 !!! note "Prompt cache interaction"
-    Switching between `'fast'` and `'standard'` invalidates the prompt cache. Requests at different speeds do not share cached prefixes, so pick one speed per cache-sensitive conversation.
+    在 `'fast'` 和 `'standard'` 之间切换会使 prompt cache 失效。不同 speed 的请求不会共享 cached prefixes，因此请为 cache-sensitive conversation 选择一种 speed。
 
-!!! note "Bedrock, Vertex, and Foundry"
-    Fast mode is only available on the direct Anthropic API. Bedrock, Vertex, and Foundry clients do not support the `speed` parameter, so `anthropic_speed='fast'` is ignored with a `UserWarning` on those clients.
+!!! note "Bedrock、Vertex 和 Foundry"
+    Fast mode 仅适用于直接的 Anthropic API。Bedrock、Vertex 和 Foundry clients 不支持 `speed` 参数，因此在这些 clients 上 `anthropic_speed='fast'` 会被忽略并发出 `UserWarning`。
 
-## Message Compaction
+## Message Compaction {#message-compaction}
 
-Anthropic supports [automatic context compaction](https://docs.anthropic.com/en/docs/build-with-claude/compaction) to manage long conversations. When input tokens exceed a configured threshold, the API automatically generates a summary that replaces older messages while preserving context.
+Anthropic 支持 [automatic context compaction](https://docs.anthropic.com/en/docs/build-with-claude/compaction)，用于管理长对话。当 input tokens 超过配置阈值时，API 会自动生成摘要，用其替换较旧 messages，同时保留上下文。
 
-The easiest way to enable compaction is with the [`AnthropicCompaction`][pydantic_ai.models.anthropic.AnthropicCompaction] capability:
+启用 compaction 最简单的方法是使用 [`AnthropicCompaction`][pydantic_ai.models.anthropic.AnthropicCompaction] capability：
 
 ```python {title="anthropic_compaction.py"}
 from pydantic_ai import Agent
@@ -526,13 +526,13 @@ agent = Agent(
 )
 ```
 
-The capability accepts:
+该 capability 接受：
 
-- **`token_threshold`** (default: 150,000, minimum: 50,000): Compaction triggers when input tokens exceed this value.
-- **`instructions`**: Custom instructions for how the summary should be generated.
-- **`pause_after_compaction`**: When `True`, the response stops after the compaction block with `stop_reason='compaction'`, allowing explicit handling before continuing.
+- **`token_threshold`**（默认：150,000，最小：50,000）：当 input tokens 超过此值时触发 compaction。
+- **`instructions`**：关于如何生成摘要的自定义 instructions。
+- **`pause_after_compaction`**：当为 `True` 时，响应会在 compaction block 后停止，并带有 `stop_reason='compaction'`，允许你在继续前显式处理。
 
-Alternatively, you can configure compaction directly via model settings using [`anthropic_context_management`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_context_management]:
+或者，你可以使用 [`anthropic_context_management`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_context_management] 通过 model settings 直接配置 compaction：
 
 ```python {title="anthropic_compaction_settings.py" test="skip"}
 from pydantic_ai import Agent
@@ -550,11 +550,11 @@ result = agent.run_sync(
 ```
 
 !!! note
-    Compaction blocks returned by Anthropic contain readable text summaries. They are automatically round-tripped in subsequent requests when included in the message history.
+    Anthropic 返回的 compaction blocks 包含可读文本摘要。只要包含在 message history 中，它们会在后续请求中自动 round-trip。
 
-## Code Execution Tool Version
+## 代码执行工具版本 {#code-execution-tool-version}
 
-By default, Pydantic AI chooses a compatible Anthropic code execution tool version for the selected model. You can override this with [`AnthropicModelSettings.anthropic_code_execution_tool_version`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_code_execution_tool_version] when you need a specific supported Anthropic tool version:
+默认情况下，Pydantic AI 会为所选模型选择兼容的 Anthropic code execution tool version。当你需要某个特定支持版本时，可以使用 [`AnthropicModelSettings.anthropic_code_execution_tool_version`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_code_execution_tool_version] 覆盖它：
 
 ```py {title="anthropic_code_execution_tool_version.py"}
 from pydantic_ai import Agent, CodeExecutionTool
@@ -568,4 +568,4 @@ agent = Agent(
 )
 ```
 
-Pydantic AI raises a [`UserError`][pydantic_ai.exceptions.UserError] if you explicitly select a tool version that the model does not support.
+如果你显式选择了模型不支持的工具版本，Pydantic AI 会引发 [`UserError`][pydantic_ai.exceptions.UserError]。

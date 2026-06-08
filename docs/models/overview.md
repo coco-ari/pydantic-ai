@@ -1,10 +1,10 @@
-# Model Providers
+# 模型提供商 {#model-providers}
 
-Pydantic AI is model-agnostic and has built-in support for multiple model providers:
+Pydantic AI 与模型无关，并内置支持多个模型提供商：
 
 * [OpenAI](openai.md)
 * [Anthropic](anthropic.md)
-* [Gemini](google.md) (via two different APIs: Gemini API and Google Cloud, formerly known as Vertex AI)
+* [Gemini](google.md)（通过两种不同 API：Gemini API 和 Google Cloud，后者曾称为 Vertex AI）
 * [xAI](xai.md)
 * [Bedrock](bedrock.md)
 * [Cerebras](cerebras.md)
@@ -13,11 +13,11 @@ Pydantic AI is model-agnostic and has built-in support for multiple model provid
 * [Hugging Face](huggingface.md)
 * [Mistral](mistral.md)
 * [OpenRouter](openrouter.md)
-* [Outlines](outlines.md) (deprecated, will be removed in v2)
+* [Outlines](outlines.md)（已弃用，将在 v2 中移除）
 
-## OpenAI-compatible Providers
+## OpenAI 兼容提供商 {#openai-compatible-providers}
 
-In addition, many providers are compatible with the OpenAI API, and can be used with `OpenAIChatModel` in Pydantic AI:
+此外，许多提供商与 OpenAI API 兼容，可以在 Pydantic AI 中配合 `OpenAIChatModel` 使用：
 
 - [Alibaba Cloud Model Studio (DashScope)](openai.md#alibaba-cloud-model-studio-dashscope)
 - [Azure AI Foundry](openai.md#azure-ai-foundry)
@@ -34,42 +34,40 @@ In addition, many providers are compatible with the OpenAI API, and can be used 
 - [Together AI](openai.md#together-ai)
 - [Vercel AI Gateway](openai.md#vercel-ai-gateway)
 
-Pydantic AI also comes with [`TestModel`](../api/models/test.md) and [`FunctionModel`](../api/models/function.md)
-for testing and development.
+Pydantic AI 还提供 [`TestModel`](../api/models/test.md) 和 [`FunctionModel`](../api/models/function.md)，
+用于测试和开发。
 
-To use each model provider, you need to configure your local environment and make sure you have the right
-packages installed. If you try to use the model without having done so, you'll be told what to install.
+要使用各个模型提供商，你需要配置本地环境，并确保安装了正确的软件包。如果你在未完成配置时尝试使用模型，Pydantic AI 会提示需要安装什么。
 
-## Models and Providers
+## 模型和提供商 {#models-and-providers}
 
-Pydantic AI uses a few key terms to describe how it interacts with different LLMs:
+Pydantic AI 使用几个关键术语来描述它如何与不同 LLM 交互：
 
-- **Model**: This refers to the Pydantic AI class used to make requests following a specific LLM API
-  (generally by wrapping a vendor-provided SDK, like the `openai` python SDK). These classes implement a
-  vendor-SDK-agnostic API, ensuring a single Pydantic AI agent is portable to different LLM vendors without
-  any other code changes just by swapping out the Model it uses. Model classes are named
-  roughly in the format `<VendorSdk>Model`, for example, we have `OpenAIChatModel`, `AnthropicModel`, `GoogleModel`,
-  etc. When using a Model class, you specify the actual LLM model name (e.g., `gpt-5`,
-  `claude-sonnet-4-5`, `gemini-3-flash-preview`) as a parameter.
-- **Provider**: This refers to provider-specific classes which handle the authentication and connections
-  to an LLM vendor. Passing a non-default _Provider_ as a parameter to a Model is how you can ensure
-  that your agent will make requests to a specific endpoint, or make use of a specific approach to
-  authentication (e.g., you can use Azure auth with the `OpenAIChatModel` by way of the `AzureProvider`).
-  In particular, this is how you can make use of an AI gateway, or an LLM vendor that offers API compatibility
-  with the vendor SDK used by an existing Model (such as `OpenAIChatModel`).
-- **Profile**: This refers to a description of how requests to a specific model or family of models need to be
-  constructed to get the best results, independent of the model and provider classes used.
-  For example, different models have different restrictions on the JSON schemas that can be used for tools,
-  and the same schema transformer needs to be used for Gemini models whether you're using `GoogleModel`
-  with model name `gemini-3-pro-preview`, or `OpenAIChatModel` with `OpenRouterProvider` and model name `google/gemini-3-pro-preview`.
+- **Model**：指 Pydantic AI 中用于按特定 LLM API 发起请求的类
+  （通常通过封装厂商提供的 SDK，例如 `openai` Python SDK）。这些类实现了一个
+  与厂商 SDK 无关的 API，因此只要替换所使用的 Model，同一个 Pydantic AI 智能体就可以移植到不同 LLM 厂商，
+  无需其他代码变更。Model 类的命名大致采用 `<VendorSdk>Model` 格式，例如 `OpenAIChatModel`、`AnthropicModel`、`GoogleModel`
+  等。使用 Model 类时，你需要把实际的 LLM 模型名称（例如 `gpt-5`、
+  `claude-sonnet-4-5`、`gemini-3-flash-preview`）作为参数指定。
+- **Provider**：指处理与 LLM 厂商认证和连接的提供商专用类。向 Model 传入非默认的 _Provider_ 参数，
+  可以确保你的智能体向特定端点发起请求，或者使用特定认证方式
+  （例如，你可以通过 `AzureProvider` 让 `OpenAIChatModel` 使用 Azure 认证）。
+  这尤其适用于使用 AI 网关，或者使用某个与现有 Model 所用厂商 SDK 兼容的 LLM 厂商
+  （例如 `OpenAIChatModel`）时。
+- **Profile**：指如何构造对特定模型或模型家族的请求以获得最佳结果的描述，
+  它独立于所使用的 model 和 provider 类。
+  例如，不同模型对工具可用的 JSON schema 有不同限制；无论你是使用
+  model name 为 `gemini-3-pro-preview` 的 `GoogleModel`，还是使用
+  `OpenAIChatModel` 搭配 `OpenRouterProvider` 和 model name `google/gemini-3-pro-preview`，
+  Gemini 模型都需要使用同一个 schema transformer。
 
-When you instantiate an [`Agent`][pydantic_ai.Agent] with just a name formatted as `<provider>:<model>`, e.g. `openai:gpt-5.2` or `openrouter:google/gemini-3-pro-preview`,
-Pydantic AI will automatically select the appropriate model class, provider, and profile.
-If you want to use a different provider or profile, you can instantiate a model class directly and pass in `provider` and/or `profile` arguments.
+当你只用 `<provider>:<model>` 格式的名称实例化 [`Agent`][pydantic_ai.Agent] 时，例如 `openai:gpt-5.2` 或 `openrouter:google/gemini-3-pro-preview`，
+Pydantic AI 会自动选择合适的 model class、provider 和 profile。
+如果你想使用不同的 provider 或 profile，可以直接实例化 model class，并传入 `provider` 和/或 `profile` 参数。
 
-## HTTP Client Lifecycle
+## HTTP 客户端生命周期 {#http-client-lifecycle}
 
-When a [`Provider`][pydantic_ai.providers.Provider] creates its own HTTP client (i.e. you don't pass a custom `http_client`), it owns that client's lifecycle. Using the [`Agent`][pydantic_ai.Agent] as an async context manager ensures the HTTP client is closed cleanly on exit:
+当 [`Provider`][pydantic_ai.providers.Provider] 创建自己的 HTTP client 时（也就是你没有传入自定义 `http_client`），它会拥有该 client 的生命周期。把 [`Agent`][pydantic_ai.Agent] 作为 async context manager 使用，可以确保退出时干净关闭 HTTP client：
 
 ```python
 from pydantic_ai import Agent
@@ -83,27 +81,26 @@ async def main():
         #> The capital of France is Paris.
 ```
 
-You can also use a [`Model`][pydantic_ai.models.Model] or [`Provider`][pydantic_ai.providers.Provider] directly as an async context manager for the same effect.
+你也可以把 [`Model`][pydantic_ai.models.Model] 或 [`Provider`][pydantic_ai.providers.Provider] 直接作为 async context manager 使用，效果相同。
 
-If you provide your own `http_client`, you are responsible for closing it yourself.
+如果你提供自己的 `http_client`，则需要自行负责关闭它。
 
-## Custom Models
+## 自定义模型 {#custom-models}
 
 !!! note
-    If a model API is compatible with the OpenAI API, you do not need a custom model class and can provide your own [custom provider](openai.md#openai-compatible-models) instead.
+    如果某个模型 API 与 OpenAI API 兼容，你不需要自定义 model class，可以改为提供自己的[自定义 provider](openai.md#openai-compatible-models)。
 
-To implement support for a model API that's not already supported, you will need to subclass the [`Model`][pydantic_ai.models.Model] abstract base class.
-For streaming, you'll also need to implement the [`StreamedResponse`][pydantic_ai.models.StreamedResponse] abstract base class.
+要为尚未支持的模型 API 实现支持，你需要继承 [`Model`][pydantic_ai.models.Model] 抽象基类。
+对于流式响应，还需要实现 [`StreamedResponse`][pydantic_ai.models.StreamedResponse] 抽象基类。
 
-The best place to start is to review the source code for existing implementations, e.g. [`OpenAIChatModel`](https://github.com/pydantic/pydantic-ai/blob/main/pydantic_ai_slim/pydantic_ai/models/openai.py).
+最好的起点是查看现有实现的源代码，例如 [`OpenAIChatModel`](https://github.com/pydantic/pydantic-ai/blob/main/pydantic_ai_slim/pydantic_ai/models/openai.py)。
 
-For details on when we'll accept contributions adding new models to Pydantic AI, see the [contributing guidelines](../contributing.md#new-model-rules).
+关于我们何时接受向 Pydantic AI 添加新模型的贡献，请参阅[贡献指南](../contributing.md#new-model-rules)。
 
-## HTTP Request Concurrency
+## HTTP 请求并发 {#http-request-concurrency}
 
-You can limit the number of concurrent HTTP requests to a model using the
-[`ConcurrencyLimitedModel`][pydantic_ai.ConcurrencyLimitedModel] wrapper.
-This is useful for respecting rate limits or managing resource usage when running many agents in parallel.
+你可以使用 [`ConcurrencyLimitedModel`][pydantic_ai.ConcurrencyLimitedModel] 包装器限制对模型的并发 HTTP 请求数量。
+当并行运行多个智能体时，这对于遵守速率限制或管理资源使用很有用。
 
 ```python {title="model_concurrency.py"}
 import asyncio
@@ -126,17 +123,17 @@ async def main():
     #> 20
 ```
 
-The `limiter` parameter accepts:
+`limiter` 参数接受：
 
-- An integer for simple limiting (e.g., `limiter=5`)
-- A [`ConcurrencyLimit`][pydantic_ai.ConcurrencyLimit] for advanced configuration with backpressure control
-- A [`ConcurrencyLimiter`][pydantic_ai.ConcurrencyLimiter] for sharing limits across multiple models
+- 用于简单限制的整数（例如 `limiter=5`）
+- 用于带 backpressure 控制的高级配置的 [`ConcurrencyLimit`][pydantic_ai.ConcurrencyLimit]
+- 用于在多个模型之间共享限制的 [`ConcurrencyLimiter`][pydantic_ai.ConcurrencyLimiter]
 
-### Shared Concurrency Limits
+### 共享并发限制 {#shared-concurrency-limits}
 
-To share a concurrency limit across multiple models (e.g., different models from the same provider),
-you can create a [`ConcurrencyLimiter`][pydantic_ai.ConcurrencyLimiter] and pass it to
-multiple `ConcurrencyLimitedModel` instances:
+要在多个模型之间共享并发限制（例如同一个提供商的不同模型），
+你可以创建一个 [`ConcurrencyLimiter`][pydantic_ai.ConcurrencyLimiter]，并把它传给
+多个 `ConcurrencyLimitedModel` 实例：
 
 ```python {title="shared_concurrency.py"}
 import asyncio
@@ -164,33 +161,31 @@ async def main():
     #> 20
 ```
 
-When instrumentation is enabled, requests waiting for a concurrency slot appear as spans with
-attributes showing the queue depth and configured limits. The `name` parameter on
-`ConcurrencyLimiter` helps identify shared limiters in traces.
+启用 instrumentation 时，正在等待并发槽位的请求会显示为 spans，
+其 attributes 会展示队列深度和配置的限制。`ConcurrencyLimiter` 上的 `name` 参数
+有助于在 traces 中识别共享 limiter。
 
 <!-- TODO(Marcelo): We need to create a section in the docs about reliability. -->
 
-## Fallback Model
+## 回退模型 {#fallback-model}
 
-You can use [`FallbackModel`][pydantic_ai.models.fallback.FallbackModel] to attempt multiple models
-in sequence until one succeeds. Pydantic AI can switch to the next model when the current model
-raises an exception (like a 4xx/5xx API error) **or** when the response content indicates a semantic
-failure (like a truncated response or a failed native tool call).
+你可以使用 [`FallbackModel`][pydantic_ai.models.fallback.FallbackModel] 按顺序尝试多个模型，
+直到其中一个成功。当前模型引发异常（例如 4xx/5xx API 错误）**或**响应内容表明语义失败
+（例如响应被截断或原生工具调用失败）时，Pydantic AI 可以切换到下一个模型。
 
-By default, fallback triggers on [`ModelAPIError`][pydantic_ai.exceptions.ModelAPIError] (4xx/5xx API errors),
-so you don't need to configure anything for the most common use case.
+默认情况下，fallback 会在 [`ModelAPIError`][pydantic_ai.exceptions.ModelAPIError]（4xx/5xx API 错误）上触发，
+因此最常见的用例无需任何配置。
 
-This behavior is controlled by the `fallback_on` parameter (see
-[`FallbackModel`][pydantic_ai.models.fallback.FallbackModel]), which accepts exception types,
-exception handlers, and response handlers — all of which can be sync or async.
+此行为由 `fallback_on` 参数控制（参见
+[`FallbackModel`][pydantic_ai.models.fallback.FallbackModel]），该参数接受异常类型、
+异常处理器和响应处理器；它们都可以是同步或异步的。
 
 !!! note
-    The provider SDKs on which Models are based (like OpenAI, Anthropic, etc.) often have built-in retry logic that can delay the `FallbackModel` from activating.
+    Model 所基于的 provider SDK（例如 OpenAI、Anthropic 等）通常内置重试逻辑，这可能会延迟 `FallbackModel` 的激活。
 
-    When using `FallbackModel`, it's recommended to disable provider SDK retries to ensure immediate fallback, for example by setting `max_retries=0` on a [custom OpenAI client](openai.md#custom-openai-client).
+    使用 `FallbackModel` 时，建议禁用 provider SDK retries，以确保能立即 fallback，例如在[自定义 OpenAI client](openai.md#custom-openai-client) 上设置 `max_retries=0`。
 
-In the following example, the agent first makes a request to the OpenAI model (which fails due to an invalid API key),
-and then falls back to the Anthropic model.
+在下面的示例中，智能体先向 OpenAI 模型发起请求（由于 API key 无效而失败），然后回退到 Anthropic 模型。
 
 <!-- TODO(Marcelo): Do not skip this test. For some reason it becomes a flaky test if we don't skip it. -->
 
@@ -233,14 +228,14 @@ print(response.all_messages())
 """
 ```
 
-The `ModelResponse` message above indicates in the `model_name` field that the output was returned by the Anthropic model, which is the second model specified in the `FallbackModel`.
+上面的 `ModelResponse` 消息在 `model_name` 字段中表明，输出由 `FallbackModel` 中指定的第二个模型 Anthropic 模型返回。
 
 !!! note
-    Each model's options should be configured individually. For example, `base_url`, `api_key`, and custom clients should be set on each model itself, not on the `FallbackModel`.
+    每个模型的选项都应单独配置。例如，`base_url`、`api_key` 和自定义 clients 应设置在各自模型本身上，而不是设置在 `FallbackModel` 上。
 
-### Per-Model Settings
+### 每个模型的设置 {#per-model-settings}
 
-You can configure different [`ModelSettings`][pydantic_ai.settings.ModelSettings] for each model in a fallback chain by passing the `settings` parameter when creating each model. This is particularly useful when different providers have different optimal configurations:
+你可以在创建 fallback chain 中的每个模型时传入 `settings` 参数，为每个模型配置不同的 [`ModelSettings`][pydantic_ai.settings.ModelSettings]。当不同 provider 有不同的最佳配置时，这尤其有用：
 
 ```python {title="fallback_model_per_settings.py"}
 from pydantic_ai import Agent, ModelSettings
@@ -268,13 +263,13 @@ In the year 2157, Captain Maya Chen piloted her spacecraft through the vast expa
 """
 ```
 
-In this example, if the OpenAI model fails, the agent will automatically fall back to the Anthropic model with its own configured settings. The `FallbackModel` itself doesn't have settings - it uses the individual settings of whichever model successfully handles the request.
+在此示例中，如果 OpenAI 模型失败，智能体会自动回退到 Anthropic 模型，并使用 Anthropic 模型自己的配置。`FallbackModel` 本身没有 settings；它使用成功处理请求的具体模型上的独立 settings。
 
-### Exception Handling
+### 异常处理 {#exception-handling}
 
-The next example demonstrates the exception-handling capabilities of `FallbackModel`.
-If all models fail, a [`FallbackExceptionGroup`][pydantic_ai.exceptions.FallbackExceptionGroup] is raised, which
-contains all the exceptions encountered during the `run` execution.
+下一个示例演示 `FallbackModel` 的异常处理能力。
+如果所有模型都失败，会引发 [`FallbackExceptionGroup`][pydantic_ai.exceptions.FallbackExceptionGroup]，
+其中包含 `run` 执行期间遇到的所有异常。
 
 === "Python >=3.11"
 
@@ -298,9 +293,9 @@ contains all the exceptions encountered during the `run` execution.
 
 === "Python <3.11"
 
-    Since [`except*`](https://docs.python.org/3/reference/compound_stmts.html#except-star) is only supported
-    in Python 3.11+, we use the [`exceptiongroup`](https://github.com/agronholm/exceptiongroup) backport
-    package for earlier Python versions:
+    由于 [`except*`](https://docs.python.org/3/reference/compound_stmts.html#except-star) 仅在
+    Python 3.11+ 中受支持，较早 Python 版本使用 [`exceptiongroup`](https://github.com/agronholm/exceptiongroup) backport
+    软件包：
 
     ```python {title="fallback_model_failure.py" noqa="F821" test="skip"}
     from exceptiongroup import catch
@@ -325,34 +320,34 @@ contains all the exceptions encountered during the `run` execution.
         response = agent.run_sync('What is the capital of France?')
     ```
 
-By default, the `FallbackModel` only moves on to the next model if the current model raises a
-[`ModelAPIError`][pydantic_ai.exceptions.ModelAPIError], which includes
-[`ModelHTTPError`][pydantic_ai.exceptions.ModelHTTPError]. You can customize this behavior by
-passing a custom `fallback_on` argument to the `FallbackModel` constructor.
+默认情况下，`FallbackModel` 只有在当前模型引发
+[`ModelAPIError`][pydantic_ai.exceptions.ModelAPIError] 时才会切换到下一个模型，其中包括
+[`ModelHTTPError`][pydantic_ai.exceptions.ModelHTTPError]。你可以通过向
+`FallbackModel` 构造函数传入自定义 `fallback_on` 参数来定制此行为。
 
 !!! note
-    Validation errors (from [structured output](../output.md#structured-output) or [tool parameters](../tools.md)) do **not** trigger fallback. These errors use the [retry mechanism](../agent.md#reflection-and-self-correction) instead, which re-prompts the same model to try again. This is intentional: validation errors stem from the non-deterministic nature of LLMs and may succeed on retry, whereas API errors (4xx/5xx) generally indicate issues that won't resolve by retrying the same request.
+    验证错误（来自[结构化输出](../output.md#structured-output)或[工具参数](../tools.md)）**不会**触发 fallback。这些错误会改用[重试机制](../agent.md#reflection-and-self-correction)，即重新提示同一个模型再试一次。这是有意设计的：验证错误源于 LLM 的非确定性，重试后可能成功；而 API 错误（4xx/5xx）通常表示继续重试同一请求也无法解决的问题。
 
-### Response-Based Fallback
+### 基于响应的回退 {#response-based-fallback}
 
-In addition to exception-based fallback, you can also trigger fallback based on the **content** of a model's response. This is useful when a model returns a successful HTTP response (no exception), but the response content indicates a semantic failure — for example, an unexpected finish reason or a native tool reporting failure.
+除了基于异常的 fallback，你也可以根据模型响应的**内容**触发 fallback。当模型返回成功的 HTTP 响应（没有异常），但响应内容表明存在语义失败时，这很有用，例如意外的 finish reason 或原生工具报告失败。
 
-!!! note "Non-streaming only"
-    Response-based fallback currently only works with non-streaming requests (`agent.run()` and `agent.run_sync()`).
-    For streaming requests (`agent.run_stream()`), only exception-based fallback is supported.
+!!! note "仅限非流式"
+    基于响应的 fallback 目前仅适用于非流式请求（`agent.run()` 和 `agent.run_sync()`）。
+    对于流式请求（`agent.run_stream()`），仅支持基于异常的 fallback。
 
-The `fallback_on` parameter accepts:
+`fallback_on` 参数接受：
 
-- A tuple of exception types: `(ModelAPIError, ModelHTTPError)`
-- An exception handler (sync or async): `lambda exc: isinstance(exc, MyError)`
-- A response handler (sync or async): `def check(r: ModelResponse) -> bool`
-- A list mixing all of the above: `[ModelAPIError, exc_handler, response_handler]`
+- 异常类型元组：`(ModelAPIError, ModelHTTPError)`
+- 异常处理器（同步或异步）：`lambda exc: isinstance(exc, MyError)`
+- 响应处理器（同步或异步）：`def check(r: ModelResponse) -> bool`
+- 混合以上内容的列表：`[ModelAPIError, exc_handler, response_handler]`
 
-Handler type is auto-detected by inspecting type hints on the first parameter. If the first parameter is hinted as [`ModelResponse`][pydantic_ai.messages.ModelResponse], it's a response handler. Otherwise (including untyped handlers and lambdas), it's an exception handler.
+处理器类型会通过检查第一个参数的 type hints 自动检测。如果第一个参数标注为 [`ModelResponse`][pydantic_ai.messages.ModelResponse]，它就是响应处理器。否则（包括未类型标注的处理器和 lambdas），它就是异常处理器。
 
-#### Finish Reason Example
+#### Finish reason 示例 {#finish-reason-example}
 
-A simple use case is checking the model's finish reason — for example, falling back if the response was truncated due to length limits:
+一个简单用例是检查模型的 finish reason，例如当响应因长度限制被截断时 fallback：
 
 ```python {title="fallback_on_finish_reason.py"}
 from pydantic_ai import Agent
@@ -379,20 +374,19 @@ print(result.output)
 #> The capital of France is Paris.
 ```
 
-!!! warning "Solo response handlers replace default exception fallback"
-    When you pass a single response handler as `fallback_on` (as above), it **replaces** the default `(ModelAPIError,)` exception fallback entirely. This means API errors (4xx/5xx) will propagate as exceptions instead of triggering fallback to the next model.
+!!! warning "单独的响应处理器会替换默认异常 fallback"
+    当你像上面那样把单个响应处理器作为 `fallback_on` 传入时，它会**完全替换**默认的 `(ModelAPIError,)` 异常 fallback。这意味着 API 错误（4xx/5xx）会作为异常向外传播，而不会触发到下一个模型的 fallback。
 
-    To keep exception-based fallback alongside a response handler, pass them together as a list — see the [mixed example below](#combining-handlers).
+    要在响应处理器之外保留基于异常的 fallback，请把它们一起作为列表传入；参见下面的[混合示例](#combining-handlers)。
 
 !!! note
-    Note that Pydantic AI already handles some finish reasons automatically in the [agent loop](../agent.md):
-    responses with a `'length'` or `'content_filter'` finish reason raise exceptions (which `FallbackModel`
-    catches by default), and empty responses are retried. A response handler is useful for custom
-    checks beyond these built-in behaviors.
+    注意，Pydantic AI 已经在[智能体循环](../agent.md)中自动处理了一些 finish reasons：
+    finish reason 为 `'length'` 或 `'content_filter'` 的响应会引发异常（`FallbackModel`
+    默认会捕获这些异常），空响应会被重试。响应处理器适用于这些内置行为之外的自定义检查。
 
-#### Native Tool Failure Example
+#### 原生工具失败示例 {#native-tool-failure-example}
 
-A more complex use case is when using native tools like web search or URL fetching. For example, Google's [`WebFetchTool`][pydantic_ai.native_tools.WebFetchTool] may return a successful response with a status indicating the URL fetch failed:
+更复杂的用例是使用 web search 或 URL fetching 等原生工具。例如，Google 的 [`WebFetchTool`][pydantic_ai.native_tools.WebFetchTool] 可能返回成功响应，但其中的状态表明 URL fetch 失败：
 
 ```python {title="fallback_on_native_tool.py"}
 from pydantic_ai import Agent
@@ -437,11 +431,11 @@ Pydantic AI is a Python agent framework for building production-grade LLM applic
 """
 ```
 
-Response handlers receive the [`ModelResponse`][pydantic_ai.messages.ModelResponse] returned by the model and should return `True` to trigger fallback to the next model, or `False` to accept the response.
+响应处理器会接收模型返回的 [`ModelResponse`][pydantic_ai.messages.ModelResponse]，并应返回 `True` 来触发到下一个模型的 fallback，或返回 `False` 接受该响应。
 
-#### Combining Handlers
+#### 组合处理器 {#combining-handlers}
 
-You can combine exception types, exception handlers, and response handlers in a single list:
+你可以在单个列表中组合异常类型、异常处理器和响应处理器：
 
 ```python {title="fallback_on_mixed.py" requires="fallback_on_native_tool.py"}
 from pydantic_ai.exceptions import ModelAPIError
@@ -460,14 +454,13 @@ fallback_model = FallbackModel(
 )
 ```
 
-### Exception Handling in Middleware and Decorators
+### Middleware 和装饰器中的异常处理 {#exception-handling-in-middleware-and-decorators}
 
-When using `FallbackModel`, it's important to understand that [`FallbackExceptionGroup`][pydantic_ai.exceptions.FallbackExceptionGroup]
-inherits from Python's [`ExceptionGroup`](https://docs.python.org/3/library/exceptions.html#ExceptionGroup). This means
-that existing exception handling code that catches specific exceptions (like `ModelAPIError`) won't automatically catch
-the individual exceptions wrapped inside the group.
+使用 `FallbackModel` 时，一个重要点是：[`FallbackExceptionGroup`][pydantic_ai.exceptions.FallbackExceptionGroup]
+继承自 Python 的 [`ExceptionGroup`](https://docs.python.org/3/library/exceptions.html#ExceptionGroup)。这意味着
+现有捕获特定异常（例如 `ModelAPIError`）的异常处理代码，不会自动捕获 group 中包装的各个异常。
 
-For example, if you have middleware or a decorator that catches `ModelAPIError`:
+例如，如果你有捕获 `ModelAPIError` 的 middleware 或装饰器：
 
 ```python {title="middleware_without_fallback.py"}
 from collections.abc import Callable
@@ -492,13 +485,12 @@ def handle_api_errors(func: Callable[..., T]) -> Callable[..., T]:
     return wrapper
 ```
 
-This decorator will miss `ModelAPIError` exceptions when using `FallbackModel`, because they're wrapped in a
-`FallbackExceptionGroup` containing one exception per failed model, in the order the models were tried.
+这个装饰器在使用 `FallbackModel` 时会漏掉 `ModelAPIError` 异常，因为这些异常被包装在
+`FallbackExceptionGroup` 中，其中每个失败模型对应一个异常，顺序与尝试模型的顺序一致。
 
-To handle both cases, you can use Python 3.11+ `except*` syntax, which catches matching exceptions from
-exception groups as well as bare exceptions. Note that `except*` always delivers the caught exceptions as an
-`ExceptionGroup` (even if the original was a bare exception), so re-raising will propagate an `ExceptionGroup`
-rather than the original exception type:
+要同时处理两种情况，可以使用 Python 3.11+ 的 `except*` 语法；它既能捕获 exception groups 中匹配的异常，也能捕获裸异常。注意，`except*` 总是把捕获到的异常作为
+`ExceptionGroup` 交付（即使原始异常是裸异常），因此重新抛出时会传播 `ExceptionGroup`
+而不是原始异常类型：
 
 === "Python >=3.11"
 
@@ -554,7 +546,7 @@ rather than the original exception type:
         return wrapper
     ```
 
-You can also catch `FallbackExceptionGroup` directly if you want to handle it specifically:
+你也可以直接捕获 `FallbackExceptionGroup`，如果你想专门处理它：
 
 ```python {title="catch_fallback_exception_group.py" test="skip"}
 from pydantic_ai import Agent, FallbackExceptionGroup
