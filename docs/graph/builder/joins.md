@@ -1,18 +1,18 @@
-# Joins and Reducers
+# Join 与 Reducer
 
-Join nodes synchronize and aggregate data from parallel execution paths. They use **Reducers** to combine multiple inputs into a single output.
+Join 节点用于同步并聚合来自并行执行路径的数据。它们使用 **Reducers** 将多个输入合并为单个输出。
 
-## Overview
+## 概览 {#overview}
 
-When you use [parallel execution](parallel.md) (broadcasting or mapping), you often need to collect and combine the results. Join nodes serve this purpose by:
+使用[并行执行](parallel.md)（广播或映射）时，你经常需要收集并合并结果。Join 节点用于完成这一工作：
 
-1. Waiting for all parallel tasks to complete
-2. Aggregating their outputs using a [`ReducerFunction`][pydantic_graph.join.ReducerFunction]
-3. Passing the aggregated result to the next node
+1. 等待所有并行任务完成
+2. 使用 [`ReducerFunction`][pydantic_graph.join.ReducerFunction] 聚合它们的输出
+3. 将聚合后的结果传给下一个节点
 
-## Creating Joins
+## 创建 Joins {#creating-joins}
 
-Create a join using `GraphBuilder.join` with a reducer function and initial value or factory:
+使用 `GraphBuilder.join`，并传入 reducer 函数和初始值或初始值工厂来创建 join：
 
 ```python {title="basic_join.py"}
 from dataclasses import dataclass
@@ -53,15 +53,15 @@ async def main():
     #> [1, 4, 9, 16, 25]
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以"按原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Built-in Reducers
+## 内置 Reducers {#built-in-reducers}
 
-Pydantic Graph provides several common reducer types out of the box:
+Pydantic Graph 开箱即用地提供几种常见 reducer 类型：
 
 ### `reduce_list_append`
 
-[`reduce_list_append`][pydantic_graph.join.reduce_list_append] collects all inputs into a list:
+[`reduce_list_append`][pydantic_graph.join.reduce_list_append] 会把所有输入收集到一个列表：
 
 ```python {title="list_reducer.py"}
 from dataclasses import dataclass
@@ -100,11 +100,11 @@ async def main():
     #> ['value-10', 'value-20', 'value-30']
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以"按原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
 ### `reduce_list_extend`
 
-[`reduce_list_extend`][pydantic_graph.join.reduce_list_extend] extends a list with an iterable of items:
+[`reduce_list_extend`][pydantic_graph.join.reduce_list_extend] 会使用一个 item iterable 扩展列表：
 
 ```python {title="list_extend_reducer.py"}
 from dataclasses import dataclass
@@ -144,11 +144,11 @@ async def main():
     #> [0, 0, 0, 1, 1, 2]
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以"按原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
 ### `reduce_dict_update`
 
-[`reduce_dict_update`][pydantic_graph.join.reduce_dict_update] merges dictionaries together:
+[`reduce_dict_update`][pydantic_graph.join.reduce_dict_update] 会合并字典：
 
 ```python {title="dict_reducer.py"}
 from dataclasses import dataclass
@@ -188,11 +188,11 @@ async def main():
     #> {'apple': 5, 'banana': 6, 'cherry': 6}
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以"按原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
 ### `reduce_null`
 
-[`reduce_null`][pydantic_graph.join.reduce_null] discards all inputs and returns `None`. Useful when you only care about side effects:
+[`reduce_null`][pydantic_graph.join.reduce_null] 会丢弃所有输入并返回 `None`。当你只关心副作用时很有用：
 
 ```python {title="null_reducer.py"}
 from dataclasses import dataclass
@@ -239,11 +239,11 @@ async def main():
     #> 15
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以"按原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
 ### `reduce_sum`
 
-[`reduce_sum`][pydantic_graph.join.reduce_sum] sums numeric values:
+[`reduce_sum`][pydantic_graph.join.reduce_sum] 会对数值求和：
 
 ```python {title="sum_reducer.py"}
 from dataclasses import dataclass
@@ -282,11 +282,11 @@ async def main():
     #> 100
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以"按原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
 ### `ReduceFirstValue`
 
-[`ReduceFirstValue`][pydantic_graph.join.ReduceFirstValue] returns the first value it receives and cancels all other parallel tasks. This is useful for "race" scenarios where you want the first successful result:
+[`ReduceFirstValue`][pydantic_graph.join.ReduceFirstValue] 会返回收到的第一个值，并取消所有其他并行任务。这适合你想获得第一个成功结果的 "race" 场景：
 
 ```python {title="first_value_reducer.py"}
 import asyncio
@@ -335,11 +335,11 @@ async def main():
     #> Tasks completed: 1
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以"按原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Custom Reducers
+## 自定义 Reducers {#custom-reducers}
 
-Create custom reducers by defining a [`ReducerFunction`][pydantic_graph.join.ReducerFunction]:
+通过定义 [`ReducerFunction`][pydantic_graph.join.ReducerFunction] 来创建自定义 reducers：
 
 ```python {title="custom_reducer.py"}
 
@@ -377,11 +377,11 @@ async def main():
     #> 50
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以"按原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Reducers with State Access
+## 可访问状态的 Reducers {#reducers-with-state-access}
 
-Reducers can access and modify the graph state:
+Reducers 可以访问并修改图状态：
 
 ```python {title="stateful_reducer.py"}
 from dataclasses import dataclass
@@ -459,11 +459,11 @@ async def main():
     #> State total_sum: 275
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以"按原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-### Canceling Sibling Tasks
+### 取消同级任务 {#canceling-sibling-tasks}
 
-Reducers with access to [`ReducerContext`][pydantic_graph.join.ReducerContext] can call [`ctx.cancel_sibling_tasks()`][pydantic_graph.join.ReducerContext.cancel_sibling_tasks] to cancel all other parallel tasks in the same fork. This is useful for early termination when you've found what you need:
+可访问 [`ReducerContext`][pydantic_graph.join.ReducerContext] 的 reducers 可以调用 [`ctx.cancel_sibling_tasks()`][pydantic_graph.join.ReducerContext.cancel_sibling_tasks]，取消同一个 fork 中的所有其他并行任务。当你已经找到所需内容并希望提前终止时，这很有用：
 
 ```python {title="cancel_siblings.py"}
 import asyncio
@@ -524,13 +524,13 @@ async def main():
     #> Searches completed: 3
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以"按原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-Note that only 3 searches completed instead of all 5, because the reducer canceled the remaining tasks after finding a match.
+注意这里只有 3 次搜索完成，而不是全部 5 次，因为 reducer 在找到匹配项后取消了剩余任务。
 
-## Multiple Joins
+## 多个 Joins {#multiple-joins}
 
-A graph can have multiple independent joins:
+一个图可以拥有多个相互独立的 joins：
 
 ```python {title="multiple_joins.py"}
 from dataclasses import dataclass, field
@@ -599,13 +599,13 @@ async def main():
     #> Group B: [30, 60]
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以"按原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Customizing Join Nodes
+## 自定义 Join 节点 {#customizing-join-nodes}
 
-### Custom Node IDs
+### 自定义节点 ID {#custom-node-ids}
 
-Like steps, joins can have custom IDs:
+与 steps 一样，joins 也可以有自定义 ID：
 
 ```python {title="join_custom_id.py" requires="basic_join.py"}
 from pydantic_graph import reduce_list_append
@@ -615,20 +615,20 @@ from basic_join import g
 my_join = g.join(reduce_list_append, initial_factory=list[int], node_id='my_custom_join_id')
 ```
 
-## How Joins Work
+## Joins 如何工作 {#how-joins-work}
 
-Internally, the graph tracks which "fork" each parallel task belongs to. A join:
+在内部，图会跟踪每个并行任务属于哪个 "fork"。一个 join 会：
 
-1. Identifies its parent fork (the fork that created the parallel paths)
-2. Waits for all tasks from that fork to reach the join
-3. Calls `reduce()` for each incoming value
-4. Calls `finalize()` once all values are received
-5. Passes the finalized result to downstream nodes
+1. 识别其父 fork（创建并行路径的 fork）
+2. 等待来自该 fork 的所有任务到达 join
+3. 对每个传入值调用 `reduce()`
+4. 在收到所有值后调用 `finalize()`
+5. 将最终结果传给下游节点
 
-This ensures proper synchronization even with nested parallel operations.
+这可以确保即便存在嵌套并行操作，也能正确同步。
 
-## Next Steps
+## 下一步 {#next-steps}
 
-- Learn about [parallel execution](parallel.md) with broadcasting and mapping
-- Explore [conditional branching](decisions.md) with decision nodes
-- See the [API reference][pydantic_graph.join] for complete reducer documentation
+- 了解带广播和映射的[并行执行](parallel.md)
+- 通过 decision nodes 探索[条件分支](decisions.md)
+- 查看 [API 参考][pydantic_graph.join]，了解完整 reducer 文档

@@ -1,10 +1,10 @@
-# Custom Evaluators
+# 自定义 Evaluators
 
-Write custom evaluators for domain-specific logic, external integrations, or specialized metrics.
+为特定领域逻辑、外部集成或专用 metrics 编写自定义 evaluators。
 
-## Basic Custom Evaluator
+## 基础自定义 Evaluator {#basic-custom-evaluator}
 
-All evaluators inherit from [`Evaluator`][pydantic_evals.evaluators.Evaluator] and must implement `evaluate`:
+所有 evaluators 都继承自 [`Evaluator`][pydantic_evals.evaluators.Evaluator]，并且必须实现 `evaluate`：
 
 ```python
 from dataclasses import dataclass
@@ -20,16 +20,16 @@ class ExactMatch(Evaluator):
         return ctx.output == ctx.expected_output
 ```
 
-**Key Points:**
+**关键点：**
 
-- Use `@dataclass` decorator (required)
-- Inherit from `Evaluator`
-- Implement `evaluate(self, ctx: EvaluatorContext) -> EvaluatorOutput`
-- Return `bool`, `int`, `float`, `str`, [`EvaluationReason`][pydantic_evals.evaluators.EvaluationReason], or `dict` of these
+- 使用 `@dataclass` 装饰器（必需）
+- 继承自 `Evaluator`
+- 实现 `evaluate(self, ctx: EvaluatorContext) -> EvaluatorOutput`
+- 返回 `bool`、`int`、`float`、`str`、[`EvaluationReason`][pydantic_evals.evaluators.EvaluationReason]，或由这些类型组成的 `dict`
 
 ## EvaluatorContext
 
-The context provides all information about the case execution:
+上下文提供 case 执行的所有信息：
 
 ```python
 from dataclasses import dataclass
@@ -60,9 +60,9 @@ class MyEvaluator(Evaluator):
         return True
 ```
 
-## Evaluator Parameters
+## Evaluator 参数 {#evaluator-parameters}
 
-Add configurable parameters as dataclass fields:
+把可配置参数作为 dataclass 字段添加：
 
 ```python
 from dataclasses import dataclass
@@ -97,11 +97,11 @@ dataset = Dataset(
 )
 ```
 
-## Return Types
+## 返回类型 {#return-types}
 
-### Boolean Assertions
+### 布尔断言 {#boolean-assertions}
 
-Simple pass/fail checks:
+简单的 pass/fail 检查：
 
 ```python
 from dataclasses import dataclass
@@ -120,9 +120,9 @@ class IsValidJSON(Evaluator):
             return False
 ```
 
-### Numeric Scores
+### 数值评分 {#numeric-scores}
 
-Quality metrics:
+质量 metrics：
 
 ```python
 from dataclasses import dataclass
@@ -149,9 +149,9 @@ class LengthScore(Evaluator):
             return score
 ```
 
-### String Labels
+### 字符串标签 {#string-labels}
 
-Categorical classifications:
+分类：
 
 ```python
 from dataclasses import dataclass
@@ -172,9 +172,9 @@ class SentimentClassifier(Evaluator):
             return 'neutral'
 ```
 
-### With Reasons
+### 带原因的结果 {#with-reasons}
 
-Add explanations to any result:
+为任意结果添加解释：
 
 ```python
 from dataclasses import dataclass
@@ -205,9 +205,9 @@ class SmartCheck(Evaluator):
         return 0.75
 ```
 
-### Multiple Results
+### 多个结果 {#multiple-results}
 
-You can return multiple evaluations from one evaluator by returning a dictionary of key-value pairs.
+通过返回键值对字典，你可以从一个 evaluator 返回多个 evaluations。
 
 ```python
 from dataclasses import dataclass
@@ -244,18 +244,18 @@ class ComprehensiveCheck(Evaluator):
         return 'short' if len(output) < 50 else 'long'
 ```
 
-Each key in the returned dictionary becomes a separate result in the report. Values can be:
+返回字典中的每个 key 都会成为报告中的一条独立结果。值可以是：
 
-- Primitives (`bool`, `int`, `float`, `str`)
-- [`EvaluationReason`][pydantic_evals.evaluators.EvaluationReason] (value with explanation)
-- Nested dicts of these types
+- 基本类型（`bool`、`int`、`float`、`str`）
+- [`EvaluationReason`][pydantic_evals.evaluators.EvaluationReason]（带解释的 value）
+- 这些类型组成的嵌套 dict
 
-The [`EvaluatorOutput`][pydantic_evals.evaluators.evaluator.EvaluatorOutput] type represents all legal values
-that can be returned by an evaluator, and can be used as the return type annotation for your custom `evaluate` method.
+[`EvaluatorOutput`][pydantic_evals.evaluators.evaluator.EvaluatorOutput] 类型表示 evaluator 可以返回的所有合法值，
+并可作为自定义 `evaluate` 方法的返回类型注解。
 
-### Conditional Results
+### 条件结果 {#conditional-results}
 
-Evaluators can dynamically choose whether to produce results for a given case by returning an empty dict when not applicable:
+Evaluators 可以针对给定 case 动态决定是否产出结果；不适用时返回空 dict：
 
 ```python
 from dataclasses import dataclass
@@ -305,23 +305,22 @@ class SQLValidator(Evaluator):
             return 'complex'
 ```
 
-This pattern is useful when:
+这个模式适用于：
 
-- An evaluator only applies to certain types of outputs (e.g., code validation only for code outputs)
-- Validation depends on metadata tags (e.g., only evaluate cases marked with `language='python'`)
-- You want to run expensive checks conditionally based on other evaluator results
+- 某个 evaluator 只适用于特定类型的输出（例如代码验证只适用于代码输出）
+- 验证依赖 metadata tags（例如只评估标记为 `language='python'` 的 cases）
+- 你希望根据其他 evaluator 结果，有条件地运行昂贵检查
 
-**Key Points:**
+**关键点：**
 
-- Returning `{}` means "this evaluator doesn't apply here" - the case won't show results from this evaluator
-- Returning `{'key': value}` means "this evaluator applies and here are the results"
-- This is more practical than using case-level evaluators when it applies to a large fraction of cases, or when the
-  condition is based on the output itself
-- The evaluator still runs for every case, but can short-circuit when not relevant
+- 返回 `{}` 表示"这个 evaluator 不适用于这里"，该 case 不会显示来自这个 evaluator 的结果
+- 返回 `{'key': value}` 表示"这个 evaluator 适用，这些是结果"
+- 当它适用于大量 cases，或条件基于输出本身时，这比使用 case-level evaluators 更实用
+- evaluator 仍会为每个 case 运行，但在不相关时可以短路
 
-## Async Evaluators
+## 异步 Evaluators {#async-evaluators}
 
-Use `async def` for I/O-bound operations:
+对 I/O-bound 操作使用 `async def`：
 
 ```python
 from dataclasses import dataclass
@@ -344,11 +343,11 @@ class APIValidator(Evaluator):
             return response.json()['valid']
 ```
 
-Pydantic Evals handles both sync and async evaluators automatically.
+Pydantic Evals 会自动处理同步和异步 evaluators。
 
-## Using Metadata
+## 使用 Metadata {#using-metadata}
 
-Access case metadata for context-aware evaluation:
+访问 case metadata，以执行 context-aware evaluation：
 
 ```python
 from dataclasses import dataclass
@@ -380,9 +379,9 @@ class DifficultyAwareScore(Evaluator):
         return 0.8
 ```
 
-## Using Metrics
+## 使用 Metrics {#using-metrics}
 
-Access custom metrics set during task execution:
+访问任务执行期间设置的自定义 metrics：
 
 ```python
 from dataclasses import dataclass
@@ -412,11 +411,11 @@ class EfficiencyCheck(Evaluator):
         return api_calls <= self.max_api_calls
 ```
 
-See [Metrics & Attributes Guide](../how-to/metrics-attributes.md) for more.
+更多信息请参阅 [Metrics & Attributes 指南](../how-to/metrics-attributes.md)。
 
-## Generic Type Parameters
+## 泛型类型参数 {#generic-type-parameters}
 
-Make evaluators type-safe with generics:
+使用泛型让 evaluators 类型安全：
 
 ```python
 from dataclasses import dataclass
@@ -435,9 +434,9 @@ class TypedEvaluator(Evaluator[InputsT, OutputT, dict]):
         return True
 ```
 
-## Custom Evaluation Names
+## 自定义 Evaluation 名称 {#custom-evaluation-names}
 
-Control how evaluations appear in reports:
+控制 evaluations 在报告中的显示方式：
 
 ```python
 from dataclasses import dataclass
@@ -461,7 +460,7 @@ class CustomNameEvaluator(Evaluator):
 evaluator = CustomNameEvaluator(check_type='format')
 ```
 
-Or use the `evaluation_name` field (if using the built-in pattern):
+或者使用 `evaluation_name` 字段（如果使用内置模式）：
 
 ```python
 from dataclasses import dataclass
@@ -481,9 +480,9 @@ class MyEvaluator(Evaluator):
 MyEvaluator(evaluation_name='my_custom_name')
 ```
 
-## Real-World Examples
+## 真实世界示例 {#real-world-examples}
 
-### SQL Validation
+### SQL 验证 {#sql-validation}
 
 ```python
 from dataclasses import dataclass
@@ -525,7 +524,7 @@ class ValidSQL(Evaluator):
             )
 ```
 
-### Code Execution
+### 代码执行 {#code-execution}
 
 ```python
 from dataclasses import dataclass
@@ -581,7 +580,7 @@ class ExecutablePython(Evaluator):
             os.unlink(temp_path)
 ```
 
-### External API Validation
+### 外部 API 验证 {#external-api-validation}
 
 ```python
 from dataclasses import dataclass
@@ -621,9 +620,9 @@ class APIResponseValid(Evaluator):
             }
 ```
 
-## Testing Evaluators
+## 测试 Evaluators {#testing-evaluators}
 
-Test evaluators like any other Python code:
+像测试其他 Python 代码一样测试 evaluators：
 
 ```python
 from dataclasses import dataclass
@@ -661,11 +660,11 @@ def test_exact_match():
     assert evaluator.evaluate(ctx) is False
 ```
 
-## Best Practices
+## 最佳实践 {#best-practices}
 
-### 1. Keep Evaluators Focused
+### 1. 保持 Evaluators 聚焦 {#1-keep-evaluators-focused}
 
-Each evaluator should check one thing:
+每个 evaluator 应该只检查一件事：
 
 ```python
 from dataclasses import dataclass
@@ -726,12 +725,12 @@ class SpellingChecker(Evaluator):
         return check_spelling(ctx.output)
 ```
 
-Some exceptions to this:
+这有一些例外：
 
-* When there is a significant amount of shared computation or network request latency, it may be better to have a single evaluator calculate all dependent outputs together.
-* If multiple checks are tightly coupled or very closely related to each other, it may make sense to include all their logic in one evaluator.
+* 当存在大量共享计算或网络请求延迟时，让单个 evaluator 一次性计算所有依赖输出可能更好。
+* 如果多个检查彼此紧密耦合或非常接近，把它们的逻辑都放到一个 evaluator 中可能是合理的。
 
-### 2. Handle Missing Data Gracefully
+### 2. 优雅处理缺失数据 {#2-handle-missing-data-gracefully}
 
 ```python
 from dataclasses import dataclass
@@ -752,7 +751,7 @@ class SafeEvaluator(Evaluator):
         ...
 ```
 
-### 3. Provide Helpful Reasons
+### 3. 提供有帮助的原因 {#3-provide-helpful-reasons}
 
 ```python
 from dataclasses import dataclass
@@ -773,7 +772,7 @@ class HelpfulEvaluator(Evaluator):
         )
 ```
 
-### 4. Use Timeouts for External Calls
+### 4. 对外部调用使用超时 {#4-use-timeouts-for-external-calls}
 
 ```python
 from dataclasses import dataclass
@@ -801,8 +800,8 @@ class APIEvaluator(Evaluator):
             return False
 ```
 
-## Next Steps
+## 下一步 {#next-steps}
 
-- **[Report Evaluators](report-evaluators.md)** - Experiment-wide analyses (confusion matrices, PR curves, custom tables)
-- **[Span-Based Evaluation](span-based.md)** - Using OpenTelemetry spans
-- **[Examples](../examples/simple-validation.md)** - Practical examples
+- **[Report Evaluators](report-evaluators.md)** - 实验级分析（confusion matrices、PR curves、自定义表格）
+- **[基于 Span 的评估](span-based.md)** - 使用 OpenTelemetry spans
+- **[示例](../examples/simple-validation.md)** - 实用示例

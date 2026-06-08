@@ -1,19 +1,19 @@
-# Metrics & Attributes
+# Metrics 与 Attributes
 
-Track custom metrics and attributes during task execution for richer evaluation insights.
+在任务执行期间跟踪自定义 metrics 和 attributes，以获得更丰富的评估洞察。
 
-## Overview
+## 概览 {#overview}
 
-While executing evaluation tasks, you can record:
+执行评估任务时，你可以记录：
 
-- **Metrics** - Numeric values (int/float) for quantitative measurements
-- **Attributes** - Any data for qualitative information
+- **Metrics** - 用于定量测量的数值（int/float）
+- **Attributes** - 用于定性信息的任意数据
 
-These appear in evaluation reports and can be used by evaluators for assessment.
+这些内容会出现在评估报告中，也可供 evaluators 用于评估。
 
-## Recording Metrics
+## 记录 Metrics {#recording-metrics}
 
-Use [`increment_eval_metric`][pydantic_evals.increment_eval_metric] to track numeric values:
+使用 [`increment_eval_metric`][pydantic_evals.increment_eval_metric] 跟踪数值：
 
 ```python
 from dataclasses import dataclass
@@ -48,9 +48,9 @@ def my_task(inputs: str) -> str:
     return result.output
 ```
 
-## Recording Attributes
+## 记录 Attributes {#recording-attributes}
 
-Use [`set_eval_attribute`][pydantic_evals.set_eval_attribute] to store any data:
+使用 [`set_eval_attribute`][pydantic_evals.set_eval_attribute] 存储任意数据：
 
 ```python
 from pydantic_evals import set_eval_attribute
@@ -77,9 +77,9 @@ def my_task(inputs: str) -> str:
     return process(inputs)
 ```
 
-## Accessing in Evaluators
+## 在 Evaluators 中访问 {#accessing-in-evaluators}
 
-Metrics and attributes are available in the [`EvaluatorContext`][pydantic_evals.evaluators.EvaluatorContext]:
+Metrics 和 attributes 可通过 [`EvaluatorContext`][pydantic_evals.evaluators.EvaluatorContext] 获取：
 
 ```python
 from dataclasses import dataclass
@@ -106,9 +106,9 @@ class EfficiencyChecker(Evaluator):
         }
 ```
 
-## Viewing in Reports
+## 在报告中查看 {#viewing-in-reports}
 
-Metrics and attributes appear in report data:
+Metrics 和 attributes 会出现在报告数据中：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -130,7 +130,7 @@ for case in report.cases:
     #>   Attributes: {}
 ```
 
-You can also display them in printed reports:
+你也可以在打印的报告中显示它们：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -157,9 +157,9 @@ for case in report.cases:
     #> Attributes: {}
 ```
 
-## Automatic Metrics
+## 自动 Metrics {#automatic-metrics}
 
-When using Pydantic AI and Logfire, some metrics are automatically tracked:
+使用 Pydantic AI 和 Logfire 时，会自动跟踪一些 metrics：
 
 ```python
 import logfire
@@ -185,7 +185,7 @@ async def ai_task(inputs: str) -> str:
 # - cost: Estimated cost (if using genai-prices)
 ```
 
-Access these in evaluators:
+在 evaluators 中访问这些指标：
 
 ```python
 from dataclasses import dataclass
@@ -202,9 +202,9 @@ class CostChecker(Evaluator):
         return cost <= self.max_cost
 ```
 
-## Practical Examples
+## 实用示例 {#practical-examples}
 
-### API Usage Tracking
+### API 使用跟踪 {#api-usage-tracking}
 
 ```python
 from dataclasses import dataclass
@@ -270,7 +270,7 @@ class EfficiencyEvaluator(Evaluator):
         }
 ```
 
-### Tool Usage Tracking
+### 工具使用跟踪 {#tool-usage-tracking}
 
 ```python
 from dataclasses import dataclass
@@ -319,7 +319,7 @@ class ToolUsageEvaluator(Evaluator):
         }
 ```
 
-### Performance Tracking
+### 性能跟踪 {#performance-tracking}
 
 ```python
 import time
@@ -374,7 +374,7 @@ class PerformanceEvaluator(Evaluator):
         }
 ```
 
-### Quality Tracking
+### 质量跟踪 {#quality-tracking}
 
 ```python
 from dataclasses import dataclass
@@ -418,9 +418,9 @@ class QualityEvaluator(Evaluator):
 ```
 
 
-## Experiment-Level Metadata
+## 实验级 Metadata {#experiment-level-metadata}
 
-In addition to case-level metadata, you can also pass experiment-level metadata when calling [`evaluate()`][pydantic_evals.dataset.Dataset.evaluate]:
+除了 case-level metadata 之外，调用 [`evaluate()`][pydantic_evals.dataset.Dataset.evaluate] 时也可以传入 experiment-level metadata：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -456,24 +456,24 @@ async def main():
     #> {'model': 'gpt-5.2', 'prompt_version': 'v2.1', 'temperature': 0.7}
 ```
 
-### When to Use Experiment Metadata
+### 何时使用实验 Metadata {#when-to-use-experiment-metadata}
 
-Experiment metadata is useful for tracking configuration that applies to the entire evaluation run:
+Experiment metadata 适合跟踪适用于整次评估运行的配置：
 
-- **Model configuration**: Model name, version, parameters
-- **Prompt versioning**: Which prompt template was used
-- **Infrastructure**: Deployment environment, region
-- **Experiment context**: Developer name, feature branch, commit hash
+- **模型配置**：模型名称、版本、参数
+- **Prompt 版本管理**：使用了哪个 prompt 模板
+- **基础设施**：部署环境、region
+- **实验上下文**：开发者名称、功能分支、commit hash
 
-This metadata is especially valuable when:
+当你需要以下能力时，这些 metadata 尤其有价值：
 
-- Comparing multiple evaluation runs over time
-- Tracking which configuration produced which results
-- Reproducing evaluation results from historical data
+- 随时间比较多次评估运行
+- 跟踪哪份配置产生了哪些结果
+- 从历史数据复现评估结果
 
-### Viewing in Reports
+### 在报告中查看 {#viewing-in-reports}
 
-Experiment metadata appears at the top of printed reports:
+Experiment metadata 会显示在打印报告顶部：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -506,18 +506,18 @@ async def main():
     """
 ```
 
-## Synchronization between Tasks and Experiment Metadata
+## 任务与实验 Metadata 之间的同步 {#synchronization-between-tasks-and-experiment-metadata}
 
-Experiment metadata is for *recording* configuration, not *configuring* the task.
-The metadata dict doesn't automatically configure your task's behavior; you must ensure the values in the metadata dict match what your task actually uses.
-For example, it's easy to accidentally have metadata claim `temperature: 0.7` while your task actually uses `temperature: 1.0`, leading to incorrect experiment tracking and unreproducible results.
+Experiment metadata 用于*记录*配置，而不是*配置*任务。
+metadata dict 不会自动配置任务行为；你必须确保 metadata dict 中的值与任务实际使用的值一致。
+例如，metadata 可能不小心声明 `temperature: 0.7`，而任务实际使用的是 `temperature: 1.0`，这会导致实验跟踪不准确且结果不可复现。
 
-To avoid this problem, we recommend establishing a single source of truth for configuration that both your task and metadata reference.
-Below are a few suggested patterns for achieving this synchronization.
+为了避免这个问题，我们建议建立一个配置的单一事实来源，让任务和 metadata 都引用它。
+下面是一些实现这种同步的建议模式。
 
-### Pattern 1: Shared Module Constants
+### 模式 1：共享模块常量 {#pattern-1-shared-module-constants}
 
-For simpler cases, use module-level constants:
+对于较简单的场景，可以使用模块级常量：
 
 ```python
 from pydantic_ai import Agent
@@ -550,9 +550,9 @@ async def main():
     )
 ```
 
-### Pattern 2: Configuration Object (Recommended)
+### 模式 2：配置对象（推荐） {#pattern-2-configuration-object-recommended}
 
-Define configuration once and use it everywhere:
+只定义一次配置，并在所有地方使用：
 
 ```python
 from dataclasses import asdict, dataclass
@@ -615,13 +615,11 @@ async def main():
     """
 ```
 
-If it's problematic to have a global task configuration, you can also create your `TaskConfig` object at the task
-call-site and pass it to the agent via `deps` or similar, but in this case you would still need to guarantee that the
-value is always the same as the value passed to `metadata` in the call to `Dataset.evaluate`.
+如果全局任务配置不合适，也可以在任务调用位置创建 `TaskConfig` 对象，并通过 `deps` 或类似机制传给 agent；但这种情况下你仍需保证该值始终与传给 `Dataset.evaluate` 的 `metadata` 中的值相同。
 
-### Anti-Pattern: Duplicate Configuration
+### 反模式：重复配置 {#anti-pattern-duplicate-configuration}
 
-**Avoid this common mistake**:
+**避免这个常见错误**：
 
 ```python
 from pydantic_ai import Agent
@@ -649,25 +647,25 @@ async def main():
     )
 ```
 
-In this anti-pattern, the metadata claims `temperature: 0.8` but the task uses `0.7`. This leads to:
+在这个反模式中，metadata 声明 `temperature: 0.8`，但任务使用的是 `0.7`。这会导致：
 
-- Incorrect experiment tracking
-- Inability to reproduce results
-- Confusion when comparing runs
-- Wasted time debugging "why results differ"
+- 实验跟踪不正确
+- 无法复现结果
+- 比较 runs 时产生困惑
+- 浪费时间调试 "为什么结果不同"
 
-## Metrics vs Attributes vs Metadata
+## Metrics vs Attributes vs Metadata {#metrics-vs-attributes-vs-metadata}
 
-Understanding the differences:
+理解它们的差异：
 
-| Feature | Metrics | Attributes | Case Metadata | Experiment Metadata |
+| 功能 | Metrics | Attributes | Case Metadata | Experiment Metadata |
 |---------|---------|------------|---------------|---------------------|
-| **Set in** | Task execution | Task execution | Case definition | `evaluate()` call |
-| **Type** | int, float | Any | Any | Any |
-| **Purpose** | Quantitative | Qualitative | Test data | Experiment config |
-| **Used for** | Aggregation | Context | Input to task | Tracking runs |
-| **Available to** | Evaluators | Evaluators | Task & Evaluators | Report only |
-| **Scope** | Per case | Per case | Per case | Per experiment |
+| **设置位置** | 任务执行 | 任务执行 | Case 定义 | `evaluate()` 调用 |
+| **类型** | int、float | Any | Any | Any |
+| **用途** | 定量 | 定性 | 测试数据 | 实验配置 |
+| **用于** | 聚合 | 上下文 | 任务输入 | 跟踪 runs |
+| **可供谁使用** | Evaluators | Evaluators | 任务和 Evaluators | 仅报告 |
+| **作用域** | 每个 case | 每个 case | 每个 case | 每个实验 |
 
 ```python
 from pydantic_evals import Case, Dataset, increment_eval_metric, set_eval_attribute
@@ -700,11 +698,11 @@ async def main():
     )
 ```
 
-## Troubleshooting
+## 故障排除 {#troubleshooting}
 
-### "Metrics/attributes not appearing"
+### "Metrics/attributes 没有出现" {#metricsattributes-not-appearing}
 
-Ensure you're calling the functions inside the task:
+确保你在任务内部调用这些函数：
 
 ```python
 from pydantic_evals import increment_eval_metric
@@ -728,9 +726,9 @@ def good_task(inputs):
     return process(inputs)
 ```
 
-### "Metrics not incrementing"
+### "Metrics 没有递增" {#metrics-not-incrementing}
 
-Check you're using `increment_eval_metric`, not `set_eval_attribute`:
+检查你使用的是 `increment_eval_metric`，而不是 `set_eval_attribute`：
 
 ```python
 from pydantic_evals import increment_eval_metric, set_eval_attribute
@@ -744,9 +742,9 @@ increment_eval_metric('count', 1)
 increment_eval_metric('count', 1)  # Now 2
 ```
 
-### "Too much data in attributes"
+### "Attributes 中的数据太多" {#too-much-data-in-attributes}
 
-Store summaries, not raw data:
+存储摘要，而不是原始数据：
 
 ```python
 from pydantic_evals import set_eval_attribute
@@ -761,9 +759,9 @@ set_eval_attribute('response_size_kb', len(str(giant_response_object)) / 1024)
 set_eval_attribute('response_keys', list(giant_response_object.keys())[:10])  # First 10 keys
 ```
 
-## Next Steps
+## 下一步 {#next-steps}
 
-- **[Case Lifecycle Hooks](lifecycle.md)** - Per-case setup, teardown, and context preparation
-- **[Custom Evaluators](../evaluators/custom.md)** - Use metrics/attributes in evaluators
-- **[Logfire Integration](logfire-integration.md)** - View metrics in Logfire
-- **[Concurrency & Performance](concurrency.md)** - Optimize evaluation performance
+- **[Case 生命周期 Hooks](lifecycle.md)** - 每个 case 的 setup、teardown 和 context 准备
+- **[自定义 Evaluators](../evaluators/custom.md)** - 在 evaluators 中使用 metrics/attributes
+- **[Logfire 集成](logfire-integration.md)** - 在 Logfire 中查看 metrics
+- **[并发与性能](concurrency.md)** - 优化评估性能
