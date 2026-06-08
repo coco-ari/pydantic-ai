@@ -1,31 +1,31 @@
-# Messages and chat history
+# Messages 和聊天历史 {#messages-and-chat-history}
 
-Pydantic AI provides access to messages exchanged during an agent run. These messages can be used both to continue a coherent conversation, and to understand how an agent performed.
+Pydantic AI 提供了访问 agent run 期间交换消息的能力。这些消息既可以用于延续连贯对话，也可以用于理解 agent 的执行表现。
 
-### Accessing Messages from Results
+### 从 Results 访问 Messages {#accessing-messages-from-results}
 
-After running an agent, you can access the messages exchanged during that run from the `result` object.
+运行 agent 后，可以从 `result` 对象访问该 run 期间交换的 messages。
 
-Both [`RunResult`][pydantic_ai.agent.AgentRunResult]
-(returned by [`Agent.run`][pydantic_ai.agent.AbstractAgent.run], [`Agent.run_sync`][pydantic_ai.agent.AbstractAgent.run_sync])
-and [`StreamedRunResult`][pydantic_ai.result.StreamedRunResult] (returned by [`Agent.run_stream`][pydantic_ai.agent.AbstractAgent.run_stream]) have the following methods:
+[`RunResult`][pydantic_ai.agent.AgentRunResult]
+（由 [`Agent.run`][pydantic_ai.agent.AbstractAgent.run]、[`Agent.run_sync`][pydantic_ai.agent.AbstractAgent.run_sync] 返回）
+和 [`StreamedRunResult`][pydantic_ai.result.StreamedRunResult]（由 [`Agent.run_stream`][pydantic_ai.agent.AbstractAgent.run_stream] 返回）都提供以下方法：
 
-- [`all_messages()`][pydantic_ai.agent.AgentRunResult.all_messages]: returns all messages, including messages from prior runs. There's also a variant that returns JSON bytes, [`all_messages_json()`][pydantic_ai.agent.AgentRunResult.all_messages_json].
-- [`new_messages()`][pydantic_ai.agent.AgentRunResult.new_messages]: returns only the messages from the current run. There's also a variant that returns JSON bytes, [`new_messages_json()`][pydantic_ai.agent.AgentRunResult.new_messages_json].
+- [`all_messages()`][pydantic_ai.agent.AgentRunResult.all_messages]：返回所有 messages，包括 prior runs 中的 messages。还有一个返回 JSON bytes 的变体 [`all_messages_json()`][pydantic_ai.agent.AgentRunResult.all_messages_json]。
+- [`new_messages()`][pydantic_ai.agent.AgentRunResult.new_messages]：只返回当前 run 中的 messages。还有一个返回 JSON bytes 的变体 [`new_messages_json()`][pydantic_ai.agent.AgentRunResult.new_messages_json]。
 
-!!! info "StreamedRunResult and complete messages"
-    On [`StreamedRunResult`][pydantic_ai.result.StreamedRunResult], the messages returned from these methods will only include the final result message once the stream has finished.
+!!! info "`StreamedRunResult` 和完整 messages"
+    在 [`StreamedRunResult`][pydantic_ai.result.StreamedRunResult] 上，这些方法返回的 messages 只有在 stream 结束后才会包含最终 result message。
 
-    E.g. you've awaited one of the following coroutines:
+    例如，你已经 await 了以下 coroutines 之一：
 
     * [`StreamedRunResult.stream_output()`][pydantic_ai.result.StreamedRunResult.stream_output]
     * [`StreamedRunResult.stream_text()`][pydantic_ai.result.StreamedRunResult.stream_text]
     * [`StreamedRunResult.stream_response()`][pydantic_ai.result.StreamedRunResult.stream_response]
     * [`StreamedRunResult.get_output()`][pydantic_ai.result.StreamedRunResult.get_output]
 
-    **Note:** The final result message will NOT be added to result messages if you use [`.stream_text(delta=True)`][pydantic_ai.result.StreamedRunResult.stream_text] since in this case the result content is never built as one string.
+    **注意：** 如果你使用 [`.stream_text(delta=True)`][pydantic_ai.result.StreamedRunResult.stream_text]，最终 result message **不会**添加到 result messages 中，因为在这种情况下 result content 从未被构建成一个完整字符串。
 
-Example of accessing methods on a [`RunResult`][pydantic_ai.agent.AgentRunResult] :
+在 [`RunResult`][pydantic_ai.agent.AgentRunResult] 上访问这些方法的示例：
 
 ```python {title="run_result_messages.py" hl_lines="10"}
 from pydantic_ai import Agent
@@ -68,9 +68,9 @@ print(result.all_messages())
 """
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-Example of accessing methods on a [`StreamedRunResult`][pydantic_ai.result.StreamedRunResult] :
+在 [`StreamedRunResult`][pydantic_ai.result.StreamedRunResult] 上访问这些方法的示例：
 
 ```python {title="streamed_run_result_messages.py" hl_lines="9 40"}
 from pydantic_ai import Agent
@@ -138,19 +138,19 @@ async def main():
         """
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以"原样"运行；你需要添加 `asyncio.run(main())` 来运行 `main`）_
 
-### Using Messages as Input for Further Agent Runs
+### 将 Messages 用作后续 Agent Runs 的输入 {#using-messages-as-input-for-further-agent-runs}
 
-The primary use of message histories in Pydantic AI is to maintain context across multiple agent runs.
+Pydantic AI 中 message histories 的主要用途，是在多个 agent runs 之间保持上下文。
 
-To use existing messages in a run, pass them to the `message_history` parameter of
-[`Agent.run`][pydantic_ai.agent.AbstractAgent.run], [`Agent.run_sync`][pydantic_ai.agent.AbstractAgent.run_sync] or
-[`Agent.run_stream`][pydantic_ai.agent.AbstractAgent.run_stream].
+要在 run 中使用已有 messages，请将它们传给
+[`Agent.run`][pydantic_ai.agent.AbstractAgent.run]、[`Agent.run_sync`][pydantic_ai.agent.AbstractAgent.run_sync] 或
+[`Agent.run_stream`][pydantic_ai.agent.AbstractAgent.run_stream] 的 `message_history` 参数。
 
-If `message_history` is set and not empty, a new system prompt is not generated — we assume the existing message history includes a system prompt. If your history comes from a source that doesn't round-trip system prompts (a UI frontend, a database that didn't persist them, a compaction pipeline), add the [`ReinjectSystemPrompt`][pydantic_ai.capabilities.ReinjectSystemPrompt] capability so the agent's configured `system_prompt` is reinjected at the head of the first request when it's missing.
+如果 `message_history` 已设置且非空，就不会生成新的 system prompt，因为我们假定已有 message history 包含 system prompt。如果你的 history 来自无法 round-trip system prompts 的来源（UI frontend、未持久化 system prompts 的数据库、compaction pipeline），请添加 [`ReinjectSystemPrompt`][pydantic_ai.capabilities.ReinjectSystemPrompt] capability，这样当缺少 system prompt 时，agent 配置的 `system_prompt` 会在第一次请求头部重新注入。
 
-Mid-conversation `SystemPromptPart`s (those in any `ModelRequest` after the first) are sent inline at their original position by providers whose API accepts system messages at arbitrary positions. For providers whose API doesn't, they're instead rendered as `<system>`-tagged `UserPromptPart`s at the same position, preserving the prefix cache and positional intent. Leading `SystemPromptPart`s always hoist to the provider's top-level system parameter.
+对话中途的 `SystemPromptPart`（第一个之后任何 `ModelRequest` 中的 `SystemPromptPart`）会由 API 接受任意位置 system messages 的 providers 按原位置 inline 发送。对于 API 不支持的 providers，它们会改为在相同位置渲染为带 `<system>` 标签的 `UserPromptPart`，以保留 prefix cache 和位置意图。Leading `SystemPromptPart` 始终会 hoist 到 provider 的顶层 system 参数。
 
 ```python {title="Reusing messages in a conversation" hl_lines="9 13"}
 from pydantic_ai import Agent
@@ -220,16 +220,16 @@ print(result2.all_messages())
 """
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-### Correlating runs with `conversation_id`
+### 用 `conversation_id` 关联 runs {#correlating-runs-with-conversation-id}
 
-Each `ModelRequest` and `ModelResponse` carries two identifiers:
+每个 `ModelRequest` 和 `ModelResponse` 都携带两个标识符：
 
-- [`run_id`][pydantic_ai.messages.ModelRequest.run_id] — unique per agent run; emitted on the OpenTelemetry agent run span as `gen_ai.agent.call.id`.
-- [`conversation_id`][pydantic_ai.messages.ModelRequest.conversation_id] — shared across all runs that build on the same `message_history`; emitted as `gen_ai.conversation.id`.
+- [`run_id`][pydantic_ai.messages.ModelRequest.run_id]：每个 agent run 唯一；作为 `gen_ai.agent.call.id` 发到 OpenTelemetry agent run span 上。
+- [`conversation_id`][pydantic_ai.messages.ModelRequest.conversation_id]：所有基于同一 `message_history` 构建的 runs 共享；作为 `gen_ai.conversation.id` 发出。
 
-A fresh `conversation_id` is generated on the first run, stamped onto every message produced by that run, and inherited by subsequent runs that pass the messages back via `message_history`. This means you can correlate traces from a multi-turn conversation in [Logfire](logfire.md) (or any OpenTelemetry backend) without tracking anything yourself — as long as the message history round-trips, the conversation ID does too.
+第一次 run 会生成新的 `conversation_id`，并标记到该 run 生成的每条 message 上；后续 runs 通过 `message_history` 把这些 messages 传回时，会继承这个 ID。这意味着你可以在 [Logfire](logfire.md)（或任何 OpenTelemetry backend）中关联多轮对话的 traces，而无需自行跟踪；只要 message history 完成 round-trip，conversation ID 也会随之传递。
 
 ```python {title="conversation_id is shared across runs in the same conversation"}
 from pydantic_ai import Agent
@@ -242,10 +242,10 @@ result2 = agent.run_sync('Explain?', message_history=result1.all_messages())
 assert result1.conversation_id == result2.conversation_id
 ```
 
-To override or fork:
+要覆盖或 fork：
 
-- Pass `conversation_id='<your-id>'` to use an ID from your own application (e.g. a chat thread ID stored in your database).
-- Pass `conversation_id='new'` to start a fresh conversation that ignores any `conversation_id` already on `message_history` — useful for branching off an existing thread without making the caller generate an ID.
+- 传入 `conversation_id='<your-id>'`，使用你自己应用中的 ID（例如数据库中存储的 chat thread ID）。
+- 传入 `conversation_id='new'`，开始一个新的 conversation，忽略 `message_history` 上已有的任何 `conversation_id`；这适合从现有 thread 分支出去，而无需让调用方生成 ID。
 
 ```python {title="forking a conversation"}
 from pydantic_ai import Agent
@@ -262,17 +262,17 @@ forked = agent.run_sync(
 assert forked.conversation_id != result1.conversation_id
 ```
 
-The [UI adapters](ui/overview.md) auto-populate `conversation_id` from the protocol's own thread/chat ID, so frontends using these protocols get correlation for free.
+[UI adapters](ui/overview.md) 会从协议自身的 thread/chat ID 自动填充 `conversation_id`，因此使用这些协议的 frontends 可以免费获得 correlation。
 
-## Storing and loading messages (to JSON)
+## 存储和加载 messages（到 JSON）{#storing-and-loading-messages-to-json}
 
-While maintaining conversation state in memory is enough for many applications, often times you may want to store the messages history of an agent run on disk or in a database. This might be for evals, for sharing data between Python and JavaScript/TypeScript, or any number of other use cases.
+虽然对许多应用来说，在内存中维护 conversation state 已经足够，但你经常可能希望把 agent run 的 messages history 存储到磁盘或数据库中。这可能用于 evals、在 Python 和 JavaScript/TypeScript 之间共享数据，或其他任何用例。
 
-The intended way to do this is using a `TypeAdapter`.
+预期做法是使用 `TypeAdapter`。
 
-We export [`ModelMessagesTypeAdapter`][pydantic_ai.messages.ModelMessagesTypeAdapter] that can be used for this, or you can create your own.
+我们导出可用于此目的的 [`ModelMessagesTypeAdapter`][pydantic_ai.messages.ModelMessagesTypeAdapter]，你也可以创建自己的 adapter。
 
-Here's an example showing how:
+下面是一个示例：
 
 ```python {title="serialize messages to json"}
 from pydantic_core import to_jsonable_python
@@ -294,30 +294,30 @@ result2 = agent.run_sync(  # (3)!
 )
 ```
 
-1. Alternatively, you can create a `TypeAdapter` from scratch:
+1. 或者，你可以从零创建一个 `TypeAdapter`：
    ```python {lint="skip" format="skip"}
    from pydantic import TypeAdapter
    from pydantic_ai import ModelMessage
    ModelMessagesTypeAdapter = TypeAdapter(list[ModelMessage])
    ```
-2. Alternatively you can serialize to/from JSON directly:
+2. 或者你也可以直接序列化到 JSON / 从 JSON 反序列化：
    ```python {test="skip" lint="skip" format="skip"}
    from pydantic_core import to_json
    ...
    as_json_objects = to_json(history_step_1)
    same_history_as_step_1 = ModelMessagesTypeAdapter.validate_json(as_json_objects)
    ```
-3. You can now continue the conversation with history `same_history_as_step_1` despite creating a new agent run.
+3. 现在你可以用 history `same_history_as_step_1` 继续对话，即使它创建了新的 agent run。
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-## Other ways of using messages
+## 使用 messages 的其他方式 {#other-ways-of-using-messages}
 
-Since messages are defined by simple dataclasses, you can manually create and manipulate, e.g. for testing.
+由于 messages 由简单 dataclasses 定义，你可以手动创建和操作它们，例如用于测试。
 
-The message format is independent of the model used, so you can use messages in different agents, or the same agent with different models.
+Message format 独立于所使用的模型，因此你可以在不同 agents 中使用 messages，或在同一个 agent 中使用不同模型。
 
-In the example below, we reuse the message from the first agent run, which uses the `openai:gpt-5.2` model, in a second agent run using the `google:gemini-3-pro-preview` model.
+在下面的示例中，我们将在第一个 agent run 中使用 `openai:gpt-5.2` 模型得到的 message，复用到第二个使用 `google:gemini-3-pro-preview` 模型的 agent run。
 
 ```python {title="Reusing messages with a different model" hl_lines="17"}
 from pydantic_ai import Agent
@@ -391,33 +391,29 @@ print(result2.all_messages())
 """
 ```
 
-## Injecting messages mid-run
+## 在 run 中途注入 messages {#injecting-messages-mid-run}
 
-Tools, capability hooks, and external code driving an agent run can inject extra content
-into the conversation mid-run with [`RunContext.enqueue`][pydantic_ai.tools.RunContext.enqueue]
-(when a `RunContext` is in scope, e.g. inside a tool or capability hook) or
-[`AgentRun.enqueue`][pydantic_ai.run.AgentRun.enqueue] (from external code driving
-[`agent.iter()`][pydantic_ai.agent.AbstractAgent.iter]). Use this when something happens during a
-run that the agent should know about — a tool wants to add follow-up context, an external event
-needs to *steer* the agent's plan, or background work needs to reach the agent when it completes.
+Tools、capability hooks 和驱动 agent run 的外部代码，可以使用 [`RunContext.enqueue`][pydantic_ai.tools.RunContext.enqueue]
+（当 `RunContext` 在作用域中时，例如在 tool 或 capability hook 内）或
+[`AgentRun.enqueue`][pydantic_ai.run.AgentRun.enqueue]（来自驱动
+[`agent.iter()`][pydantic_ai.agent.AbstractAgent.iter] 的外部代码），在 run 中途向 conversation 注入额外内容。当 run 过程中发生了 agent 应该知道的事情时使用它：tool 想添加后续上下文、外部事件需要 *steer* agent 的计划，或后台工作完成后需要抵达 agent。
 
-A `priority` controls when the enqueued content is delivered:
+`priority` 控制 enqueued content 何时投递：
 
-- `'asap'` (default): delivered at the earliest opportunity — added to the next [`ModelRequest`][pydantic_ai.messages.ModelRequest], or, if the agent would otherwise terminate before another request, used to redirect the run into one more request. Use when the new context should reach the model as soon as possible; this is what other frameworks often call **steering** an in-flight agent.
-- `'when_idle'`: delivered only when the agent would otherwise terminate, after any `'asap'` messages. Use when the agent shouldn't be interrupted but should pick up the new work — a follow-up task — once it's done with what it's doing.
+- `'asap'`（默认）：尽早投递；添加到下一个 [`ModelRequest`][pydantic_ai.messages.ModelRequest]，或者如果 agent 原本会在另一请求前终止，则用于将 run 重定向到再发起一次请求。当新上下文应尽快到达模型时使用；这也是其他 frameworks 常称为 in-flight agent **steering** 的行为。
+- `'when_idle'`：仅当 agent 原本会终止时投递，在任何 `'asap'` messages 之后。当不应打断 agent，但希望它完成当前工作后接收新工作（一个 follow-up task）时使用。
 
-`enqueue` is variadic — each positional argument is one item, and can be:
+`enqueue` 是 variadic 的；每个 positional argument 是一个 item，可以是：
 
-- a piece of [`UserContent`][pydantic_ai.messages.UserContent] — a `str` or multi-modal content like an [`ImageUrl`][pydantic_ai.messages.ImageUrl]. Adjacent user content is gathered into a single [`UserPromptPart`][pydantic_ai.messages.UserPromptPart], so `enqueue('caption', image)` forms one user turn. To pass an existing list, spread it: `enqueue(*items)`;
-- a [`ModelRequestPart`][pydantic_ai.messages.ModelRequestPart], such as a [`SystemPromptPart`][pydantic_ai.messages.SystemPromptPart];
-- a complete [`ModelRequest`][pydantic_ai.messages.ModelRequest] or [`ModelResponse`][pydantic_ai.messages.ModelResponse], to control request-level fields like `instructions`/`metadata` or to inject a synthetic prior turn.
+- 一段 [`UserContent`][pydantic_ai.messages.UserContent]：`str` 或像 [`ImageUrl`][pydantic_ai.messages.ImageUrl] 这样的 multi-modal content。相邻的 user content 会聚合成单个 [`UserPromptPart`][pydantic_ai.messages.UserPromptPart]，因此 `enqueue('caption', image)` 会形成一个 user turn。要传入已有 list，请展开它：`enqueue(*items)`；
+- 一个 [`ModelRequestPart`][pydantic_ai.messages.ModelRequestPart]，例如 [`SystemPromptPart`][pydantic_ai.messages.SystemPromptPart]；
+- 一个完整的 [`ModelRequest`][pydantic_ai.messages.ModelRequest] 或 [`ModelResponse`][pydantic_ai.messages.ModelResponse]，用于控制 request-level fields（如 `instructions`/`metadata`）或注入 synthetic prior turn。
 
-Adjacent part-style items (user content and [`ModelRequestPart`][pydantic_ai.messages.ModelRequestPart]s) are coalesced into one [`ModelRequest`][pydantic_ai.messages.ModelRequest]; complete messages stay separate. This lets a single call inject an interleaved exchange — for example a synthetic tool call (a [`ModelResponse`][pydantic_ai.messages.ModelResponse]) followed by its result (a [`ModelRequest`][pydantic_ai.messages.ModelRequest]). The content must end in a request, so the agent has something to respond to.
+相邻的 part-style items（user content 和 [`ModelRequestPart`][pydantic_ai.messages.ModelRequestPart]s）会合并为一个 [`ModelRequest`][pydantic_ai.messages.ModelRequest]；完整 messages 会保持独立。这让一次调用可以注入交错 exchange，例如一个 synthetic tool call（[`ModelResponse`][pydantic_ai.messages.ModelResponse]）后跟它的结果（[`ModelRequest`][pydantic_ai.messages.ModelRequest]）。内容必须以 request 结束，这样 agent 才有内容可响应。
 
-### From inside a tool or hook
+### 从 tool 或 hook 内部 {#from-inside-a-tool-or-hook}
 
-Use [`RunContext.enqueue`][pydantic_ai.tools.RunContext.enqueue] when you have a
-`RunContext` in scope:
+当你有 `RunContext` 在作用域中时，使用 [`RunContext.enqueue`][pydantic_ai.tools.RunContext.enqueue]：
 
 ```python {title="enqueue_from_tool.py"}
 from pydantic_ai import Agent, RunContext
@@ -439,17 +435,11 @@ def enter_incident_mode(ctx: RunContext[None]) -> str:
     return 'incident mode enabled'
 ```
 
-The `'asap'` message is appended to the agent's message history and is visible to the
-model on the next request, alongside any tool returns from the same step. A
-[`SystemPromptPart`][pydantic_ai.messages.SystemPromptPart] is delivered the same way; on
-providers that hoist system prompts (e.g. Anthropic, Google) a non-leading one is sent as a
-`<system>`-tagged user-role message, so it keeps its mid-conversation position rather than being
-lifted to the top.
+`'asap'` message 会附加到 agent 的 message history 中，并在下一个请求中与同一步骤中的任何 tool returns 一起对模型可见。[`SystemPromptPart`][pydantic_ai.messages.SystemPromptPart] 也会以相同方式投递；在会 hoist system prompts 的 providers（例如 Anthropic、Google）上，非 leading 的 system prompt 会作为带 `<system>` 标签的 user-role message 发送，从而保留其中途对话位置，而不是被提升到顶部。
 
-### From external code driving `agent.iter()`
+### 从驱动 `agent.iter()` 的外部代码 {#from-external-code-driving-agent-iter}
 
-Use [`AgentRun.enqueue`][pydantic_ai.run.AgentRun.enqueue] when you're driving a run
-from outside (e.g. forwarding events from a webhook, chat platform, or job queue):
+当你从外部驱动 run 时（例如从 webhook、chat platform 或 job queue 转发 events），使用 [`AgentRun.enqueue`][pydantic_ai.run.AgentRun.enqueue]：
 
 ```python {title="enqueue_from_agent_run.py"}
 from pydantic_ai import Agent
@@ -472,80 +462,65 @@ async def main():
             node = await agent_run.next(node)
 ```
 
-The example drives the run with [`agent.iter()`][pydantic_ai.agent.AbstractAgent.iter] +
-[`AgentRun.next()`][pydantic_ai.run.AgentRun.next] because `'when_idle'` messages are only
-drained when the agent would otherwise reach an `End` — that drain happens in `after_node_run`,
-which doesn't fire inside a bare `async for node in agent_run:` loop. `'asap'` messages are
-drained in `before_model_request` (which fires either way) and also at the same end-of-run point
-if anything arrived during the final step. Reaching the end of a bare `async for` loop with
-undrained pending messages raises [`UndrainedPendingMessagesError`][pydantic_ai.exceptions.UndrainedPendingMessagesError],
-since those messages would otherwise be silently lost.
+示例使用 [`agent.iter()`][pydantic_ai.agent.AbstractAgent.iter] +
+[`AgentRun.next()`][pydantic_ai.run.AgentRun.next] 驱动 run，因为 `'when_idle'` messages 只有在 agent 原本会到达 `End` 时才会 drained；该 drain 发生在 `after_node_run` 中，
+不会在裸 `async for node in agent_run:` loop 内触发。`'asap'` messages 在 `before_model_request` 中 drained（两种驱动方式都会触发），如果有内容在最终步骤期间到达，也会在同一个 end-of-run point drained。当一个裸 `async for` loop 结束时仍有未 drained pending messages，会引发 [`UndrainedPendingMessagesError`][pydantic_ai.exceptions.UndrainedPendingMessagesError]，
+否则这些 messages 会被静默丢失。
 
-!!! info "Limitations"
-    - End-of-run redirects need [`Agent.run`][pydantic_ai.agent.AbstractAgent.run] or
-      explicit [`AgentRun.next()`][pydantic_ai.run.AgentRun.next] driving — they
-      aren't drained inside a bare `async for node in agent_run:` loop (which raises
-      [`UndrainedPendingMessagesError`][pydantic_ai.exceptions.UndrainedPendingMessagesError]
-      if it ends with undrained messages). Messages delivered into a
-      `before_model_request` work in either case.
-    - Inside a [Temporal](durable_execution/temporal.md) workflow, tools run in
-      activities and don't share state with the workflow, so `ctx.enqueue` from a
-      tool doesn't currently propagate back to the run. Enqueue from the workflow
-      context (e.g. via `AgentRun.enqueue`) instead.
-    - Each end-of-run redirect opens a new model request. If something keeps
-      enqueueing on every step (e.g. a tool that always enqueues, or a
-      system-prompt callback that re-enqueues on each reinjection), the run will
-      loop indefinitely. Set [`UsageLimits`][pydantic_ai.usage.UsageLimits] on the
-      run as a safety net.
-    - `enqueue` is designed to be called from the same event loop that drives the
-      agent run. Inside the run that's automatic: async tools, sync tools (which
-      Pydantic AI auto-wraps in a thread executor), and capability hooks all
-      enqueue safely because the drain only iterates between graph nodes, never
-      concurrently with a tool body. If you're forwarding events from a *different*
-      thread or loop (e.g. a webhook handler), marshal the call onto the agent's
-      loop first — e.g. `loop.call_soon_threadsafe(agent_run.enqueue, msg)`. The
-      drain isn't atomic against concurrent cross-thread appends.
+!!! info "限制"
+    - End-of-run redirects 需要 [`Agent.run`][pydantic_ai.agent.AbstractAgent.run] 或
+      显式 [`AgentRun.next()`][pydantic_ai.run.AgentRun.next] 驱动；
+      它们不会在裸 `async for node in agent_run:` loop 中 drained（如果以未 drained messages 结束，会引发
+      [`UndrainedPendingMessagesError`][pydantic_ai.exceptions.UndrainedPendingMessagesError]）。
+      投递到 `before_model_request` 的 messages 在两种情况下都可工作。
+    - 在 [Temporal](durable_execution/temporal.md) workflow 内部，tools 运行在
+      activities 中，并且不与 workflow 共享 state，因此 tool 中的 `ctx.enqueue`
+      目前不会传播回 run。请改为从 workflow context（例如通过 `AgentRun.enqueue`）enqueue。
+    - 每次 end-of-run redirect 都会打开新的 model request。如果某些东西在每个 step 都持续 enqueue
+      （例如总是 enqueue 的 tool，或每次 reinjection 都重新 enqueue 的
+      system-prompt callback），run 会无限循环。请在 run 上设置 [`UsageLimits`][pydantic_ai.usage.UsageLimits]
+      作为安全网。
+    - `enqueue` 设计为从驱动 agent run 的同一个 event loop 调用。
+      在 run 内部这是自动的：async tools、sync tools（Pydantic AI 会自动用 thread executor 包装）和 capability hooks
+      都可以安全 enqueue，因为 drain 只会在 graph nodes 之间迭代，从不会与 tool body 并发执行。
+      如果你从*不同* thread 或 loop 转发 events（例如 webhook handler），请先把调用 marshal 到 agent 的
+      loop 上，例如 `loop.call_soon_threadsafe(agent_run.enqueue, msg)`。
+      drain 不会针对跨线程并发 append 保持 atomic。
 
-## Processing Message History
+## 处理 Message History {#processing-message-history}
 
-Sometimes you may want to modify the message history before it's sent to the model. This could be for privacy
-reasons (filtering out sensitive information), to save costs on tokens, to give less context to the LLM, or
-custom processing logic.
+有时你可能想在 message history 发送给模型前修改它。这可能出于隐私原因
+（过滤敏感信息）、节省 token 成本、给 LLM 更少上下文，或自定义处理逻辑。
 
-Pydantic AI provides the [`ProcessHistory`][pydantic_ai.capabilities.ProcessHistory] capability that allows
-you to intercept and modify the message history before each model request.
+Pydantic AI 提供 [`ProcessHistory`][pydantic_ai.capabilities.ProcessHistory] capability，允许你在每次 model request 前拦截并修改 message history。
 
-!!! note "`ProcessHistory` is a thin wrapper over `before_model_request`"
-    [`ProcessHistory`][pydantic_ai.capabilities.ProcessHistory] is a migration-friendly wrapper
-    around the [`before_model_request`](hooks.md) lifecycle hook. If you want richer control
-    over the message history — access to the full [`RunContext`][pydantic_ai.tools.RunContext]
-    and [`ModelRequestContext`][pydantic_ai.models.ModelRequestContext], the ability to short-circuit
-    the model call, etc. — hook the event directly via
-    `capabilities=[Hooks(before_model_request=fn)]`.
+!!! note "`ProcessHistory` 是 `before_model_request` 上的一层薄包装"
+    [`ProcessHistory`][pydantic_ai.capabilities.ProcessHistory] 是围绕 [`before_model_request`](hooks.md) lifecycle hook 的 migration-friendly wrapper。如果你想对 message history 进行更丰富的控制，例如访问完整的 [`RunContext`][pydantic_ai.tools.RunContext]
+    和 [`ModelRequestContext`][pydantic_ai.models.ModelRequestContext]、短路 model call 等，请通过
+    `capabilities=[Hooks(before_model_request=fn)]` 直接挂接事件。
 
-!!! warning "History processors replace the message history"
-    History processors replace the message history in the state with the processed messages, including the new user prompt part.
-    This means that if you want to keep the original message history, you need to make a copy of it.
+!!! warning "History processors 会替换 message history"
+    History processors 会用处理后的 messages 替换 state 中的 message history，包括新的 user prompt part。
+    这意味着如果你想保留原始 message history，需要先复制一份。
 
-!!! warning "History processors can affect `new_messages()` results"
-    [`new_messages()`][pydantic_ai.agent.AgentRunResult.new_messages] returns the messages
-    produced during the current run. Messages provided via `message_history` are excluded —
-    including the trailing `ModelRequest` when resuming without a user prompt, even though
-    the framework may stamp it with the current run's `run_id` for observability.
+!!! warning "History processors 可能影响 `new_messages()` 结果"
+    [`new_messages()`][pydantic_ai.agent.AgentRunResult.new_messages] 返回当前 run 期间生成的 messages。
+    通过 `message_history` 提供的 messages 会被排除，包括在没有 user prompt 的情况下继续时尾部的
+    `ModelRequest`，即使 framework 可能为了 observability 给它标记当前 run 的 `run_id`。
 
-    To keep this working when your processor mutates or adds messages:
+    当 processor mutate 或添加 messages 时，为了保持这个行为可用：
 
-    - If you rebuild the trailing `ModelRequest`, preserve its `parts`, `timestamp`,
-      `instructions`, and `metadata` so it can still be identified as prior context.
-    - If you insert a new message that should appear in `new_messages()`, use a
-      [context-aware processor](#runcontext-parameter) and set `run_id=ctx.run_id` on it.
+    - 如果你重建尾部 `ModelRequest`，请保留其 `parts`、`timestamp`、
+      `instructions` 和 `metadata`，以便它仍能被识别为 prior context。
+    - 如果你插入的新 message 应该出现在 `new_messages()` 中，请使用
+      [context-aware processor](#runcontext-parameter)，并在其上设置 `run_id=ctx.run_id`。
 
-### Usage
+### 用法 {#history-processing-usage}
 
-Each [`ProcessHistory`][pydantic_ai.capabilities.ProcessHistory] wraps a callable that takes a list of
-[`ModelMessage`][pydantic_ai.messages.ModelMessage] and returns a modified list of the same type.
+每个 [`ProcessHistory`][pydantic_ai.capabilities.ProcessHistory] 都包装一个 callable，该 callable 接受
+[`ModelMessage`][pydantic_ai.messages.ModelMessage] list，并返回同类型的修改后 list。
 
-Each processor is applied in sequence, and processors can be either synchronous or asynchronous.
+Processors 会按顺序应用，并且可以是同步或异步的。
 
 ```python {title="simple_history_processor.py"}
 from pydantic_ai import (
@@ -576,9 +551,9 @@ message_history = [
 # result = agent.run_sync('What about 3+3?', message_history=message_history)
 ```
 
-#### Keep Only Recent Messages
+#### 只保留最近 Messages {#keep-only-recent-messages}
 
-You can use the `history_processor` to only keep the recent messages:
+你可以使用 `history_processor` 只保留最近 messages：
 
 ```python {title="keep_recent_messages.py"}
 from pydantic_ai import Agent, ModelMessage
@@ -596,13 +571,12 @@ long_conversation_history: list[ModelMessage] = []  # Your long conversation his
 # result = agent.run_sync('What did we discuss?', message_history=long_conversation_history)
 ```
 
-!!! warning "Be careful when slicing the message history"
-    When slicing the message history, you need to make sure that tool calls and returns are paired, otherwise the LLM may return an error. For more details, refer to [this GitHub issue](https://github.com/pydantic/pydantic-ai/issues/2050#issuecomment-3019976269).
+!!! warning "切片 message history 时要小心"
+    切片 message history 时，需要确保 tool calls 和 returns 成对，否则 LLM 可能返回错误。更多细节请参阅[这个 GitHub issue](https://github.com/pydantic/pydantic-ai/issues/2050#issuecomment-3019976269)。
 
-#### `RunContext` parameter
+#### `RunContext` 参数 {#runcontext-parameter}
 
-History processors can optionally accept a [`RunContext`][pydantic_ai.tools.RunContext] parameter to access
-additional information about the current run, such as dependencies, model information, and usage statistics:
+History processors 可以选择接受 [`RunContext`][pydantic_ai.tools.RunContext] 参数，以访问当前 run 的额外信息，例如 dependencies、model information 和 usage statistics：
 
 ```python {title="context_aware_processor.py"}
 from pydantic_ai import Agent, ModelMessage, RunContext
@@ -624,11 +598,11 @@ def context_aware_processor(
 agent = Agent('openai:gpt-5.2', capabilities=[ProcessHistory(context_aware_processor)])
 ```
 
-This allows for more sophisticated message processing based on the current state of the agent run.
+这允许你根据 agent run 的当前 state 进行更复杂的 message processing。
 
-#### Summarize Old Messages
+#### 总结旧 Messages {#summarize-old-messages}
 
-Use an LLM to summarize older messages to preserve context while reducing tokens.
+使用 LLM 总结较旧 messages，以在减少 tokens 的同时保留上下文。
 
 ```python {title="summarize_old_messages.py"}
 from pydantic_ai import Agent, ModelMessage
@@ -658,13 +632,12 @@ async def summarize_old_messages(messages: list[ModelMessage]) -> list[ModelMess
 agent = Agent('openai:gpt-5.2', capabilities=[ProcessHistory(summarize_old_messages)])
 ```
 
-!!! warning "Be careful when summarizing the message history"
-    When summarizing the message history, you need to make sure that tool calls and returns are paired, otherwise the LLM may return an error. For more details, refer to [this GitHub issue](https://github.com/pydantic/pydantic-ai/issues/2050#issuecomment-3019976269), where you can find examples of summarizing the message history.
+!!! warning "总结 message history 时要小心"
+    总结 message history 时，需要确保 tool calls 和 returns 成对，否则 LLM 可能返回错误。更多细节请参阅[这个 GitHub issue](https://github.com/pydantic/pydantic-ai/issues/2050#issuecomment-3019976269)，其中可以找到总结 message history 的示例。
 
-### Testing History Processors
+### 测试 History Processors {#testing-history-processors}
 
-You can test what messages are actually sent to the model provider using
-[`FunctionModel`][pydantic_ai.models.function.FunctionModel]:
+你可以使用 [`FunctionModel`][pydantic_ai.models.function.FunctionModel] 测试实际发送给 model provider 的 messages：
 
 ```python {title="test_history_processor.py"}
 import pytest
@@ -715,9 +688,9 @@ def test_history_processor(function_model: FunctionModel, received_messages: lis
     ]
 ```
 
-### Multiple Processors
+### 多个 Processors {#multiple-processors}
 
-You can also use multiple processors:
+你也可以使用多个 processors：
 
 ```python {title="multiple_history_processors.py"}
 from pydantic_ai import Agent, ModelMessage, ModelRequest
@@ -738,9 +711,9 @@ agent = Agent(
 )
 ```
 
-In this case, the `filter_responses` processor will be applied first, and the
-`summarize_old_messages` processor will be applied second.
+在这种情况下，会先应用 `filter_responses` processor，再应用
+`summarize_old_messages` processor。
 
-## Examples
+## 示例 {#examples}
 
-For a more complete example of using messages in conversations, see the [chat app](examples/chat-app.md) example.
+有关在 conversations 中使用 messages 的更完整示例，请参阅 [chat app](examples/chat-app.md) 示例。
