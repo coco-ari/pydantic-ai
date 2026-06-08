@@ -1,24 +1,25 @@
-# Dataset Serialization
+# 数据集序列化 {#dataset-serialization}
 
-Learn how to save and load datasets in different formats, with support for custom evaluators and IDE integration.
+了解如何以不同格式保存和加载 datasets，并支持自定义 evaluators 和 IDE 集成。
 
-## Overview
+## 概览 {#overview}
 
-Pydantic Evals supports serializing datasets to files in two formats:
+Pydantic Evals 支持将 datasets 序列化为两种格式的文件：
 
-- **YAML** (`.yaml`, `.yml`) - Human-readable, great for version control
-- **JSON** (`.json`) - Structured, machine-readable
+- **YAML**（`.yaml`、`.yml`）- 人类可读，非常适合版本控制
+- **JSON**（`.json`）- 结构化、机器可读
 
-Both formats support:
-- Automatic JSON schema generation for IDE autocomplete and validation
-- Custom evaluator serialization/deserialization
-- Type-safe loading with generic parameters
+两种格式都支持：
 
-## YAML Format
+- 自动生成 JSON schema，用于 IDE 自动补全和验证
+- 自定义 evaluator 序列化/反序列化
+- 使用泛型参数进行类型安全加载
 
-YAML is the recommended format for most use cases due to its readability and compact syntax.
+## YAML 格式 {#yaml-format}
 
-### Basic Example
+由于可读性和紧凑语法，YAML 是大多数用例的推荐格式。
+
+### 基本示例 {#basic-example}
 
 ```python
 from typing import Any
@@ -26,7 +27,7 @@ from typing import Any
 from pydantic_evals import Case, Dataset
 from pydantic_evals.evaluators import EqualsExpected, IsInstance
 
-# Create a dataset with typed parameters
+# 创建带类型参数的数据集
 dataset = Dataset[str, str, Any](
     name='my_tests',
     cases=[
@@ -42,16 +43,16 @@ dataset = Dataset[str, str, Any](
     ],
 )
 
-# Save to YAML
+# 保存为 YAML
 dataset.to_file('my_tests.yaml')
 ```
 
-This creates two files:
+这会创建两个文件：
 
-1. **`my_tests.yaml`** - The dataset
-2. **`my_tests_schema.json`** - JSON schema for IDE support
+1. **`my_tests.yaml`** - dataset
+2. **`my_tests_schema.json`** - 用于 IDE 支持的 JSON schema
 
-### YAML Output
+### YAML 输出 {#yaml-output}
 
 ```yaml
 # yaml-language-server: $schema=my_tests_schema.json
@@ -65,30 +66,31 @@ evaluators:
 - EqualsExpected
 ```
 
-### JSON Schema for IDEs
+### 用于 IDE 的 JSON Schema {#json-schema-for-ides}
 
-The first line references the schema file:
+第一行引用 schema 文件：
 
 ```yaml
 # yaml-language-server: $schema=my_tests_schema.json
 ```
 
-This enables:
-- ✅ **Autocomplete** in VS Code, PyCharm, and other editors
-- ✅ **Inline validation** while editing
-- ✅ **Documentation tooltips** for fields
-- ✅ **Error highlighting** for invalid data
+这会启用：
 
-!!! note "Editor Support"
-    The `yaml-language-server` comment is supported by:
+- **Autocomplete**：在 VS Code、PyCharm 和其他编辑器中自动补全
+- **Inline validation**：编辑时内联验证
+- **Documentation tooltips**：字段文档提示
+- **Error highlighting**：对无效数据高亮错误
+
+!!! note "编辑器支持"
+    `yaml-language-server` 注释受以下工具支持：
 
     - VS Code (with YAML extension)
     - JetBrains IDEs (PyCharm, IntelliJ, etc.)
     - Most editors with YAML language server support
 
-    See the [YAML Language Server docs](https://github.com/redhat-developer/yaml-language-server#using-inlined-schema) for more details.
+    更多细节请参见 [YAML Language Server docs](https://github.com/redhat-developer/yaml-language-server#using-inlined-schema)。
 
-### Loading from YAML
+### 从 YAML 加载 {#loading-from-yaml}
 
 ```python
 from pathlib import Path
@@ -97,7 +99,7 @@ from typing import Any
 from pydantic_evals import Case, Dataset
 from pydantic_evals.evaluators import EqualsExpected, IsInstance
 
-# First create and save the dataset
+# 先创建并保存数据集
 Path('my_tests.yaml').parent.mkdir(exist_ok=True)
 dataset = Dataset[str, str, Any](
     name='my_tests',
@@ -106,7 +108,7 @@ dataset = Dataset[str, str, Any](
 )
 dataset.to_file('my_tests.yaml')
 
-# Load the dataset with type parameters
+# 使用类型参数加载数据集
 dataset = Dataset[str, str, Any].from_file('my_tests.yaml')
 
 
@@ -114,15 +116,15 @@ def my_task(text: str) -> str:
     return text.upper()
 
 
-# Run evaluation
+# 运行 evaluation
 report = dataset.evaluate_sync(my_task)
 ```
 
-## JSON Format
+## JSON 格式 {#json-format}
 
-JSON format is useful for programmatic generation or when strict structure is required.
+JSON 格式适合程序化生成，或需要严格结构的场景。
 
-### Basic Example
+### 基本示例 {#basic-example}
 
 ```python
 from typing import Any
@@ -138,11 +140,11 @@ dataset = Dataset[str, str, Any](
     evaluators=[EqualsExpected()],
 )
 
-# Save to JSON
+# 保存为 JSON
 dataset.to_file('my_tests.json')
 ```
 
-### JSON Output
+### JSON 输出 {#json-output}
 
 ```json
 {
@@ -161,9 +163,9 @@ dataset.to_file('my_tests.json')
 }
 ```
 
-The `$schema` key at the top enables IDE support similar to YAML.
+顶部的 `$schema` key 会启用类似 YAML 的 IDE 支持。
 
-### Loading from JSON
+### 从 JSON 加载 {#loading-from-json}
 
 ```python
 from typing import Any
@@ -171,7 +173,7 @@ from typing import Any
 from pydantic_evals import Case, Dataset
 from pydantic_evals.evaluators import EqualsExpected
 
-# First create and save the dataset
+# 先创建并保存数据集
 dataset = Dataset[str, str, Any](
     name='my_tests',
     cases=[Case(name='test_1', inputs='hello', expected_output='HELLO')],
@@ -179,15 +181,15 @@ dataset = Dataset[str, str, Any](
 )
 dataset.to_file('my_tests.json')
 
-# Load from JSON
+# 从 JSON 加载
 dataset = Dataset[str, str, Any].from_file('my_tests.json')
 ```
 
-## Schema Generation
+## Schema 生成 {#schema-generation}
 
-### Automatic Schema Creation
+### 自动创建 Schema {#automatic-schema-creation}
 
-By default, `to_file()` creates a JSON schema file alongside your dataset:
+默认情况下，`to_file()` 会在 dataset 旁边创建 JSON schema 文件：
 
 ```python
 from typing import Any
@@ -196,11 +198,11 @@ from pydantic_evals import Case, Dataset
 
 dataset = Dataset[str, str, Any](name='my_tests', cases=[Case(inputs='test')])
 
-# Creates both my_tests.yaml AND my_tests_schema.json
+# 同时创建 my_tests.yaml 和 my_tests_schema.json
 dataset.to_file('my_tests.yaml')
 ```
 
-### Custom Schema Location
+### 自定义 Schema 位置 {#custom-schema-location}
 
 ```python
 from pathlib import Path
@@ -210,22 +212,22 @@ from pydantic_evals import Case, Dataset
 
 dataset = Dataset[str, str, Any](name='my_tests', cases=[Case(inputs='test')])
 
-# Create directories
+# 创建目录
 Path('data').mkdir(exist_ok=True)
 
-# Custom schema filename (relative to dataset file location)
+# 自定义 schema 文件名（相对于 dataset 文件位置）
 dataset.to_file(
     'data/my_tests.yaml',
     schema_path='my_schema.json',
 )
 
-# No schema file
+# 不生成 schema 文件
 dataset.to_file('my_tests.yaml', schema_path=None)
 ```
 
-### Schema Path Templates
+### Schema Path 模板 {#schema-path-templates}
 
-Use `{stem}` to reference the dataset filename:
+使用 `{stem}` 引用 dataset 文件名：
 
 ```python
 from typing import Any
@@ -234,16 +236,16 @@ from pydantic_evals import Case, Dataset
 
 dataset = Dataset[str, str, Any](name='my_tests', cases=[Case(inputs='test')])
 
-# Creates: my_tests.yaml and my_tests.schema.json
+# 创建：my_tests.yaml 和 my_tests.schema.json
 dataset.to_file(
     'my_tests.yaml',
     schema_path='{stem}.schema.json',
 )
 ```
 
-### Manual Schema Generation
+### 手动生成 Schema {#manual-schema-generation}
 
-Generate a schema without saving the dataset:
+无需保存 dataset 即可生成 schema：
 
 ```python
 import json
@@ -251,27 +253,27 @@ from typing import Any
 
 from pydantic_evals import Dataset
 
-# Get schema as dictionary for a specific dataset type
+# 获取特定 dataset 类型的 dict 形式 schema
 schema = Dataset[str, str, Any].model_json_schema_with_evaluators()
 
-# Save manually
+# 手动保存
 with open('custom_schema.json', 'w', encoding='utf-8') as f:
     json.dump(schema, f, indent=2)
 ```
 
-## Custom Evaluators
+## 自定义 Evaluators {#custom-evaluators}
 
-Custom evaluators require special handling during serialization and deserialization.
+自定义 evaluators 在序列化和反序列化期间需要特殊处理。
 
-### Requirements
+### 要求 {#requirements}
 
-Custom evaluators must:
+自定义 evaluators 必须：
 
-1. Be decorated with `@dataclass`
-2. Inherit from `Evaluator`
-3. Be passed to both `to_file()` and `from_file()`
+1. 使用 `@dataclass` 装饰
+2. 继承自 `Evaluator`
+3. 同时传给 `to_file()` 和 `from_file()`
 
-### Complete Example
+### 完整示例 {#complete-example}
 
 ```python
 from dataclasses import dataclass
@@ -283,7 +285,7 @@ from pydantic_evals.evaluators import Evaluator, EvaluatorContext
 
 @dataclass
 class CustomThreshold(Evaluator):
-    """Check if output length exceeds a threshold."""
+    """检查 output 长度是否超过阈值。"""
 
     min_length: int
     max_length: int = 100
@@ -293,7 +295,7 @@ class CustomThreshold(Evaluator):
         return self.min_length <= length <= self.max_length
 
 
-# Create dataset with custom evaluator
+# 创建带自定义 evaluator 的数据集
 dataset = Dataset[str, str, Any](
     name='custom_threshold_tests',
     cases=[
@@ -308,14 +310,14 @@ dataset = Dataset[str, str, Any](
     ],
 )
 
-# Save with custom evaluator types
+# 使用自定义 evaluator types 保存
 dataset.to_file(
     'dataset.yaml',
     custom_evaluator_types=[CustomThreshold],
 )
 ```
 
-### Saved YAML
+### 保存后的 YAML {#saved-yaml}
 
 ```yaml
 # yaml-language-server: $schema=dataset_schema.json
@@ -329,7 +331,7 @@ cases:
       max_length: 20
 ```
 
-### Loading with Custom Evaluators
+### 使用自定义 Evaluators 加载 {#loading-with-custom-evaluators}
 
 ```python
 from dataclasses import dataclass
@@ -341,7 +343,7 @@ from pydantic_evals.evaluators import Evaluator, EvaluatorContext
 
 @dataclass
 class CustomThreshold(Evaluator):
-    """Check if output length exceeds a threshold."""
+    """检查 output 长度是否超过阈值。"""
 
     min_length: int
     max_length: int = 100
@@ -351,7 +353,7 @@ class CustomThreshold(Evaluator):
         return self.min_length <= length <= self.max_length
 
 
-# First create and save the dataset
+# 先创建并保存数据集
 dataset = Dataset[str, str, Any](
     name='custom_threshold_tests',
     cases=[
@@ -365,32 +367,32 @@ dataset = Dataset[str, str, Any](
 )
 dataset.to_file('dataset.yaml', custom_evaluator_types=[CustomThreshold])
 
-# Load with custom evaluator registry
+# 使用自定义 evaluator registry 加载
 dataset = Dataset[str, str, Any].from_file(
     'dataset.yaml',
     custom_evaluator_types=[CustomThreshold],
 )
 ```
 
-!!! warning "Important"
-    You must pass `custom_evaluator_types` to **both** `to_file()` and `from_file()`.
+!!! warning "重要"
+    你必须同时向 `to_file()` 和 `from_file()` 传入 `custom_evaluator_types`。
 
-    - `to_file()`: Includes the evaluator in the JSON schema
-    - `from_file()`: Registers the evaluator for deserialization
+    - `to_file()`：在 JSON schema 中包含该 evaluator
+    - `from_file()`：注册该 evaluator 用于反序列化
 
-## Evaluator Serialization Formats
+## Evaluator 序列化格式 {#evaluator-serialization-formats}
 
-Evaluators can be serialized in three forms:
+Evaluators 可以序列化为三种形式：
 
-### 1. Name Only (No Parameters)
+### 1. 仅名称（无参数） {#1-name-only-no-parameters}
 
 ```yaml
 evaluators:
 - EqualsExpected
-- IsInstance: str  # Using default parameter
+- IsInstance: str  # 使用默认参数
 ```
 
-### 2. Single Parameter (Short Form)
+### 2. 单个参数（短格式） {#2-single-parameter-short-form}
 
 ```yaml
 evaluators:
@@ -399,7 +401,7 @@ evaluators:
 - MaxDuration: 2.0
 ```
 
-### 3. Multiple Parameters (Dict Form)
+### 3. 多个参数（Dict 格式） {#3-multiple-parameters-dict-form}
 
 ```yaml
 evaluators:
@@ -412,22 +414,22 @@ evaluators:
     include_input: true
 ```
 
-## Format Comparison
+## 格式对比 {#format-comparison}
 
-| Feature | YAML | JSON |
+| 特性 | YAML | JSON |
 |---------|------|------|
-| Human readable | ✅ Excellent | ⚠️ Good |
-| Comments | ✅ Yes | ❌ No |
-| Compact | ✅ Yes | ⚠️ Verbose |
-| Machine parsing | ✅ Good | ✅ Excellent |
-| IDE support | ✅ Yes | ✅ Yes |
-| Version control | ✅ Clean diffs | ⚠️ Noisy diffs |
+| 人类可读 | 优秀 | 良好 |
+| 注释 | 支持 | 不支持 |
+| 紧凑 | 是 | 较冗长 |
+| 机器解析 | 良好 | 优秀 |
+| IDE 支持 | 支持 | 支持 |
+| 版本控制 | diff 清晰 | diff 噪声较多 |
 
-**Recommendation**: Use YAML for most cases, JSON for programmatic generation.
+**建议**：大多数情况下使用 YAML；程序化生成时使用 JSON。
 
-## Advanced: Evaluator Serialization Name
+## 高级：Evaluator 序列化名称 {#advanced-evaluator-serialization-name}
 
-Customize how your evaluator appears in serialized files:
+自定义 evaluator 在序列化文件中的显示方式：
 
 ```python
 from dataclasses import dataclass
@@ -445,37 +447,37 @@ class VeryLongDescriptiveEvaluatorName(Evaluator):
         return True
 ```
 
-In YAML:
+在 YAML 中：
 
 ```yaml
 evaluators:
-- ShortName  # Instead of VeryLongDescriptiveEvaluatorName
+- ShortName  # 而不是 VeryLongDescriptiveEvaluatorName
 ```
 
-## Troubleshooting
+## 故障排查 {#troubleshooting}
 
-### Schema Not Found in IDE
+### IDE 中找不到 Schema {#schema-not-found-in-ide}
 
-**Problem**: YAML file doesn't show autocomplete
+**问题**：YAML 文件不显示自动补全
 
-**Solutions**:
+**解决方案**：
 
-1. **Check the schema path** in the first line of YAML:
+1. **检查 schema path**，位于 YAML 第一行：
    ```yaml
    # yaml-language-server: $schema=correct_schema_name.json
    ```
 
-2. **Verify schema file exists** in the same directory
+2. **验证 schema 文件存在**，并位于同一目录
 
-3. **Restart the language server** in your IDE
+3. **重启 language server**，在 IDE 中操作
 
-4. **Install YAML extension** (VS Code: "YAML" by Red Hat)
+4. **安装 YAML extension**（VS Code：Red Hat 的 "YAML"）
 
-### Custom Evaluator Not Found
+### 找不到自定义 Evaluator {#custom-evaluator-not-found}
 
-**Problem**: `ValueError: Unknown evaluator name: 'CustomEvaluator'`
+**问题**：`ValueError: Unknown evaluator name: 'CustomEvaluator'`
 
-**Solution**: Pass `custom_evaluator_types` when loading:
+**解决方案**：加载时传入 `custom_evaluator_types`：
 
 ```python
 from dataclasses import dataclass
@@ -491,25 +493,25 @@ class CustomEvaluator(Evaluator):
         return True
 
 
-# First create and save with custom evaluator
+# 先创建并使用自定义 evaluator 保存
 dataset = Dataset[str, str, Any](
     name='custom_eval_tests',
     cases=[Case(inputs='test', evaluators=[CustomEvaluator()])],
 )
 dataset.to_file('tests.yaml', custom_evaluator_types=[CustomEvaluator])
 
-# Load with custom evaluator types
+# 使用自定义 evaluator types 加载
 dataset = Dataset[str, str, Any].from_file(
     'tests.yaml',
-    custom_evaluator_types=[CustomEvaluator],  # Required!
+    custom_evaluator_types=[CustomEvaluator],  # 必需！
 )
 ```
 
-### Format Inference Failed
+### 格式推断失败 {#format-inference-failed}
 
-**Problem**: `ValueError: Cannot infer format from extension`
+**问题**：`ValueError: Cannot infer format from extension`
 
-**Solution**: Specify format explicitly:
+**解决方案**：显式指定格式：
 
 ```python
 from typing import Any
@@ -518,16 +520,16 @@ from pydantic_evals import Case, Dataset
 
 dataset = Dataset[str, str, Any](name='my_tests', cases=[Case(inputs='test')])
 
-# Explicit format for unusual extensions
+# 为非常规扩展名显式指定格式
 dataset.to_file('data.txt', fmt='yaml')
 dataset_loaded = Dataset[str, str, Any].from_file('data.txt', fmt='yaml')
 ```
 
-### Schema Generation Error
+### Schema 生成错误 {#schema-generation-error}
 
-**Problem**: Custom evaluator causes schema generation to fail
+**问题**：自定义 evaluator 导致 schema 生成失败
 
-**Solution**: Ensure evaluator is a proper dataclass:
+**解决方案**：确保 evaluator 是正确的 dataclass：
 
 ```python
 from dataclasses import dataclass
@@ -535,7 +537,7 @@ from dataclasses import dataclass
 from pydantic_evals.evaluators import Evaluator, EvaluatorContext
 
 
-# ✅ Correct
+# 正确
 @dataclass
 class MyEvaluator(Evaluator):
     value: int
@@ -544,7 +546,7 @@ class MyEvaluator(Evaluator):
         return True
 
 
-# ❌ Wrong: Missing @dataclass
+# 错误：缺少 @dataclass
 class BadEvaluator(Evaluator):
     def __init__(self, value: int):
         self.value = value
@@ -553,8 +555,8 @@ class BadEvaluator(Evaluator):
         return True
 ```
 
-## Next Steps
+## 后续步骤 {#next-steps}
 
-- **[Dataset Management](dataset-management.md)** - Creating and organizing datasets
-- **[Custom Evaluators](../evaluators/custom.md)** - Write custom evaluation logic
-- **[Core Concepts](../core-concepts.md)** - Understand the data model
+- **[Dataset Management](dataset-management.md)** - 创建和组织 datasets
+- **[Custom Evaluators](../evaluators/custom.md)** - 编写自定义 evaluation 逻辑
+- **[Core Concepts](../core-concepts.md)** - 理解数据模型

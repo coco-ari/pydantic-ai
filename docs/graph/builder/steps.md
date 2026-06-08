@@ -1,10 +1,10 @@
-# Steps
+# Steps {#steps}
 
-Steps are the fundamental units of work in a graph. They're async functions that receive a [`StepContext`][pydantic_graph.step.StepContext] and return a value.
+Steps 是 graph 中的基本工作单元。它们是接收 [`StepContext`][pydantic_graph.step.StepContext] 并返回值的 async functions。
 
-## Creating Steps
+## 创建 Steps {#creating-steps}
 
-Steps are created using the [`@g.step`][pydantic_graph.graph_builder.GraphBuilder.step] decorator on the [`GraphBuilder`][pydantic_graph.graph_builder.GraphBuilder]:
+Steps 通过 [`GraphBuilder`][pydantic_graph.graph_builder.GraphBuilder] 上的 [`@g.step`][pydantic_graph.graph_builder.GraphBuilder.step] 装饰器创建：
 
 ```python {title="basic_step.py"}
 from dataclasses import dataclass
@@ -37,19 +37,19 @@ async def main():
     #> 1
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Step Context
+## Step Context {#step-context}
 
-Every step function receives a [`StepContext`][pydantic_graph.step.StepContext] as its first parameter. The context provides access to:
+每个 step function 都会将 [`StepContext`][pydantic_graph.step.StepContext] 作为第一个参数接收。context 提供对以下内容的访问：
 
-- `ctx.state` - The mutable graph state (type: `StateT`)
-- `ctx.deps` - Injected dependencies (type: `DepsT`)
-- `ctx.inputs` - Input data for this step (type: `InputT`)
+- `ctx.state` - mutable graph state（类型：`StateT`）
+- `ctx.deps` - 注入的 dependencies（类型：`DepsT`）
+- `ctx.inputs` - 此 step 的 input data（类型：`InputT`）
 
-### Accessing State
+### 访问 State {#accessing-state}
 
-State is shared across all steps in a graph and can be freely mutated:
+State 在 graph 中的所有 steps 之间共享，并且可以自由修改：
 
 ```python {title="state_access.py"}
 from dataclasses import dataclass
@@ -91,11 +91,11 @@ async def main():
     #> ['Hello', 'World']
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-### Working with Inputs
+### 处理 Inputs {#working-with-inputs}
 
-Steps can receive and transform input data:
+Steps 可以接收并转换 input data：
 
 ```python {title="step_inputs.py"}
 from dataclasses import dataclass
@@ -117,12 +117,12 @@ async def main():
 
     @g.step
     async def double_it(ctx: StepContext[SimpleState, None, int]) -> int:
-        """Double the input value."""
+        """将输入值加倍。"""
         return ctx.inputs * 2
 
     @g.step
     async def stringify(ctx: StepContext[SimpleState, None, int]) -> str:
-        """Convert to a formatted string."""
+        """转换为格式化字符串。"""
         return f'Result: {ctx.inputs}'
 
     g.add(
@@ -137,11 +137,11 @@ async def main():
     #> Result: 42
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Dependency Injection
+## 依赖注入 {#dependency-injection}
 
-Steps can access injected dependencies through `ctx.deps`:
+Steps 可以通过 `ctx.deps` 访问注入的 dependencies：
 
 ```python {title="dependencies.py"}
 from dataclasses import dataclass
@@ -156,7 +156,7 @@ class AppState:
 
 @dataclass
 class AppDeps:
-    """Dependencies injected into the graph."""
+    """注入到 graph 中的 dependencies。"""
 
     multiplier: int
 
@@ -171,7 +171,7 @@ async def main():
 
     @g.step
     async def multiply(ctx: StepContext[AppState, AppDeps, int]) -> int:
-        """Multiply input by the injected multiplier."""
+        """用注入的 multiplier 乘以输入。"""
         return ctx.inputs * ctx.deps.multiplier
 
     g.add(
@@ -186,13 +186,13 @@ async def main():
     #> 50
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Customizing Steps
+## 自定义 Steps {#customizing-steps}
 
-### Custom Node IDs
+### 自定义 Node IDs {#custom-node-ids}
 
-By default, step node IDs are inferred from the function name. You can override this:
+默认情况下，step node IDs 会从函数名推断。你可以覆盖它：
 
 ```python {title="custom_id.py" requires="basic_step.py"}
 from pydantic_graph import StepContext
@@ -204,12 +204,12 @@ from basic_step import MyState, g
 async def my_step(ctx: StepContext[MyState, None, None]) -> int:
     return 42
 
-# The node ID is now 'my_custom_id' instead of 'my_step'
+# node ID 现在是 'my_custom_id'，而不是 'my_step'
 ```
 
-### Human-Readable Labels
+### 人类可读 Labels {#human-readable-labels}
 
-Labels provide documentation for diagram generation:
+Labels 会为 diagram generation 提供文档：
 
 ```python {title="labels.py" requires="basic_step.py"}
 from pydantic_graph import StepContext
@@ -222,14 +222,14 @@ async def increment(ctx: StepContext[MyState, None, None]) -> int:
     ctx.state.counter += 1
     return ctx.state.counter
 
-# Access the label programmatically
+# 以编程方式访问 label
 print(increment.label)
 #> Increment the counter
 ```
 
-## Sequential Steps
+## 顺序 Steps {#sequential-steps}
 
-Multiple steps can be chained sequentially:
+多个 steps 可以按顺序串联：
 
 ```python {title="sequential.py"}
 from dataclasses import dataclass
@@ -264,7 +264,7 @@ async def main():
         ctx.state.operations.append('subtract 3')
         return ctx.inputs - 3
 
-    # Connect steps sequentially
+    # 按顺序连接 steps
     g.add(
         g.edge_from(g.start_node).to(add_five),
         g.edge_from(add_five).to(multiply_by_two),
@@ -282,13 +282,13 @@ async def main():
     #> Operations: ['add 5', 'multiply by 2', 'subtract 3']
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-The computation is: `(10 + 5) * 2 - 3 = 27`
+计算过程是：`(10 + 5) * 2 - 3 = 27`
 
-## Streaming Steps
+## Streaming Steps {#streaming-steps}
 
-In addition to regular steps that return a single value, you can create streaming steps that yield multiple values over time using the [`@g.stream`][pydantic_graph.graph_builder.GraphBuilder.stream] decorator:
+除了返回单个值的普通 steps，你还可以使用 [`@g.stream`][pydantic_graph.graph_builder.GraphBuilder.stream] 装饰器创建 streaming steps，让它们随时间 yield 多个值：
 
 ```python {title="streaming_step.py"}
 from dataclasses import dataclass
@@ -305,7 +305,7 @@ g = GraphBuilder(state_type=SimpleState, output_type=list[int])
 
 @g.stream
 async def generate_stream(ctx: StepContext[SimpleState, None, None]):
-    """Stream numbers from 1 to 5."""
+    """流式生成 1 到 5 的数字。"""
     for i in range(1, 6):
         yield i
 
@@ -317,7 +317,7 @@ collect = g.join(reduce_list_append, initial_factory=list[int])
 
 g.add(
     g.edge_from(g.start_node).to(generate_stream),
-    # The stream output is an AsyncIterable, so we can map over it
+    # stream output 是 AsyncIterable，因此可以对它 map
     g.edge_from(generate_stream).map().to(square),
     g.edge_from(square).to(collect),
     g.edge_from(collect).to(g.end_node),
@@ -331,18 +331,18 @@ async def main():
     #> [1, 4, 9, 16, 25]
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-### How Streaming Steps Work
+### Streaming Steps 如何工作 {#how-streaming-steps-work}
 
-Streaming steps return an `AsyncIterable` that yields values over time. When you use `.map()` on a streaming step's output, the graph processes each yielded value as it becomes available, creating parallel tasks dynamically. This is particularly useful for:
+Streaming steps 会返回随时间 yield 值的 `AsyncIterable`。当你对 streaming step 的 output 使用 `.map()` 时，graph 会在每个 yielded value 可用时处理它，并动态创建 parallel tasks。这对以下场景尤其有用：
 
-- Processing data from APIs that stream responses
-- Handling real-time data feeds
-- Progressive processing of large datasets
-- Any scenario where you want to start processing results before all data is available
+- 处理来自 streaming responses API 的数据
+- 处理实时数据 feeds
+- 渐进式处理大型数据集
+- 任何希望在所有数据可用前就开始处理结果的场景
 
-Like regular steps, streaming steps can also have custom node IDs and labels:
+与普通 steps 一样，streaming steps 也可以有自定义 node IDs 和 labels：
 
 ```python {title="labeled_stream.py" requires="streaming_step.py"}
 from pydantic_graph import StepContext
@@ -356,11 +356,11 @@ async def labeled_stream(ctx: StepContext[SimpleState, None, None]):
         yield i
 ```
 
-## Edge Building Convenience Methods
+## Edge 构建便捷方法 {#edge-building-convenience-methods}
 
-The builder provides helper methods for common edge patterns:
+builder 为常见 edge patterns 提供 helper methods：
 
-### Simple Edges with `add_edge()`
+### 使用 `add_edge()` 创建简单 Edges {#simple-edges-with-add_edge}
 
 ```python {title="add_edge_example.py"}
 from dataclasses import dataclass
@@ -384,7 +384,7 @@ async def main():
     async def step_b(ctx: StepContext[SimpleState, None, int]) -> int:
         return ctx.inputs + 5
 
-    # Using add_edge() for simple connections
+    # 使用 add_edge() 创建简单连接
     g.add_edge(g.start_node, step_a)
     g.add_edge(step_a, step_b, label='from a to b')
     g.add_edge(step_b, g.end_node)
@@ -395,15 +395,15 @@ async def main():
     #> 15
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Type Safety
+## 类型安全 {#type-safety}
 
-The graph builder API provides strong type checking through generics. Type parameters on [`StepContext`][pydantic_graph.step.StepContext] ensure:
+graph builder API 通过 generics 提供强类型检查。[`StepContext`][pydantic_graph.step.StepContext] 上的类型参数可以确保：
 
-- State access is properly typed
-- Dependencies are correctly typed
-- Input/output types match across edges
+- State access 具有正确类型
+- Dependencies 具有正确类型
+- Input/output 类型在 edges 之间匹配
 
 ```python
 from dataclasses import dataclass
@@ -417,7 +417,7 @@ class MyState:
 
 g = GraphBuilder(state_type=MyState, output_type=str)
 
-# Type checker will catch mismatches
+# 类型检查器会捕获不匹配
 @g.step
 async def expects_int(ctx: StepContext[MyState, None, int]) -> str:
     return str(ctx.inputs)
@@ -426,12 +426,12 @@ async def expects_int(ctx: StepContext[MyState, None, int]) -> str:
 async def returns_str(ctx: StepContext[MyState, None, None]) -> str:
     return 'hello'
 
-# This would be a type error - expects_int needs int input, but returns_str outputs str
-# g.add(g.edge_from(returns_str).to(expects_int))  # Type error!
+# 这会是类型错误：expects_int 需要 int input，但 returns_str 输出 str
+# g.add(g.edge_from(returns_str).to(expects_int))  # 类型错误！
 ```
 
-## Next Steps
+## 后续步骤 {#next-steps}
 
-- Learn about [parallel execution](parallel.md) with broadcasting and mapping
-- Understand [join nodes](joins.md) for aggregating parallel results
-- Explore [conditional branching](decisions.md) with decision nodes
+- 了解使用 broadcasting 和 mapping 的[并行执行](parallel.md)
+- 理解用于聚合并行结果的 [join nodes](joins.md)
+- 探索使用 decision nodes 的[条件分支](decisions.md)

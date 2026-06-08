@@ -1,20 +1,20 @@
-# Decision Nodes
+# Decision Nodes {#decision-nodes}
 
-Decision nodes enable conditional branching in your graph based on the type or value of data flowing through it.
+Decision nodes 允许你根据流经 graph 的数据类型或值进行条件分支。
 
-## Overview
+## 概览 {#overview}
 
-A decision node evaluates incoming data and routes it to different branches based on:
+decision node 会评估传入数据，并基于以下条件将其路由到不同分支：
 
-- Type matching (using `isinstance`)
-- Literal value matching
-- Custom predicate functions
+- 类型匹配（使用 `isinstance`）
+- Literal 值匹配
+- 自定义 predicate functions
 
-The first matching branch is taken, similar to pattern matching or `if-elif-else` chains.
+会采用第一个匹配的 branch，类似 pattern matching 或 `if-elif-else` 链。
 
-## Creating Decisions
+## 创建 Decisions {#creating-decisions}
 
-Use [`g.decision()`][pydantic_graph.graph_builder.GraphBuilder.decision] to create a decision node, then add branches with [`g.match()`][pydantic_graph.graph_builder.GraphBuilder.match]:
+使用 [`g.decision()`][pydantic_graph.graph_builder.GraphBuilder.decision] 创建 decision node，然后用 [`g.match()`][pydantic_graph.graph_builder.GraphBuilder.match] 添加 branches：
 
 ```python {title="simple_decision.py"}
 from dataclasses import dataclass
@@ -64,11 +64,11 @@ async def main():
     #> left
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Type Matching
+## 类型匹配 {#type-matching}
 
-Match by type using regular Python types:
+使用普通 Python types 按类型匹配：
 
 ```python {title="type_matching.py"}
 from dataclasses import dataclass
@@ -112,11 +112,11 @@ async def main():
     #> Got int: 42
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-### Matching Union Types
+### 匹配 Union Types {#matching-union-types}
 
-For more complex type expressions like unions, you need to use [`TypeExpression`][pydantic_graph.util.TypeExpression] because Python's type system doesn't allow union types to be used directly as runtime values:
+对于 unions 等更复杂的 type expressions，你需要使用 [`TypeExpression`][pydantic_graph.util.TypeExpression]，因为 Python 的类型系统不允许 union types 直接作为 runtime values 使用：
 
 ```python {title="union_type_matching.py"}
 from dataclasses import dataclass
@@ -134,7 +134,7 @@ async def main():
 
     @g.step
     async def return_value(ctx: StepContext[DecisionState, None, None]) -> int | str:
-        """Returns either an int or a str."""
+        """返回 int 或 str。"""
         return 42
 
     @g.step
@@ -149,7 +149,7 @@ async def main():
         g.edge_from(g.start_node).to(return_value),
         g.edge_from(return_value).to(
             g.decision()
-            # Use TypeExpression for union types
+            # 对 union types 使用 TypeExpression
             .branch(g.match(TypeExpression[int | float]).to(handle_number))
             .branch(g.match(str).to(handle_text))
         ),
@@ -162,17 +162,17 @@ async def main():
     #> Got number: 42
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
 !!! note
-    [`TypeExpression`][pydantic_graph.util.TypeExpression] is only necessary for complex type expressions like unions (`int | str`), `Literal`, and other type forms that aren't valid as runtime `type` objects. For simple types like `int`, `str`, or custom classes, you can pass them directly to `g.match()`.
+    [`TypeExpression`][pydantic_graph.util.TypeExpression] 只在 unions（`int | str`）、`Literal` 以及其他不能作为 runtime `type` objects 的 type forms 这类复杂 type expressions 中必要。对于 `int`、`str` 或自定义 classes 这样的简单类型，可以直接传给 `g.match()`。
 
-    The `TypeForm` class introduced in [PEP 747](https://peps.python.org/pep-0747/) should eventually eliminate the need for this workaround.
+    [PEP 747](https://peps.python.org/pep-0747/) 中引入的 `TypeForm` 类最终应该会消除对此 workaround 的需求。
 
 
-## Custom Matchers
+## 自定义 Matchers {#custom-matchers}
 
-Provide custom matching logic with the `matches` parameter:
+使用 `matches` 参数提供自定义匹配逻辑：
 
 ```python {title="custom_matcher.py"}
 from dataclasses import dataclass
@@ -216,11 +216,11 @@ async def main():
     #> 7 is odd
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Branch Priority
+## Branch 优先级 {#branch-priority}
 
-Branches are evaluated in the order they're added. The first matching branch is taken:
+Branches 会按添加顺序评估。会采用第一个匹配的 branch：
 
 ```python {title="branch_priority.py"}
 from dataclasses import dataclass
@@ -264,13 +264,13 @@ async def main():
     #> Branch A
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-Both branches could match `10`, but Branch A is first, so it's taken.
+两个 branches 都可以匹配 `10`，但 Branch A 在前，因此会采用它。
 
-## Catch-All Branches
+## Catch-All Branches（兜底分支） {#catch-all-branches}
 
-Use `object` or `Any` to create a catch-all branch:
+使用 `object` 或 `Any` 创建 catch-all branch：
 
 ```python {title="catch_all.py"}
 from dataclasses import dataclass
@@ -306,11 +306,11 @@ async def main():
     #> Caught: 100
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Nested Decisions
+## 嵌套 Decisions {#nested-decisions}
 
-Decisions can be nested for complex conditional logic:
+Decisions 可以嵌套，以表达复杂条件逻辑：
 
 ```python {title="nested_decisions.py"}
 from dataclasses import dataclass
@@ -367,11 +367,11 @@ async def main():
     #> Large positive
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Branching with Labels
+## 使用 Labels 的分支 {#branching-with-labels}
 
-Add labels to branches for documentation and diagram generation:
+为 branches 添加 labels，用于文档和 diagram generation：
 
 ```python {title="labeled_branches.py"}
 from dataclasses import dataclass
@@ -416,10 +416,10 @@ async def main():
     #> Path A
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Next Steps
+## 后续步骤 {#next-steps}
 
-- Learn about [parallel execution](parallel.md) with broadcasting and mapping
-- Understand [join nodes](joins.md) for aggregating parallel results
-- See the [API reference][pydantic_graph.decision] for complete decision documentation
+- 了解使用 broadcasting 和 mapping 的[并行执行](parallel.md)
+- 理解用于聚合并行结果的 [join nodes](joins.md)
+- 查看 [API reference][pydantic_graph.decision] 获取完整 decision 文档

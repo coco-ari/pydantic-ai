@@ -1,17 +1,17 @@
-# Parallel Execution
+# 并行执行 {#parallel-execution}
 
-The graph builder API provides two powerful mechanisms for parallel execution: **broadcasting** and **mapping**.
+graph builder API 为并行执行提供了两种强大机制：**broadcasting** 和 **mapping**。
 
-## Overview
+## 概览 {#overview}
 
-- **Broadcasting** - Send the same data to multiple parallel paths
-- **Spreading** - Fan out items from an iterable to parallel paths
+- **Broadcasting** - 将相同数据发送到多个并行路径
+- **Spreading** - 将 iterable 中的 items fan out 到并行路径
 
-Both create "forks" in the execution graph that can later be synchronized with [join nodes](joins.md).
+二者都会在 execution graph 中创建 "forks"，随后可用 [join nodes](joins.md) 同步。
 
-## Broadcasting
+## Broadcasting {#broadcasting}
 
-Broadcasting sends identical data to multiple destinations simultaneously:
+Broadcasting 会同时将相同数据发送到多个目标：
 
 ```python {title="basic_broadcast.py"}
 from dataclasses import dataclass
@@ -45,7 +45,7 @@ async def main():
 
     collect = g.join(reduce_list_append, initial_factory=list[int])
 
-    # Broadcasting: send the value from source to all three steps
+    # Broadcasting：将 source 中的值发送到全部三个 steps
     g.add(
         g.edge_from(g.start_node).to(source),
         g.edge_from(source).to(add_one, add_two, add_three),
@@ -59,13 +59,13 @@ async def main():
     #> [11, 12, 13]
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-All three steps receive the same input value (`10`) and execute in parallel.
+三个 steps 都会接收相同 input value（`10`）并并行执行。
 
-## Spreading
+## Spreading {#spreading}
 
-Spreading fans out elements from an iterable, processing each element in parallel:
+Spreading 会 fan out iterable 中的元素，并行处理每个元素：
 
 ```python {title="basic_map.py"}
 from dataclasses import dataclass
@@ -91,7 +91,7 @@ async def main():
 
     collect = g.join(reduce_list_append, initial_factory=list[int])
 
-    # Spreading: each item in the list gets its own parallel execution
+    # Spreading：列表中每个 item 都获得自己的并行执行
     g.add(
         g.edge_from(g.start_node).to(generate_list),
         g.edge_from(generate_list).map().to(square),
@@ -105,11 +105,11 @@ async def main():
     #> [1, 4, 9, 16, 25]
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-### Spreading AsyncIterables
+### Spreading AsyncIterables {#spreading-asynciterables}
 
-The `.map()` operation also works with `AsyncIterable` values. When mapping over an async iterable, the graph creates parallel tasks dynamically as values are yielded. This is particularly useful for streaming data or processing data that's being generated on-the-fly:
+`.map()` operation 也适用于 `AsyncIterable` values。对 async iterable 进行 mapping 时，graph 会在 values 被 yielded 时动态创建 parallel tasks。这对于 streaming data 或处理动态生成的数据尤其有用：
 
 ```python {title="async_iterable_map.py"}
 import asyncio
@@ -128,9 +128,9 @@ async def main():
 
     @g.stream
     async def stream_numbers(ctx: StepContext[SimpleState, None, None]):
-        """Stream numbers with delays to simulate real-time data."""
+        """带延迟地流式生成数字，以模拟实时数据。"""
         for i in range(1, 4):
-            await asyncio.sleep(0.05)  # Simulate delay
+            await asyncio.sleep(0.05)  # 模拟延迟
             yield i
 
     @g.step
@@ -141,7 +141,7 @@ async def main():
 
     g.add(
         g.edge_from(g.start_node).to(stream_numbers),
-        # Map over the async iterable - tasks created as items are yielded
+        # 对 async iterable map：items yield 时创建 tasks
         g.edge_from(stream_numbers).map().to(triple),
         g.edge_from(triple).to(collect),
         g.edge_from(collect).to(g.end_node),
@@ -153,13 +153,13 @@ async def main():
     #> [3, 6, 9]
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-This allows for progressive processing where downstream steps can start working on early results while later results are still being generated.
+这允许渐进式处理：当后续结果仍在生成时，下游 steps 可以先开始处理早期结果。
 
-### Using `add_mapping_edge()`
+### 使用 `add_mapping_edge()` {#using-add_mapping_edge}
 
-The convenience method [`add_mapping_edge()`][pydantic_graph.graph_builder.GraphBuilder.add_mapping_edge] provides a simpler syntax:
+便捷方法 [`add_mapping_edge()`][pydantic_graph.graph_builder.GraphBuilder.add_mapping_edge] 提供了更简单的语法：
 
 ```python {title="mapping_convenience.py"}
 from dataclasses import dataclass
@@ -198,11 +198,11 @@ async def main():
     #> ['Value: 10', 'Value: 20', 'Value: 30']
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Empty Iterables
+## 空 Iterables {#empty-iterables}
 
-When mapping an empty iterable, you can specify a `downstream_join_id` to ensure the join still executes:
+对空 iterable 进行 mapping 时，可以指定 `downstream_join_id`，以确保 join 仍会执行：
 
 ```python {title="empty_map.py"}
 from dataclasses import dataclass
@@ -241,13 +241,13 @@ async def main():
     #> []
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Nested Parallel Operations
+## 嵌套并行操作 {#nested-parallel-operations}
 
-You can nest broadcasts and maps for complex parallel patterns:
+你可以嵌套 broadcasts 和 maps，以表达复杂并行模式：
 
-### Spread then Broadcast
+### 先 Spread 再 Broadcast {#spread-then-broadcast}
 
 ```python {title="map_then_broadcast.py"}
 from dataclasses import dataclass
@@ -279,7 +279,7 @@ async def main():
 
     g.add(
         g.edge_from(g.start_node).to(generate_list),
-        # Spread the list, then broadcast each item to both steps
+        # spread 列表，然后将每个 item broadcast 到两个 steps
         g.edge_from(generate_list).map().to(add_one, add_two),
         g.edge_from(add_one, add_two).to(collect),
         g.edge_from(collect).to(g.end_node),
@@ -291,13 +291,14 @@ async def main():
     #> [11, 12, 21, 22]
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-The result contains:
-- From 10: `10+1=11` and `10+2=12`
-- From 20: `20+1=21` and `20+2=22`
+结果包含：
 
-### Multiple Sequential Spreads
+- 来自 10：`10+1=11` 和 `10+2=12`
+- 来自 20：`20+1=21` 和 `20+2=22`
+
+### 多个连续 Spreads {#multiple-sequential-spreads}
 
 ```python {title="sequential_maps.py"}
 from dataclasses import dataclass
@@ -329,9 +330,9 @@ async def main():
 
     g.add(
         g.edge_from(g.start_node).to(generate_pairs),
-        # First map: one task per tuple
+        # 第一次 map：每个 tuple 一个 task
         g.edge_from(generate_pairs).map().to(unpack_pair),
-        # Second map: one task per number in each tuple
+        # 第二次 map：每个 tuple 中的每个数字一个 task
         g.edge_from(unpack_pair).map().to(stringify),
         g.edge_from(stringify).to(collect),
         g.edge_from(collect).to(g.end_node),
@@ -343,11 +344,11 @@ async def main():
     #> ['num:1', 'num:2', 'num:3', 'num:4']
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Edge Labels
+## Edge Labels {#edge-labels}
 
-Add labels to parallel edges for better documentation:
+为 parallel edges 添加 labels，以改善文档：
 
 ```python {title="labeled_parallel.py"}
 from dataclasses import dataclass
@@ -391,11 +392,11 @@ async def main():
     #> ['item-1', 'item-2', 'item-3']
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## State Sharing in Parallel Execution
+## 并行执行中的 State 共享 {#state-sharing-in-parallel-execution}
 
-All parallel tasks share the same graph state. Be careful with mutations:
+所有 parallel tasks 共享同一个 graph state。修改时要小心：
 
 ```python {title="parallel_state.py"}
 from dataclasses import dataclass, field
@@ -417,7 +418,7 @@ async def main():
 
     @g.step
     async def track_and_square(ctx: StepContext[CounterState, None, int]) -> int:
-        # All parallel tasks mutate the same state
+        # 所有 parallel tasks 都会修改同一个 state
         ctx.state.values.append(ctx.inputs)
         return ctx.inputs * ctx.inputs
 
@@ -440,11 +441,11 @@ async def main():
     #> Tracked: [1, 2, 3]
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Edge Transformations
+## Edge Transformations {#edge-transformations}
 
-You can transform data inline as it flows along edges using the `.transform()` method:
+你可以使用 `.transform()` 方法，在数据沿 edges 流动时进行 inline 转换：
 
 ```python {title="edge_transform.py"}
 from dataclasses import dataclass
@@ -468,7 +469,7 @@ async def main():
     async def format_output(ctx: StepContext[SimpleState, None, str]) -> str:
         return f'The answer is: {ctx.inputs}'
 
-    # Transform the number to a string inline
+    # inline 将数字转换为字符串
     g.add(
         g.edge_from(g.start_node).to(generate_number),
         g.edge_from(generate_number).transform(lambda ctx: str(ctx.inputs * 2)).to(format_output),
@@ -481,16 +482,16 @@ async def main():
     #> The answer is: 84
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-The transform function receives a [`StepContext`][pydantic_graph.step.StepContext] with the current inputs and has access to state and dependencies. This is useful for:
+transform function 会接收包含当前 inputs 的 [`StepContext`][pydantic_graph.step.StepContext]，并可访问 state 和 dependencies。这适用于：
 
-- Converting data types between incompatible steps
-- Extracting specific fields from complex objects
-- Applying simple computations without creating a full step
-- Adapting data formats during routing
+- 在不兼容 steps 之间转换数据类型
+- 从复杂对象中提取特定字段
+- 不创建完整 step 就应用简单计算
+- 在路由期间适配数据格式
 
-Transforms can be chained and combined with other edge operations like `.map()` and `.label()`:
+Transforms 可以链式调用，并与 `.map()` 和 `.label()` 等其他 edge operations 组合：
 
 ```python {title="chained_transforms.py"}
 from dataclasses import dataclass
@@ -518,7 +519,7 @@ async def main():
 
     g.add(
         g.edge_from(g.start_node).to(generate_data),
-        # Transform to extract values, then map over them
+        # 转换以提取 values，然后对它们 map
         g.edge_from(generate_data)
         .transform(lambda ctx: [item['value'] for item in ctx.inputs])
         .label('Extract values')
@@ -534,10 +535,10 @@ async def main():
     #> ['Processed: 10', 'Processed: 20', 'Processed: 30']
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Next Steps
+## 后续步骤 {#next-steps}
 
-- Learn about [join nodes](joins.md) for aggregating parallel results
-- Explore [conditional branching](decisions.md) with decision nodes
-- See the [steps documentation](steps.md) for more on step execution
+- 了解用于聚合并行结果的 [join nodes](joins.md)
+- 探索使用 decision nodes 的[条件分支](decisions.md)
+- 查看 [steps documentation](steps.md) 了解更多 step execution 内容
