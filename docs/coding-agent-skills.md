@@ -1,53 +1,53 @@
-# Coding Agent Skills
+# 编码智能体 Skills
 
-If you're building Pydantic AI applications with a coding agent, you can install the Pydantic AI skill from the [`pydantic/skills`](https://github.com/pydantic/skills) repository to give your agent up-to-date framework knowledge.
+如果你正在用编码智能体构建 Pydantic AI 应用，可以从 [`pydantic/skills`](https://github.com/pydantic/skills) 仓库安装 Pydantic AI skill，为智能体提供最新的框架知识。
 
-[Agent skills](https://agentskills.io) are packages of instructions and reference material that coding agents load on demand. With the skill installed, coding agents have access to Pydantic AI patterns, architecture guidance, and common task references covering [tools](tools.md), [capabilities](capabilities.md), [structured output](output.md), [streaming](agent.md#streaming-events-and-final-output), [testing](testing.md), [multi-agent delegation](multi-agent-applications.md), [hooks](hooks.md), and [agent specs](agent-spec.md).
+[Agent skills](https://agentskills.io) 是指令和参考材料包，编码智能体会按需加载它们。安装此 skill 后，编码智能体可以访问 Pydantic AI 模式、架构指南，以及涵盖[工具](tools.md)、[能力](capabilities.md)、[结构化输出](output.md)、[流式传输](agent.md#streaming-events-and-final-output)、[测试](testing.md)、[多智能体委托](multi-agent-applications.md)、[钩子](hooks.md)和 [agent specs](agent-spec.md) 的常见任务参考。
 
 !!! note
-    If you want to build agent skills for your Pydantic AI agent, see the [Agent Skills](capabilities.md#agent-skills) entry in the Third-party capabilities section on the Capabilities page.
+    如果你想为自己的 Pydantic AI 智能体构建 agent skills，请参见 Capabilities 页面中第三方能力部分的 [Agent Skills](capabilities.md#agent-skills) 条目。
 
-## Installation
+## 安装
 
 ### Claude Code
 
-Install the [official Pydantic AI plugin](https://claude.com/plugins/pydantic-ai) from the Anthropic marketplace, which is available by default:
+从 Anthropic marketplace 安装[官方 Pydantic AI plugin](https://claude.com/plugins/pydantic-ai)，它默认可用：
 
 ```bash
 claude plugin install pydantic-ai@claude-plugins-official
 ```
 
-As an alternative, you can install from the [`pydantic/skills`](https://github.com/pydantic/skills) marketplace, which bundles the Pydantic AI skill alongside other Pydantic-maintained skills:
+作为替代方案，你也可以从 [`pydantic/skills`](https://github.com/pydantic/skills) marketplace 安装；该 marketplace 将 Pydantic AI skill 与其他由 Pydantic 维护的 skills 打包在一起：
 
 ```bash
 claude plugin marketplace add pydantic/skills
 claude plugin install ai@pydantic-skills
 ```
 
-### Cross-Agent (agentskills.io)
+### 跨智能体（agentskills.io）
 
-Install the Pydantic AI skill using the [skills CLI](https://github.com/vercel-labs/skills):
+使用 [skills CLI](https://github.com/vercel-labs/skills) 安装 Pydantic AI skill：
 
 ```bash
 npx skills add pydantic/skills
 ```
 
-This works with 30+ agents via the [agentskills.io](https://agentskills.io) standard, including Claude Code, Codex, Cursor, and Gemini CLI.
+这可通过 [agentskills.io](https://agentskills.io) 标准用于 30 多种智能体，包括 Claude Code、Codex、Cursor 和 Gemini CLI。
 
 ### Library Skills
 
-Pydantic AI also ships its skill bundled with the package, so you can install it directly from your project's dependencies via [library-skills.io](https://library-skills.io):
+Pydantic AI 也会将其 skill 随包一起发布，因此你可以通过 [library-skills.io](https://library-skills.io) 直接从项目依赖中安装：
 
 ```bash
 uvx library-skills --all
 ```
 
-The `--all` flag is required because the skill is bundled in `pydantic-ai-slim`, which is a transitive dependency of the `pydantic-ai` meta-package. Without it, `library-skills` only scans direct dependencies and won't discover the skill.
+必须使用 `--all` 标志，因为该 skill 打包在 `pydantic-ai-slim` 中，而 `pydantic-ai` 元包只是传递依赖它。没有此标志时，`library-skills` 只扫描直接依赖，无法发现该 skill。
 
-Add `--claude` to also install into `.claude/skills/` alongside the default `.agents/skills/` directory, since Claude Code doesn't read from `.agents/`.
+添加 `--claude` 可在默认 `.agents/skills/` 目录之外，同时安装到 `.claude/skills/`，因为 Claude Code 不会读取 `.agents/`。
 
-## See Also
+## 另请参见
 
-- [`pydantic/skills`](https://github.com/pydantic/skills): source repository
-- [agentskills.io](https://agentskills.io): the open standard for agent skills
-- [library-skills.io](https://library-skills.io): install agent skills bundled with your project's dependencies
+- [`pydantic/skills`](https://github.com/pydantic/skills)：源码仓库
+- [agentskills.io](https://agentskills.io)：agent skills 的开放标准
+- [library-skills.io](https://library-skills.io)：安装随项目依赖打包的 agent skills

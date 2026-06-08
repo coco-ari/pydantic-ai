@@ -1,12 +1,12 @@
 # Code Mode
 
-Code mode is one of the capabilities in [**Pydantic AI Harness**](overview.md), the official capability library for Pydantic AI. The full docs live in the [harness repo](https://github.com/pydantic/pydantic-ai-harness) -- this page is a short intro.
+Code mode 是 [**Pydantic AI Harness**](overview.md) 中的一项能力，Pydantic AI Harness 是 Pydantic AI 的官方能力库。完整文档位于 [harness 仓库](https://github.com/pydantic/pydantic-ai-harness)，本页只是简短介绍。
 
-[`CodeMode`](https://github.com/pydantic/pydantic-ai-harness/blob/main/pydantic_ai_harness/code_mode/README.md) wraps your tools into a single `run_code` tool powered by our [Monty](https://github.com/pydantic/monty) sandbox. The model writes Python that calls multiple tools with loops, conditionals, variables, and `asyncio.gather` -- all inside one tool call.
+[`CodeMode`](https://github.com/pydantic/pydantic-ai-harness/blob/main/pydantic_ai_harness/code_mode/README.md) 会把你的工具包装成一个由 [Monty](https://github.com/pydantic/monty) 沙箱驱动的 `run_code` 工具。模型会编写 Python，在一次工具调用中使用循环、条件、变量和 `asyncio.gather` 调用多个工具。
 
-Standard tool calling requires one model round-trip per tool call. An agent that needs to fetch 10 items and process each one makes 11+ model calls -- slow, expensive, and context-heavy. Code mode collapses that into one.
+标准工具调用每次工具调用都需要一次模型往返。一个需要获取 10 个项目并逐个处理的智能体会产生 11 次以上模型调用，速度慢、成本高且占用大量上下文。Code mode 会把这些压缩为一次调用。
 
-## Usage
+## 使用
 
 ```bash
 uv add "pydantic-ai-harness[code-mode]"
@@ -35,7 +35,7 @@ result = agent.run_sync("What's the weather in Paris and Tokyo, in Celsius?")
 print(result.output)
 ```
 
-The model writes code like:
+模型会编写类似下面的代码：
 
 ```python {test="skip" lint="skip"}
 paris, tokyo = await asyncio.gather(
@@ -47,6 +47,6 @@ tokyo_c = await convert_temp(fahrenheit=tokyo['temp_f'])
 {'paris': paris_c, 'tokyo': tokyo_c}
 ```
 
-## Full documentation
+## 完整文档
 
-See the [Code Mode README](https://github.com/pydantic/pydantic-ai-harness/blob/main/pydantic_ai_harness/code_mode/README.md) in the harness repo for selective tool sandboxing, metadata-based selection, return value handling, REPL state, observability, sandbox restrictions, the full API, and agent spec usage.
+有关选择性工具沙箱、基于元数据的选择、返回值处理、REPL 状态、可观测性、沙箱限制、完整 API 和 agent spec 用法，请参见 harness 仓库中的 [Code Mode README](https://github.com/pydantic/pydantic-ai-harness/blob/main/pydantic_ai_harness/code_mode/README.md)。

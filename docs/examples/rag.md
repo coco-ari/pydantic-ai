@@ -1,20 +1,19 @@
 # RAG
 
-RAG search example. This demo allows you to ask question of the [logfire](https://pydantic.dev/logfire) documentation.
+RAG 搜索示例。此演示允许你向 [Logfire](https://pydantic.dev/logfire) 文档提问。
 
-Demonstrates:
+演示内容：
 
-- [tools](../tools.md)
-- [agent dependencies](../dependencies.md)
-- RAG search
+- [工具](../tools.md)
+- [智能体依赖](../dependencies.md)
+- RAG 搜索
 
-This is done by creating a database containing each section of the markdown documentation, then registering
-the search tool with the Pydantic AI agent.
+实现方式是创建一个包含 Markdown 文档各个章节的数据库，然后将搜索工具注册到 Pydantic AI 智能体。
 
-Logic for extracting sections from markdown files and a JSON file with that data is available in
-[this gist](https://gist.github.com/samuelcolvin/4b5bb9bb163b1122ff17e29e48c10992).
+从 Markdown 文件中提取章节的逻辑，以及包含这些数据的 JSON 文件，可在
+[这个 gist](https://gist.github.com/samuelcolvin/4b5bb9bb163b1122ff17e29e48c10992) 中找到。
 
-[PostgreSQL with pgvector](https://github.com/pgvector/pgvector) is used as the search database, the easiest way to download and run pgvector is using Docker:
+搜索数据库使用 [带 pgvector 的 PostgreSQL](https://github.com/pgvector/pgvector)，下载并运行 pgvector 最简单的方式是使用 Docker：
 
 ```bash
 mkdir postgres-data
@@ -25,23 +24,23 @@ docker run --rm \
   pgvector/pgvector:pg17
 ```
 
-As with the [SQL gen](./sql-gen.md) example, we run postgres on port `54320` to avoid conflicts with any other postgres instances you may have running.
-We also mount the PostgreSQL `data` directory locally to persist the data if you need to stop and restart the container.
+与 [SQL 生成](./sql-gen.md)示例一样，我们在 `54320` 端口运行 postgres，以避免与你可能正在运行的其他 postgres 实例冲突。
+我们还会将 PostgreSQL `data` 目录挂载到本地，以便在需要停止并重启容器时持久化数据。
 
-With that running and [dependencies installed and environment variables set](./setup.md#usage), we can build the search database with (**WARNING**: this requires the `OPENAI_API_KEY` env variable and will calling the OpenAI embedding API around 300 times to generate embeddings for each section of the documentation):
+启动数据库并[安装依赖、设置环境变量](./setup.md#usage)后，可以用下面的命令构建搜索数据库（**警告**：这需要 `OPENAI_API_KEY` 环境变量，并会调用 OpenAI embedding API 约 300 次，为文档的每个章节生成 embedding）：
 
 ```bash
 python/uv-run -m pydantic_ai_examples.rag build
 ```
 
-(Note building the database doesn't use Pydantic AI right now, instead it uses the OpenAI SDK directly.)
+（注意：当前构建数据库并不使用 Pydantic AI，而是直接使用 OpenAI SDK。）
 
-You can then ask the agent a question with:
+然后可以用下面的命令向智能体提问：
 
 ```bash
 python/uv-run -m pydantic_ai_examples.rag search "How do I configure logfire to work with FastAPI?"
 ```
 
-## Example Code
+## 示例代码
 
 ```snippet {path="/examples/pydantic_ai_examples/rag.py"}```
