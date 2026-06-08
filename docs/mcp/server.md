@@ -1,10 +1,10 @@
-# Server
+# Server {#server}
 
-Pydantic AI models can also be used within MCP Servers.
+Pydantic AI 模型也可以在 MCP Servers 中使用。
 
 ## MCP Server
 
-Here's a simple example of a [Python MCP server](https://github.com/modelcontextprotocol/python-sdk) using Pydantic AI within a tool call:
+下面是一个简单示例，展示如何在 [Python MCP server](https://github.com/modelcontextprotocol/python-sdk) 的工具调用中使用 Pydantic AI：
 
 ```py {title="mcp_server.py"}
 from mcp.server.fastmcp import FastMCP
@@ -28,9 +28,9 @@ if __name__ == '__main__':
     server.run()
 ```
 
-## Simple client
+## 简单 client {#simple-client}
 
-This server can be queried with any MCP client. Here is an example using the Python SDK directly:
+任何 MCP client 都可以查询这个 server。下面是一个直接使用 Python SDK 的示例：
 
 ```py {title="mcp_client.py" requires="mcp_server.py" dunder_name="not_main"}
 import asyncio
@@ -63,12 +63,12 @@ if __name__ == '__main__':
 
 ## MCP Sampling
 
-!!! info "What is MCP Sampling?"
-    See the [MCP client docs](./client.md#mcp-sampling) for details of what MCP sampling is, and how you can support it when using Pydantic AI as an MCP client.
+!!! info "什么是 MCP Sampling？"
+    MCP sampling 是什么，以及使用 Pydantic AI 作为 MCP client 时如何支持它，请参见 [MCP client 文档](./client.md#mcp-sampling)。
 
-When Pydantic AI agents are used within MCP servers, they can use sampling via [`MCPSamplingModel`][pydantic_ai.models.mcp_sampling.MCPSamplingModel].
+当 Pydantic AI 智能体在 MCP servers 中使用时，可以通过 [`MCPSamplingModel`][pydantic_ai.models.mcp_sampling.MCPSamplingModel] 使用 sampling。
 
-We can extend the above example to use sampling so instead of connecting directly to the LLM, the agent calls back through the MCP client to make LLM calls.
+我们可以扩展上面的示例来使用 sampling。这样智能体不再直接连接 LLM，而是通过 MCP client 回调来发起 LLM 调用。
 
 ```py {title="mcp_server_sampling.py"}
 from mcp.server.fastmcp import Context, FastMCP
@@ -91,9 +91,9 @@ if __name__ == '__main__':
     server.run()  # run the server over stdio
 ```
 
-The [above](#simple-client) client does not support sampling, so if you tried to use it with this server you'd get an error.
+[上面的](#simple-client) client 不支持 sampling，因此如果尝试把它用于这个 server，会得到错误。
 
-The simplest way to support sampling in an MCP client is to [use](./client.md#mcp-sampling) a Pydantic AI agent as the client, but if you wanted to support sampling with the vanilla MCP SDK, you could do so like this:
+在 MCP client 中支持 sampling 的最简单方式，是[使用](./client.md#mcp-sampling) Pydantic AI 智能体作为 client；但如果你想用原生 MCP SDK 支持 sampling，也可以这样做：
 
 ```py {title="mcp_client_sampling.py" requires="mcp_server_sampling.py"}
 import asyncio
@@ -156,4 +156,4 @@ if __name__ == '__main__':
     asyncio.run(client())
 ```
 
-_(This example is complete, it can be run "as is")_
+_（此示例是完整的，可以"原样"运行）_

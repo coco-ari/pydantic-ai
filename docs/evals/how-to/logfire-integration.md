@@ -1,37 +1,37 @@
-# Logfire Integration
+# Logfire 集成 {#logfire-integration}
 
-Visualize and analyze evaluation results using Pydantic Logfire.
+使用 Pydantic Logfire 可视化和分析 evaluation 结果。
 
-## Overview
+## 概览 {#overview}
 
-Pydantic Evals uses OpenTelemetry to record traces of the evaluation process. These traces contain all the information from your evaluation reports, plus full tracing from the execution of your task function.
+Pydantic Evals 使用 OpenTelemetry 记录 evaluation 过程的 traces。这些 traces 包含 evaluation 报告中的所有信息，以及任务函数执行过程中的完整 tracing。
 
-You can send these traces to any OpenTelemetry-compatible backend, including [Pydantic Logfire](https://logfire.pydantic.dev/docs/guides/web-ui/evals/).
+你可以将这些 traces 发送到任何兼容 OpenTelemetry 的后端，包括 [Pydantic Logfire](https://logfire.pydantic.dev/docs/guides/web-ui/evals/)。
 
-## Installation
+## 安装 {#installation}
 
-Install the optional logfire dependency:
+安装可选的 logfire 依赖：
 
 ```bash
 pip install 'pydantic-evals[logfire]'
 ```
 
-## Basic Setup
+## 基本设置 {#basic-setup}
 
-Configure Logfire before running evaluations:
+在运行 evaluations 前配置 Logfire：
 
 ```python {title="basic_logfire_setup.py"}
 import logfire
 
 from pydantic_evals import Case, Dataset
 
-# Configure Logfire
+# 配置 Logfire
 logfire.configure(
     send_to_logfire='if-token-present',  # (1)!
 )
 
 
-# Your evaluation code
+# 你的 evaluation 代码
 def my_task(inputs: str) -> str:
     return f'result for {inputs}'
 
@@ -40,72 +40,72 @@ dataset = Dataset(name='logfire_demo', cases=[Case(name='test', inputs='example'
 report = dataset.evaluate_sync(my_task)
 ```
 
-1. Sends data to Logfire only if the `LOGFIRE_TOKEN` environment variable is set
+1. 只有在设置了 `LOGFIRE_TOKEN` 环境变量时，才向 Logfire 发送数据
 
-That's it! Your evaluation traces will now appear in the Logfire web UI as long as you have the `LOGFIRE_TOKEN` environment variable set.
+就这样。只要你设置了 `LOGFIRE_TOKEN` 环境变量，evaluation traces 现在就会出现在 Logfire web UI 中。
 
-## What Gets Sent to Logfire
+## 会发送哪些内容到 Logfire {#what-gets-sent-to-logfire}
 
-When you run an evaluation, Logfire receives:
+运行 evaluation 时，Logfire 会收到：
 
 1. **Evaluation metadata**
-    1. Dataset name
-    1. Number of cases
-    1. Evaluator names
-2. **Per-case data**
-    1. Inputs and outputs
-    1. Expected outputs
-    1. Metadata
-    1. Execution duration
-3. **Evaluation results**
-    1. Scores, assertions, and labels
-    1. Reasons (if included)
-    1. Evaluator failures
-4. **Task execution traces**
-    1. All OpenTelemetry spans from your task function
-    1. Tool calls (for Pydantic AI agents)
-    1. API calls, database queries, etc.
+    1. 数据集名称
+    1. cases 数量
+    1. evaluator 名称
+2. **每个 case 的数据**
+    1. inputs 和 outputs
+    1. expected outputs
+    1. metadata
+    1. 执行时长
+3. **Evaluation 结果**
+    1. 分数、断言和 labels
+    1. reasons（如果包含）
+    1. evaluator failures
+4. **任务执行 traces**
+    1. 来自任务函数的所有 OpenTelemetry spans
+    1. 工具调用（对于 Pydantic AI agents）
+    1. API 调用、数据库查询等
 
-## Viewing Results in Logfire
+## 在 Logfire 中查看结果 {#viewing-results-in-logfire}
 
-### Evaluation Overview
+### Evaluation 概览 {#evaluation-overview}
 
-Logfire provides a special table view for evaluation results on the root evaluation span:
+Logfire 会在 root evaluation span 上为 evaluation 结果提供一个特殊表格视图：
 
 ![Logfire Evals Overview](../../img/logfire-evals-overview.png)
 
-This view shows:
+该视图会显示：
 
-- Case names
-- Pass/fail status
-- Scores and assertions
-- Execution duration
-- Quick filtering and sorting
+- Case 名称
+- 通过/失败状态
+- 分数和断言
+- 执行时长
+- 快速过滤和排序
 
-### Individual Case Details
+### 单个 Case 详情 {#individual-case-details}
 
-Click any case to see detailed inputs and outputs:
+点击任何 case 即可查看详细 inputs 和 outputs：
 
 ![Logfire Evals Case](../../img/logfire-evals-case.png)
 
-### Full Trace View
+### 完整 Trace 视图 {#full-trace-view}
 
-View the complete execution trace including all spans generated during evaluation:
+查看完整执行 trace，包括 evaluation 期间生成的所有 spans：
 
 ![Logfire Evals Case Trace](../../img/logfire-evals-case-trace.png)
 
-This is especially useful for:
+这对以下场景尤其有用：
 
-- Debugging failed cases
-- Understanding performance bottlenecks
-- Analyzing tool usage patterns
-- Writing span-based evaluators
+- 调试失败 cases
+- 理解性能瓶颈
+- 分析工具使用模式
+- 编写基于 span 的 evaluators
 
-## Analyzing Traces
+## 分析 Traces {#analyzing-traces}
 
-### Comparing Runs
+### 对比运行 {#comparing-runs}
 
-Run the same evaluation multiple times and compare in Logfire:
+多次运行同一个 evaluation，并在 Logfire 中对比：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -121,28 +121,28 @@ def improved_task(inputs: str) -> str:
 
 dataset = Dataset(name='comparison', cases=[Case(name='test', inputs='example')])
 
-# Run 1: Original implementation
+# 运行 1：原始实现
 report1 = dataset.evaluate_sync(original_task)
 
-# Run 2: Improved implementation
+# 运行 2：改进实现
 report2 = dataset.evaluate_sync(improved_task)
 
-# Compare in Logfire by filtering by timestamp or attributes
+# 在 Logfire 中按时间戳或 attributes 过滤进行对比
 ```
 
-### Debugging Failed Cases
+### 调试失败 Cases {#debugging-failed-cases}
 
-Find failed cases quickly:
+快速查找失败 cases：
 
-1. Search for `service_name = 'my_service_evals' AND is_exception` (replace with the actual service name you are using)
-2. View the full span tree to see where the failure occurred
-3. Inspect attributes and logs for error messages
+1. 搜索 `service_name = 'my_service_evals' AND is_exception`（替换成你实际使用的 service name）
+2. 查看完整 span tree，确认失败发生的位置
+3. 检查 attributes 和 logs 中的错误消息
 
-## Span-Based Evaluation
+## 基于 Span 的 Evaluation {#span-based-evaluation}
 
-Logfire integration enables powerful span-based evaluators. See [Span-Based Evaluation](../evaluators/span-based.md) for details.
+Logfire 集成支持强大的 span-based evaluators。详情请参见 [Span-Based Evaluation](../evaluators/span-based.md)。
 
-Example: Verify specific tools were called:
+示例：验证调用了特定工具：
 
 ```python
 import logfire
@@ -171,39 +171,39 @@ dataset = Dataset(
 report = dataset.evaluate_sync(my_agent)
 ```
 
-The span tree is available in both:
+span tree 可在以下两处使用：
 
-- Your evaluator code (via `ctx.span_tree`)
-- Logfire UI (visual trace view)
+- 你的 evaluator 代码中（通过 `ctx.span_tree`）
+- Logfire UI 中（可视化 trace 视图）
 
-## Troubleshooting
+## 故障排查 {#troubleshooting}
 
-### No Data Appearing in Logfire
+### Logfire 中没有数据 {#no-data-appearing-in-logfire}
 
-Check:
+请检查：
 
-1. **Token is set**: `echo $LOGFIRE_TOKEN`
-2. **Configuration is correct**:
+1. **Token 已设置**：`echo $LOGFIRE_TOKEN`
+2. **配置正确**：
    ```python
    import logfire
 
-   logfire.configure(send_to_logfire='always')  # Force sending
+   logfire.configure(send_to_logfire='always')  # 强制发送
    ```
-3. **Network connectivity**: Check firewall settings
-4. **Project exists**: Verify project name in Logfire UI
+3. **网络连接**：检查防火墙设置
+4. **项目存在**：在 Logfire UI 中验证项目名称
 
-### Traces Missing Spans
+### Traces 缺少 Spans {#traces-missing-spans}
 
-If some spans are missing:
+如果缺少某些 spans：
 
-1. **Ensure logfire is configured before imports**:
+1. **确保在 imports 前配置 logfire**：
    ```python
    import logfire
 
-   logfire.configure()  # Must be first
+   logfire.configure()  # 必须最先执行
    ```
 
-2. **Check instrumentation**: Ensure your code has enabled all instrumentations you want:
+2. **检查 instrumentation**：确保代码启用了你需要的所有 instrumentations：
    ```python
    import logfire
 
@@ -211,11 +211,11 @@ If some spans are missing:
    logfire.instrument_httpx(capture_all=True)
    ```
 
-## Best Practices
+## 最佳实践 {#best-practices}
 
-### 1. Configure Early
+### 1. 尽早配置 {#1-configure-early}
 
-Always configure Logfire before running evaluations:
+始终在运行 evaluations 前配置 Logfire：
 
 ```python
 import logfire
@@ -225,7 +225,7 @@ from pydantic_evals import Case, Dataset
 logfire.configure(send_to_logfire='if-token-present')
 
 
-# Now import and run evaluations
+# 现在导入并运行 evaluations
 def task(inputs: str) -> str:
     return f'result for {inputs}'
 
@@ -234,7 +234,7 @@ dataset = Dataset(name='logfire_demo', cases=[Case(name='test', inputs='example'
 dataset.evaluate_sync(task)
 ```
 
-### 2. Use Descriptive Service Names And Environments
+### 2. 使用描述性 Service Names 和 Environments {#2-use-descriptive-service-names-and-environments}
 
 ```python
 import logfire
@@ -245,15 +245,15 @@ logfire.configure(
 )
 ```
 
-### 3. Review Periodically
+### 3. 定期查看 {#3-review-periodically}
 
-- Check Logfire regularly to identify patterns
-- Look for consistently failing cases
-- Analyze performance trends
-- Adjust evaluators based on insights
+- 定期检查 Logfire 以识别模式
+- 查找持续失败的 cases
+- 分析性能趋势
+- 基于洞察调整 evaluators
 
-## Next Steps
+## 后续步骤 {#next-steps}
 
-- **[Span-Based Evaluation](../evaluators/span-based.md)** - Use OpenTelemetry spans in evaluators
-- **[Logfire Documentation](https://logfire.pydantic.dev/docs/guides/web-ui/evals/)** - Complete Logfire guide
-- **[Metrics & Attributes](metrics-attributes.md)** - Add custom data to traces
+- **[Span-Based Evaluation](../evaluators/span-based.md)** - 在 evaluators 中使用 OpenTelemetry spans
+- **[Logfire Documentation](https://logfire.pydantic.dev/docs/guides/web-ui/evals/)** - 完整 Logfire 指南
+- **[Metrics & Attributes](metrics-attributes.md)** - 向 traces 添加自定义数据

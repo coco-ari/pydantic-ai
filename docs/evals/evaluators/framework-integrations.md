@@ -1,40 +1,25 @@
-# Third-Party Integrations
+# 第三方集成 {#third-party-integrations}
 
-Pydantic Evals does not take a hard dependency on any particular metrics framework. When a team
-already uses [Ragas](https://github.com/explodinggradients/ragas),
-[DeepEval](https://github.com/confident-ai/deepeval), or another scoring library, the
-[`Evaluator`][pydantic_evals.evaluators.Evaluator] base class makes it straightforward to wrap the
-upstream metric and run it inside any Pydantic Evals dataset. This page shows worked examples for
-the common ones.
+Pydantic Evals 不会强依赖任何特定 metrics 框架。当团队已经在使用 [Ragas](https://github.com/explodinggradients/ragas)、[DeepEval](https://github.com/confident-ai/deepeval) 或其他评分库时，[`Evaluator`][pydantic_evals.evaluators.Evaluator] 基类可以很直接地包装上游 metric，并在任何 Pydantic Evals 数据集中运行它。本页展示常见集成的完整示例。
 
-!!! tip "Prefer a native evaluator where you can"
-    If a rubric-based [`LLMJudge`][pydantic_evals.evaluators.LLMJudge] or a
-    [custom evaluator](custom.md) covers your use case, that's usually simpler — zero extra
-    dependencies and the scores slot into reports cleanly. Reach for the integrations below
-    when you specifically want the *exact* upstream implementation (for reproducibility with
-    published benchmarks, parity with an existing evaluation suite, or features we don't
-    expose natively). You can mix external and native evaluators in one dataset.
+!!! tip "能用原生 evaluator 时优先使用"
+    如果基于 rubric 的 [`LLMJudge`][pydantic_evals.evaluators.LLMJudge] 或[自定义 evaluator](custom.md) 能覆盖你的用例，通常会更简单：没有额外依赖，分数也能干净地进入报告。只有当你明确需要*完全一致*的上游实现时，才使用下面的集成，例如为了复现已发布 benchmark、与现有评估套件保持一致，或使用我们没有原生暴露的功能。你可以在同一个数据集中混用外部 evaluator 和原生 evaluator。
 
-## Pattern
+## 模式 {#pattern}
 
-Each framework integration follows the same pattern:
+每个框架集成都遵循同一种模式：
 
-1. Subclass [`Evaluator`][pydantic_evals.evaluators.Evaluator].
-2. Adapt `ctx.inputs`, `ctx.output`, `ctx.expected_output`, and metadata into whatever the
-   upstream metric expects.
-3. Return a `float` score, a `bool` assertion, an [`EvaluationReason`][pydantic_evals.evaluators.EvaluationReason],
-   or a `dict` of these.
+1. 继承 [`Evaluator`][pydantic_evals.evaluators.Evaluator]。
+2. 将 `ctx.inputs`、`ctx.output`、`ctx.expected_output` 和 metadata 适配为上游 metric 期望的形式。
+3. 返回 `float` 分数、`bool` 断言、[`EvaluationReason`][pydantic_evals.evaluators.EvaluationReason]，或包含这些值的 `dict`。
 
-The rest of this page shows concrete adapters. They are intentionally compact — extend them with
-whatever configuration your team needs (model selection, thresholds, per-case toggles).
+本页其余部分展示具体 adapter。这些示例刻意保持简洁，你可以按团队需要扩展配置，例如模型选择、阈值、按 case 开关等。
 
 ## Ragas
 
-Install with `pip install ragas` (not included in `pydantic-evals`).
+使用 `pip install ragas` 安装（不包含在 `pydantic-evals` 中）。
 
-This adapter wraps [`ragas.metrics.Faithfulness`](https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/faithfulness/)
-for a single-turn sample. Each case is expected to provide the retrieved context as part of its
-inputs or metadata.
+这个 adapter 会为单轮样本包装 [`ragas.metrics.Faithfulness`](https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/faithfulness/)。每个 case 都需要在 inputs 或 metadata 中提供检索到的上下文。
 
 ```python {test="skip" lint="skip"}
 from dataclasses import dataclass
@@ -67,7 +52,7 @@ class RagasFaithfulness(Evaluator):
         return EvaluationReason(value=float(score), reason=f'ragas.Faithfulness = {score:.3f}')
 ```
 
-Usage is the same as any built-in evaluator:
+用法与任何内置 evaluator 相同：
 
 ```python {test="skip" lint="skip"}
 from pydantic_evals import Case, Dataset
@@ -84,16 +69,13 @@ dataset = Dataset(
 )
 ```
 
-The same pattern works for `ragas.metrics.answer_relevancy`, `context_precision`, and the other
-scoring metrics: swap the metric class and (if needed) the sample fields.
+同样的模式也适用于 `ragas.metrics.answer_relevancy`、`context_precision` 和其他评分 metrics：替换 metric 类，并在需要时替换样本字段。
 
 ## DeepEval
 
-Install with `pip install deepeval` (not included in `pydantic-evals`).
+使用 `pip install deepeval` 安装（不包含在 `pydantic-evals` 中）。
 
-This adapter wraps [DeepEval's `GEval` metric](https://docs.confident-ai.com/docs/metrics-llm-evals)
-to score a criterion against a `LLMTestCase`. DeepEval's `measure` is synchronous, so the
-evaluator is synchronous too.
+这个 adapter 会包装 [DeepEval 的 `GEval` metric](https://docs.confident-ai.com/docs/metrics-llm-evals)，针对 `LLMTestCase` 对某个 criterion 打分。DeepEval 的 `measure` 是同步的，因此这个 evaluator 也是同步的。
 
 ```python {test="skip" lint="skip"}
 from dataclasses import dataclass
@@ -131,14 +113,9 @@ class DeepEvalGEval(Evaluator):
         }
 ```
 
-The same wrapper shape works for DeepEval's `FaithfulnessMetric`, `AnswerRelevancyMetric`,
-`HallucinationMetric`, and others — swap the metric class and populate the relevant
-`LLMTestCase` fields (for example `retrieval_context` for faithfulness).
+同样的包装形态也适用于 DeepEval 的 `FaithfulnessMetric`、`AnswerRelevancyMetric`、`HallucinationMetric` 等：替换 metric 类，并填充相关的 `LLMTestCase` 字段（例如 faithfulness 需要 `retrieval_context`）。
 
-## Notes on dependencies
+## 依赖说明 {#notes-on-dependencies}
 
-- `ragas` and `deepeval` are optional dependencies — they are not installed with
-  `pydantic-evals` and are not part of any dependency group. Install them only in projects that
-  use these integrations.
-- Both libraries make their own LLM calls, so be prepared for extra API usage when running a
-  dataset that includes these evaluators.
+- `ragas` 和 `deepeval` 是可选依赖，不会随 `pydantic-evals` 安装，也不属于任何依赖组。只在使用这些集成的项目中安装它们。
+- 这两个库都会自行发起 LLM 调用，因此在运行包含这些 evaluators 的数据集时，要预期额外的 API 用量。

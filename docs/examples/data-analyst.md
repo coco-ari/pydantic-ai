@@ -1,48 +1,43 @@
-# Data Analyst
+# 数据分析师 {#data-analyst}
 
-Sometimes in an agent workflow, the agent does not need to know the exact tool
-output, but still needs to process the tool output in some ways. This is
-especially common in data analytics: the agent needs to know that the result of a
-query tool is a `DataFrame` with certain named columns, but not
-necessarily the content of every single row.
+在某些智能体工作流中，智能体不需要知道工具输出的精确内容，但仍需要以某种方式处理工具输出。这在数据分析中尤其常见：智能体需要知道查询工具的结果是一个带有特定命名列的 `DataFrame`，但不一定需要知道每一行的内容。
 
-With Pydantic AI, you can use a [dependencies object](../dependencies.md) to
-store the result from one tool and use it in another tool.
+借助 Pydantic AI，你可以使用[依赖对象](../dependencies.md)存储某个工具的结果，并在另一个工具中使用它。
 
-In this example, we'll build an agent that analyzes the [Rotten Tomatoes movie review dataset from Cornell](https://huggingface.co/datasets/cornell-movie-review-data/rotten_tomatoes).
+在这个示例中，我们将构建一个智能体，用于分析 [Cornell 的 Rotten Tomatoes 电影评论数据集](https://huggingface.co/datasets/cornell-movie-review-data/rotten_tomatoes)。
 
 
-Demonstrates:
+演示内容：
 
-- [agent dependencies](../dependencies.md)
+- [智能体依赖](../dependencies.md)
 
 
-## Running the Example
+## 运行示例 {#running-the-example}
 
-With [dependencies installed and environment variables set](./setup.md#usage), run:
+在[安装依赖并设置环境变量](./setup.md#usage)后，运行：
 
 ```bash
 python/uv-run -m pydantic_ai_examples.data_analyst
 ```
 
 
-Output (debug):
+输出（debug）：
 
 
-> Based on my analysis of the Cornell Movie Review dataset (rotten_tomatoes), there are **4,265 negative comments** in the training split. These are the reviews labeled as 'neg' (represented by 0 in the dataset).
+> 根据我对 Cornell Movie Review 数据集（rotten_tomatoes）的分析，训练拆分中有 **4,265 条负面评论**。这些评论的标签是 'neg'（在数据集中用 0 表示）。
 
 
 
-## Example Code
+## 示例代码 {#example-code}
 
 ```snippet {path="/examples/pydantic_ai_examples/data_analyst.py"}```
 
 
-## Appendix
+## 附录 {#appendix}
 
-### Choosing a Model
+### 选择模型 {#choosing-a-model}
 
-This example requires using a model that understands DuckDB SQL. You can check with `clai`:
+此示例需要使用理解 DuckDB SQL 的模型。你可以用 `clai` 检查：
 
 ```sh
 > clai -m bedrock:us.anthropic.claude-sonnet-4-5-20250929-v1:0
@@ -50,18 +45,18 @@ clai - Pydantic AI CLI v0.0.1.dev920+41dd069 with bedrock:us.anthropic.claude-so
 clai ➤ do you understand duckdb sql?
 # DuckDB SQL
 
-Yes, I understand DuckDB SQL. DuckDB is an in-process analytical SQL database
-that uses syntax similar to PostgreSQL. It specializes in analytical queries
-and is designed for high-performance analysis of structured data.
+是的，我理解 DuckDB SQL。DuckDB 是一种进程内分析型 SQL 数据库，
+语法类似 PostgreSQL。它专注于分析查询，
+并为结构化数据的高性能分析而设计。
 
-Some key features of DuckDB SQL include:
+DuckDB SQL 的一些关键特性包括：
 
- • OLAP (Online Analytical Processing) optimized
- • Columnar-vectorized query execution
- • Standard SQL support with PostgreSQL compatibility
- • Support for complex analytical queries
- • Efficient handling of CSV/Parquet/JSON files
+ • 针对 OLAP（在线分析处理）优化
+ • 列式向量化查询执行
+ • 支持标准 SQL，并兼容 PostgreSQL
+ • 支持复杂分析查询
+ • 高效处理 CSV/Parquet/JSON 文件
 
-I can help you with DuckDB SQL queries, schema design, optimization, or other
-DuckDB-related questions.
+我可以帮助你处理 DuckDB SQL 查询、schema 设计、优化或其他
+DuckDB 相关问题。
 ```

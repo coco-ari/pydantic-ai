@@ -1,12 +1,12 @@
-# Concurrency & Performance
+# 并发与性能 {#concurrency-performance}
 
-Control how evaluation cases are executed in parallel.
+控制 evaluation cases 如何并行执行。
 
-## Overview
+## 概览 {#overview}
 
-By default, Pydantic Evals runs all cases concurrently to maximize throughput. You can control this behavior using the `max_concurrency` parameter.
+默认情况下，Pydantic Evals 会并发运行所有 cases，以最大化吞吐量。你可以用 `max_concurrency` 参数控制此行为。
 
-## Basic Usage
+## 基本用法 {#basic-usage}
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -18,21 +18,21 @@ def my_task(inputs: str) -> str:
 
 dataset = Dataset(name='concurrency_demo', cases=[Case(inputs='test1'), Case(inputs='test2')])
 
-# Run all cases concurrently (default)
+# 并发运行所有 cases（默认）
 report = dataset.evaluate_sync(my_task)
 
-# Limit to 5 concurrent cases
+# 限制为 5 个并发 cases
 report = dataset.evaluate_sync(my_task, max_concurrency=5)
 
-# Run sequentially (one at a time)
+# 顺序运行（一次一个）
 report = dataset.evaluate_sync(my_task, max_concurrency=1)
 ```
 
-## When to Limit Concurrency
+## 何时限制并发 {#when-to-limit-concurrency}
 
-### Rate Limiting
+### 速率限制 {#rate-limiting}
 
-Many APIs have rate limits that restrict concurrent requests:
+许多 API 都有速率限制，会约束并发请求：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -44,16 +44,16 @@ async def my_llm_task(inputs: str) -> str:
 
 dataset = Dataset(name='rate_limit_demo', cases=[Case(inputs='test1')])
 
-# If your API allows 10 requests/second
+# 如果你的 API 允许每秒 10 个请求
 report = dataset.evaluate_sync(
     my_llm_task,
     max_concurrency=10,
 )
 ```
 
-### Resource Constraints
+### 资源约束 {#resource-constraints}
 
-Limit concurrency to avoid overwhelming system resources:
+限制并发可以避免压垮系统资源：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -69,22 +69,22 @@ def db_query_task(inputs: str) -> str:
 
 dataset = Dataset(name='resource_constraints', cases=[Case(inputs='test1')])
 
-# Memory-intensive operations
+# 内存密集型操作
 report = dataset.evaluate_sync(
     heavy_computation,
-    max_concurrency=2,  # Only 2 at a time
+    max_concurrency=2,  # 每次只运行 2 个
 )
 
-# Database connection pool limits
+# 数据库连接池限制
 report = dataset.evaluate_sync(
     db_query_task,
-    max_concurrency=5,  # Match connection pool size
+    max_concurrency=5,  # 匹配连接池大小
 )
 ```
 
-### Debugging
+### 调试 {#debugging}
 
-Run sequentially to see clear error traces:
+顺序运行可以看到更清晰的错误 trace：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -96,23 +96,23 @@ def my_task(inputs: str) -> str:
 
 dataset = Dataset(name='debug_demo', cases=[Case(inputs='test1')])
 
-# Easier to debug
+# 更容易调试
 report = dataset.evaluate_sync(
     my_task,
     max_concurrency=1,
 )
 ```
 
-## Performance Comparison
+## 性能对比 {#performance-comparison}
 
-Here's an example showing the performance difference:
+下面的示例展示性能差异：
 
 ```python {title="concurrency_example.py"}
 import asyncio
 
 from pydantic_evals import Case, Dataset
 
-# Create a dataset with multiple test cases
+# 创建包含多个测试 cases 的数据集
 dataset = Dataset(
     name='performance_comparison',
     cases=[
@@ -127,24 +127,24 @@ dataset = Dataset(
 
 
 async def slow_task(input_value: int) -> int:
-    """Simulates a slow operation (e.g., API call)."""
-    await asyncio.sleep(0.1)  # 100ms per case
+    """模拟慢操作（例如 API 调用）。"""
+    await asyncio.sleep(0.1)  # 每个 case 100ms
     return input_value * 2
 
 
-# Unlimited concurrency: ~0.1s total (all cases run in parallel)
+# 无限制并发：总计约 0.1s（所有 cases 并行运行）
 report = dataset.evaluate_sync(slow_task)
 
-# Limited concurrency: ~0.5s total (2 at a time, 5 batches)
+# 限制并发：总计约 0.5s（每次 2 个，5 批）
 report = dataset.evaluate_sync(slow_task, max_concurrency=2)
 
-# Sequential: ~1.0s total (one at a time, 10 cases)
+# 顺序执行：总计约 1.0s（每次 1 个，10 个 cases）
 report = dataset.evaluate_sync(slow_task, max_concurrency=1)
 ```
 
-## Concurrency with Evaluators
+## Evaluators 的并发 {#concurrency-with-evaluators}
 
-Both task execution and evaluator execution happen concurrently by default:
+默认情况下，任务执行和 evaluator 执行都会并发发生：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -157,27 +157,28 @@ def my_task(inputs: str) -> str:
 
 dataset = Dataset(
     name='evaluator_concurrency',
-    cases=[Case(inputs=f'test{i}') for i in range(100)],  # 100 cases
+    cases=[Case(inputs=f'test{i}') for i in range(100)],  # 100 个 cases
     evaluators=[
-        LLMJudge(rubric='Quality check'),  # Makes API calls
+        LLMJudge(rubric='Quality check'),  # 会发起 API 调用
     ],
 )
 
-# Both task and evaluator run with controlled concurrency
+# 任务和 evaluator 都按受控并发运行
 report = dataset.evaluate_sync(
     my_task,
     max_concurrency=10,
 )
 ```
 
-If your evaluators are expensive (e.g., [`LLMJudge`][pydantic_evals.evaluators.LLMJudge]), limiting concurrency helps manage:
-- API rate limits
-- Cost (fewer concurrent API calls)
-- Memory usage
+如果你的 evaluators 成本较高（例如 [`LLMJudge`][pydantic_evals.evaluators.LLMJudge]），限制并发有助于管理：
 
-## Async vs Sync
+- API 速率限制
+- 成本（减少并发 API 调用）
+- 内存使用
 
-Both sync and async evaluation support concurrency control:
+## Async 与 Sync {#async-vs-sync}
+
+同步和异步 evaluation 都支持并发控制：
 
 ### Sync API
 
@@ -191,7 +192,7 @@ def my_task(inputs: str) -> str:
 
 dataset = Dataset(name='sync_demo', cases=[Case(inputs='test1')])
 
-# Runs async operations internally with controlled concurrency
+# 在内部以受控并发运行异步操作
 report = dataset.evaluate_sync(my_task, max_concurrency=10)
 ```
 
@@ -207,14 +208,14 @@ async def my_task(inputs: str) -> str:
 
 async def run_evaluation():
     dataset = Dataset(name='async_demo', cases=[Case(inputs='test1')])
-    # Same behavior, but in async context
+    # 行为相同，但位于 async context 中
     report = await dataset.evaluate(my_task, max_concurrency=10)
     return report
 ```
 
-## Monitoring Concurrency
+## 监控并发 {#monitoring-concurrency}
 
-Track execution to optimize settings:
+跟踪执行情况以优化设置：
 
 ```python {test="skip"}
 import time
@@ -245,9 +246,9 @@ print(f'Effective concurrency: ~{num_cases * avg_duration / duration:.1f}')
 #> Effective concurrency: ~1.0
 ```
 
-## Handling Rate Limits
+## 处理速率限制 {#handling-rate-limits}
 
-If you hit rate limits, the evaluation will fail. Use retry strategies:
+如果触发速率限制，evaluation 会失败。请使用 retry strategies：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -259,17 +260,17 @@ def task(inputs: str) -> str:
 
 dataset = Dataset(name='rate_limit_handling', cases=[Case(inputs='test1')])
 
-# Reduce concurrency to avoid rate limits
+# 降低并发以避免速率限制
 report = dataset.evaluate_sync(
     task,
-    max_concurrency=5,  # Stay under rate limit
+    max_concurrency=5,  # 保持在速率限制以下
 )
 ```
 
-See [Retry Strategies](retry-strategies.md) for handling transient failures.
+处理瞬时失败请参见 [Retry Strategies](retry-strategies.md)。
 
-## Next Steps
+## 后续步骤 {#next-steps}
 
-- **[Retry Strategies](retry-strategies.md)** - Handle transient failures
-- **[Dataset Management](dataset-management.md)** - Work with large datasets
-- **[Logfire Integration](logfire-integration.md)** - Monitor performance
+- **[Retry Strategies](retry-strategies.md)** - 处理瞬时失败
+- **[Dataset Management](dataset-management.md)** - 处理大型数据集
+- **[Logfire Integration](logfire-integration.md)** - 监控性能

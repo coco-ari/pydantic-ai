@@ -1,34 +1,34 @@
 
-# Extensibility
+# 可扩展性 {#extensibility}
 
-Pydantic AI is designed to be extended. [Capabilities](capabilities.md) are the primary extension point — they bundle tools, lifecycle hooks, instructions, and model settings into reusable units that can be shared across agents, packaged as libraries, and loaded from [spec files](agent-spec.md).
+Pydantic AI 的设计目标之一就是易于扩展。[Capabilities](capabilities.md) 是主要扩展点：它们会把工具、生命周期 hooks、instructions 和模型设置打包成可复用单元，可在多个智能体之间共享、作为库发布，并从 [spec 文件](agent-spec.md)加载。
 
-Beyond capabilities, Pydantic AI provides several other extension mechanisms for specialized needs.
+除了 capabilities，Pydantic AI 还为专门需求提供了其他几种扩展机制。
 
 ## Capabilities
 
-Capabilities are the recommended way to extend Pydantic AI. They are useful for:
+Capabilities 是扩展 Pydantic AI 的推荐方式，适用于：
 
-- **Teams** building reusable internal agent components (guardrails, audit logging, authentication)
-- **Package authors** shipping extensions that work across models and agents
-- **Community contributors** sharing solutions to common problems
+- **团队**构建可复用的内部智能体组件（guardrails、审计日志、认证）
+- **包作者**发布可跨模型和智能体工作的扩展
+- **社区贡献者**分享常见问题的解决方案
 
-See [Capabilities](capabilities.md) for using and building capabilities, and [Hooks](hooks.md) for the lightweight decorator-based approach.
+使用和构建 capabilities 请参见 [Capabilities](capabilities.md)；轻量级、基于装饰器的做法请参见 [Hooks](hooks.md)。
 
 !!! tip
-    If you want to contribute a capability, open an issue on [**Pydantic AI Harness**](https://github.com/pydantic/pydantic-ai-harness) rather than on pydantic-ai. Most capabilities belong in the harness -- see [What goes where?](harness/overview.md#what-goes-where) for the distinction.
+    如果你想贡献 capability，请在 [**Pydantic AI Harness**](https://github.com/pydantic/pydantic-ai-harness) 上开 issue，而不是在 pydantic-ai 上。大多数 capabilities 都属于 harness，区别请参见[哪些内容放在哪里？](harness/overview.md#what-goes-where)。
 
-## Publishing capability packages
+## 发布 capability 包 {#publishing-capability-packages}
 
-To make a capability installable and usable in [agent specs](agent-spec.md):
+要让 capability 可安装，并可在 [agent specs](agent-spec.md) 中使用：
 
-1. **Implement [`get_serialization_name()`][pydantic_ai.capabilities.AbstractCapability.get_serialization_name]** — defaults to the class name. Return `None` to opt out of spec support.
+1. **实现 [`get_serialization_name()`][pydantic_ai.capabilities.AbstractCapability.get_serialization_name]**：默认使用类名。返回 `None` 可选择不支持 spec。
 
-2. **Implement [`from_spec()`][pydantic_ai.capabilities.AbstractCapability.from_spec]** — defaults to `cls(*args, **kwargs)`. Override when your constructor takes non-serializable types.
+2. **实现 [`from_spec()`][pydantic_ai.capabilities.AbstractCapability.from_spec]**：默认行为是 `cls(*args, **kwargs)`。如果构造函数接受不可序列化类型，请覆盖它。
 
-3. **Package naming** — use the `pydantic-ai-` prefix (e.g. `pydantic-ai-guardrails`) so users can find your package.
+3. **包命名**：使用 `pydantic-ai-` 前缀（例如 `pydantic-ai-guardrails`），便于用户找到你的包。
 
-4. **Registration** — users pass custom capability types via `custom_capability_types` on [`Agent.from_spec`][pydantic_ai.Agent.from_spec] or [`Agent.from_file`][pydantic_ai.Agent.from_file].
+4. **注册**：用户通过 [`Agent.from_spec`][pydantic_ai.Agent.from_spec] 或 [`Agent.from_file`][pydantic_ai.Agent.from_file] 的 `custom_capability_types` 传入自定义 capability 类型。
 
 ```python {test="skip" lint="skip"}
 from pydantic_ai import Agent
@@ -38,48 +38,48 @@ from my_package import MyCapability
 agent = Agent.from_file('agent.yaml', custom_capability_types=[MyCapability])
 ```
 
-See [Custom capabilities in specs](agent-spec.md#custom-capabilities-in-specs) for implementation details.
+实现细节请参见 [spec 中的自定义 capabilities](agent-spec.md#custom-capabilities-in-specs)。
 
 ## Pydantic AI Harness
 
-[**Pydantic AI Harness**](harness/overview.md) is the official capability library for Pydantic AI -- standalone capabilities like memory, guardrails, and context management live there rather than in core. See [What goes where?](harness/overview.md#what-goes-where) for the full breakdown, or jump to the [capability matrix](https://github.com/pydantic/pydantic-ai-harness#capability-matrix).
+[**Pydantic AI Harness**](harness/overview.md) 是 Pydantic AI 的官方 capability 库：memory、guardrails 和 context management 等独立 capabilities 位于这里，而不是 core 中。完整拆分请参见[哪些内容放在哪里？](harness/overview.md#what-goes-where)，也可以直接查看 [capability matrix](https://github.com/pydantic/pydantic-ai-harness#capability-matrix)。
 
-## Third-party ecosystem
+## 第三方生态 {#third-party-ecosystem}
 
 ### Capabilities
 
-[Capabilities](capabilities.md) are the recommended extension mechanism for packages that need to bundle tools with hooks, instructions, or model settings. See [Third-party capabilities](capabilities.md#third-party-capabilities) for community packages.
+[Capabilities](capabilities.md) 是需要把工具与 hooks、instructions 或模型设置打包在一起的包的推荐扩展机制。社区包请参见[第三方 capabilities](capabilities.md#third-party-capabilities)。
 
 ### Toolsets
 
-Many third-party extensions are available as [toolsets](toolsets.md), which can also be wrapped as [capabilities](capabilities.md) to take advantage of hooks, instructions, and model settings. See [Third-party toolsets](toolsets.md#third-party-toolsets) for the full list.
+许多第三方扩展以 [toolsets](toolsets.md) 形式提供；它们也可以包装成 [capabilities](capabilities.md)，以使用 hooks、instructions 和模型设置。完整列表请参见[第三方 toolsets](toolsets.md#third-party-toolsets)。
 
-## Other extension points
+## 其他扩展点 {#other-extension-points}
 
-### Custom toolsets
+### 自定义 toolsets {#custom-toolsets}
 
-For specialized tool execution needs (custom transport, tool filtering, execution wrapping), implement [`AbstractToolset`][pydantic_ai.toolsets.AbstractToolset] or subclass [`WrapperToolset`][pydantic_ai.toolsets.WrapperToolset]:
+对于专门的工具执行需求（自定义传输、工具过滤、执行包装），请实现 [`AbstractToolset`][pydantic_ai.toolsets.AbstractToolset]，或继承 [`WrapperToolset`][pydantic_ai.toolsets.WrapperToolset]：
 
-- [`AbstractToolset`][pydantic_ai.toolsets.AbstractToolset] — full control over tool definitions and execution
-- [`WrapperToolset`][pydantic_ai.toolsets.WrapperToolset] — delegates to a wrapped toolset, override specific methods
+- [`AbstractToolset`][pydantic_ai.toolsets.AbstractToolset]：完全控制工具定义和执行
+- [`WrapperToolset`][pydantic_ai.toolsets.WrapperToolset]：委托给被包装的 toolset，并覆盖特定方法
 
-See [Building a Custom Toolset](toolsets.md#building-a-custom-toolset) for details.
+详情请参见[构建自定义 Toolset](toolsets.md#building-a-custom-toolset)。
 
 !!! tip
-    If your toolset also needs to provide instructions, model settings, or hooks, consider building a [custom capability](capabilities.md#building-custom-capabilities) instead.
+    如果你的 toolset 还需要提供 instructions、模型设置或 hooks，请考虑改为构建[自定义 capability](capabilities.md#building-custom-capabilities)。
 
-### Custom models
+### 自定义模型 {#custom-models}
 
-For connecting to model providers not yet supported by Pydantic AI, implement [`Model`][pydantic_ai.models.Model]:
+要连接 Pydantic AI 尚未支持的模型提供商，请实现 [`Model`][pydantic_ai.models.Model]：
 
-- [`Model`][pydantic_ai.models.Model] — the base interface for model implementations
-- [`WrapperModel`][pydantic_ai.models.wrapper.WrapperModel] — delegates to a wrapped model, useful for adding instrumentation or transformations
+- [`Model`][pydantic_ai.models.Model]：模型实现的基础接口
+- [`WrapperModel`][pydantic_ai.models.wrapper.WrapperModel]：委托给被包装的模型，适合添加 instrumentation 或转换
 
-See [Custom Models](models/overview.md#custom-models) for details.
+详情请参见[自定义模型](models/overview.md#custom-models)。
 
-### Custom agents
+### 自定义智能体 {#custom-agents}
 
-For custom agent behavior, subclass [`AbstractAgent`][pydantic_ai.agent.AbstractAgent] or [`WrapperAgent`][pydantic_ai.agent.WrapperAgent]:
+对于自定义智能体行为，请继承 [`AbstractAgent`][pydantic_ai.agent.AbstractAgent] 或 [`WrapperAgent`][pydantic_ai.agent.WrapperAgent]：
 
-- [`AbstractAgent`][pydantic_ai.agent.AbstractAgent] — the base interface for agent implementations, providing `run`, `run_sync`, and `run_stream`
-- [`WrapperAgent`][pydantic_ai.agent.WrapperAgent] — delegates to a wrapped agent, useful for adding pre/post-processing or context management
+- [`AbstractAgent`][pydantic_ai.agent.AbstractAgent]：智能体实现的基础接口，提供 `run`、`run_sync` 和 `run_stream`
+- [`WrapperAgent`][pydantic_ai.agent.WrapperAgent]：委托给被包装的智能体，适合添加前/后处理或上下文管理
