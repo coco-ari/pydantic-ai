@@ -1,29 +1,29 @@
-# LLM Judge Deep Dive
+# LLM Judge 深入说明 {#llm-judge-deep-dive}
 
-The [`LLMJudge`][pydantic_evals.evaluators.LLMJudge] evaluator uses an LLM to assess subjective qualities of outputs based on a rubric.
+[`LLMJudge`][pydantic_evals.evaluators.LLMJudge] 评估器使用 LLM 根据评分规则评估输出的主观质量。
 
-## When to Use LLM-as-a-Judge
+## 何时使用 LLM-as-a-Judge {#when-to-use-llm-as-a-judge}
 
-LLM judges are ideal for evaluating qualities that require understanding and judgment:
+LLM judges 非常适合评估需要理解和判断的质量：
 
-**Good Use Cases:**
+**适合的使用场景：**
 
-- Factual accuracy
-- Helpfulness and relevance
-- Tone and style compliance
-- Completeness of responses
-- Following complex instructions
-- RAG groundedness (does the answer use provided context?)
-- Citation accuracy
+- 事实准确性
+- 有帮助程度和相关性
+- 语气和风格合规
+- 响应完整性
+- 遵循复杂指令
+- RAG groundedness（答案是否使用了提供的上下文？）
+- 引用准确性
 
-**Poor Use Cases:**
+**不适合的使用场景：**
 
-- Format validation (use [`IsInstance`][pydantic_evals.evaluators.IsInstance] instead)
-- Exact matching (use [`EqualsExpected`][pydantic_evals.evaluators.EqualsExpected])
-- Performance checks (use [`MaxDuration`][pydantic_evals.evaluators.MaxDuration])
-- Deterministic logic (write a custom evaluator)
+- 格式验证（改用 [`IsInstance`][pydantic_evals.evaluators.IsInstance]）
+- 精确匹配（使用 [`EqualsExpected`][pydantic_evals.evaluators.EqualsExpected]）
+- 性能检查（使用 [`MaxDuration`][pydantic_evals.evaluators.MaxDuration]）
+- 确定性逻辑（编写自定义 evaluator）
 
-## Basic Usage
+## 基础用法 {#basic-usage}
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -38,13 +38,13 @@ dataset = Dataset(
 )
 ```
 
-## Configuration Options
+## 配置选项 {#configuration-options}
 
 ### Rubric
 
-The `rubric` is your evaluation criteria. Be specific and clear:
+`rubric` 是你的评估标准。应具体且清晰：
 
-**Bad rubrics (vague):**
+**不好的 rubrics（模糊）：**
 ```python
 from pydantic_evals.evaluators import LLMJudge
 
@@ -52,7 +52,7 @@ LLMJudge(rubric='Good response')  # Too vague
 LLMJudge(rubric='Check quality')  # What aspect of quality?
 ```
 
-**Good rubrics (specific):**
+**好的 rubrics（具体）：**
 ```python
 from pydantic_evals.evaluators import LLMJudge
 
@@ -61,9 +61,9 @@ LLMJudge(rubric='Response uses formal, professional language appropriate for bus
 LLMJudge(rubric='All factual claims in the response are supported by the provided context')
 ```
 
-### Including Context
+### 包含上下文 {#including-context}
 
-Control what information the judge sees:
+控制 judge 能看到哪些信息：
 
 ```python
 from pydantic_evals.evaluators import LLMJudge
@@ -85,7 +85,7 @@ LLMJudge(
 )
 ```
 
-**Example:**
+**示例：**
 ```python
 from pydantic_evals import Case, Dataset
 from pydantic_evals.evaluators import LLMJudge
@@ -109,9 +109,9 @@ dataset = Dataset(
 )
 ```
 
-### Model Selection
+### 模型选择 {#model-selection}
 
-Choose the judge model based on cost/quality tradeoffs:
+根据成本/质量权衡选择 judge model：
 
 ```python
 from pydantic_evals.evaluators import LLMJudge
@@ -138,9 +138,9 @@ LLMJudge(
 )
 ```
 
-### Model Settings
+### 模型设置 {#model-settings}
 
-Customize model behavior:
+自定义模型行为：
 
 ```python
 from pydantic_ai import ModelSettings
@@ -155,11 +155,11 @@ LLMJudge(
 )
 ```
 
-## Output Modes
+## 输出模式 {#output-modes}
 
-### Assertion Only (Default)
+### 仅断言（默认） {#assertion-only-default}
 
-Returns pass/fail with reason:
+返回带原因的通过/失败：
 
 ```python
 from pydantic_evals.evaluators import LLMJudge
@@ -168,15 +168,15 @@ LLMJudge(rubric='Response is accurate')
 # Returns: {'LLMJudge_pass': EvaluationReason(value=True, reason='...')}
 ```
 
-In reports:
+在报告中：
 ```
 ┃ Assertions ┃
 ┃ ✔          ┃
 ```
 
-### Score Only
+### 仅分数 {#score-only}
 
-Returns a numeric score (0.0 to 1.0):
+返回数值分数（0.0 到 1.0）：
 
 ```python
 from pydantic_evals.evaluators import LLMJudge
@@ -189,13 +189,13 @@ LLMJudge(
 # Returns: {'LLMJudge_score': EvaluationReason(value=0.85, reason='...')}
 ```
 
-In reports:
+在报告中：
 ```
 ┃ Scores             ┃
 ┃ LLMJudge_score: 0.85 ┃
 ```
 
-### Both Score and Assertion
+### 同时返回分数和断言 {#both-score-and-assertion}
 
 ```python
 from pydantic_evals.evaluators import LLMJudge
@@ -211,7 +211,7 @@ LLMJudge(
 # }
 ```
 
-### Custom Names
+### 自定义名称 {#custom-names}
 
 ```python
 from pydantic_evals.evaluators import LLMJudge
@@ -226,17 +226,17 @@ LLMJudge(
 # Returns: {'accuracy': EvaluationReason(value=True, reason='...')}
 ```
 
-In reports:
+在报告中：
 ```
 ┃ Assertions ┃
 ┃ accuracy: ✔ ┃
 ```
 
-## Practical Examples
+## 实用示例 {#practical-examples}
 
-### RAG Evaluation
+### RAG 评估 {#rag-evaluation}
 
-Evaluate whether a RAG system uses provided context:
+评估 RAG 系统是否使用了提供的上下文：
 
 ```python
 from dataclasses import dataclass
@@ -276,9 +276,9 @@ dataset = Dataset(
 )
 ```
 
-### Recipe Generation with Case-Specific Rubrics
+### 使用 Case-Specific Rubrics 生成食谱 {#recipe-generation-with-case-specific-rubrics}
 
-This example shows how to use both dataset-level and case-specific evaluators:
+这个示例展示如何同时使用 dataset-level 和 case-specific evaluators：
 
 ```python {title="recipe_evaluation.py" test="skip"}
 from __future__ import annotations
@@ -373,13 +373,13 @@ print(report)
 """
 ```
 
-1. Case-specific evaluator - only runs for the vegetarian recipe case
-2. Case-specific evaluator - only runs for the gluten-free recipe case
-3. Dataset-level evaluators - run for all cases
+1. Case-specific evaluator：只针对 vegetarian recipe case 运行
+2. Case-specific evaluator：只针对 gluten-free recipe case 运行
+3. Dataset-level evaluators：针对所有 cases 运行
 
-### Multi-Aspect Evaluation
+### 多维度评估 {#multi-aspect-evaluation}
 
-Use multiple judges for different quality dimensions:
+使用多个 judges 评估不同质量维度：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -419,9 +419,9 @@ dataset = Dataset(
 )
 ```
 
-### Comparative Evaluation
+### 比较式评估 {#comparative-evaluation}
 
-Compare output against expected output:
+将输出与预期输出比较：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -448,25 +448,25 @@ dataset = Dataset(
 )
 ```
 
-## Best Practices
+## 最佳实践 {#best-practices}
 
-### 1. Be Specific in Rubrics
+### 1. Rubrics 要具体 {#1-be-specific-in-rubrics}
 
-**Bad:**
+**不好：**
 ```python
 from pydantic_evals.evaluators import LLMJudge
 
 LLMJudge(rubric='Good answer')
 ```
 
-**Better:**
+**更好：**
 ```python
 from pydantic_evals.evaluators import LLMJudge
 
 LLMJudge(rubric='Response accurately answers the question without hallucinating facts')
 ```
 
-**Best:**
+**最好：**
 ```python
 from pydantic_evals.evaluators import LLMJudge
 
@@ -482,9 +482,9 @@ LLMJudge(
 )
 ```
 
-### 2. Use Multiple Judges
+### 2. 使用多个 Judges {#2-use-multiple-judges}
 
-Don't always try to evaluate everything with one rubric:
+不要总是试图用一个 rubric 评估所有内容：
 
 ```python
 from pydantic_evals.evaluators import LLMJudge
@@ -500,9 +500,9 @@ evaluators = [
 ]
 ```
 
-### 3. Combine with Deterministic Checks
+### 3. 与确定性检查组合 {#3-combine-with-deterministic-checks}
 
-Don't use LLM evaluation for checks that can be done deterministically:
+不要把 LLM evaluation 用在可以确定性完成的检查上：
 
 ```python
 from pydantic_evals.evaluators import Contains, IsInstance, LLMJudge
@@ -514,7 +514,7 @@ evaluators = [
 ]
 ```
 
-### 4. Use Temperature 0 for Consistency
+### 4. 使用 Temperature 0 保持一致性 {#4-use-temperature-0-for-consistency}
 
 ```python
 from pydantic_ai import ModelSettings
@@ -527,53 +527,53 @@ LLMJudge(
 ```
 
 
-## Limitations
+## 限制 {#limitations}
 
-### Non-Determinism
+### 非确定性 {#non-determinism}
 
-LLM judges are not deterministic. The same output may receive different scores across runs.
+LLM judges 不是确定性的。同一输出在不同运行中可能获得不同分数。
 
-**Mitigation:**
+**缓解：**
 
-- Use `temperature=0.0` for more consistency
-- Run multiple evaluations and average
-- Use retry strategies for flaky evaluations
+- 使用 `temperature=0.0` 获得更高一致性
+- 运行多次评估并求平均
+- 对不稳定评估使用重试策略
 
-### Cost
+### 成本 {#cost}
 
-LLM judges make API calls, which cost money and time.
+LLM judges 会发起 API 调用，这会花费金钱和时间。
 
-**Mitigation:**
+**缓解：**
 
-- Use cheaper models for simple checks (`gpt-5-mini`)
-- Run deterministic checks first to fail fast
-- Cache results when possible
-- Limit evaluation to changed cases
+- 对简单检查使用更便宜的模型（`gpt-5-mini`）
+- 先运行确定性检查以快速失败
+- 尽可能缓存结果
+- 只评估发生变化的 cases
 
-### Model Biases
+### 模型偏见 {#model-biases}
 
-LLM judges inherit biases from their training data.
+LLM judges 会继承训练数据中的偏见。
 
-**Mitigation:**
+**缓解：**
 
-- Use multiple judge models and compare
-- Review evaluation reasons, not just scores
-- Validate judges against human-labeled test sets
-- Be aware of known biases (length bias, style preferences)
+- 使用多个 judge models 并比较
+- 审查评估原因，而不只是分数
+- 用人工标注测试集验证 judges
+- 注意已知偏见（长度偏见、风格偏好）
 
-### Context Limits
+### 上下文限制 {#context-limits}
 
-Judges have token limits for inputs.
+Judges 对输入有 token 限制。
 
-**Mitigation:**
+**缓解：**
 
-- Truncate long inputs/outputs intelligently
-- Use focused rubrics that don't require full context
-- Consider chunked evaluation for very long content
+- 智能截断长输入/输出
+- 使用不需要完整上下文的聚焦 rubrics
+- 对超长内容考虑分块评估
 
-## Debugging LLM Judges
+## 调试 LLM Judges {#debugging-llm-judges}
 
-### View Reasons
+### 查看原因 {#view-reasons}
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -606,7 +606,7 @@ report.print(include_reasons=True)
 """
 ```
 
-Output:
+输出：
 ```
 ┃ Assertions              ┃
 ┃ accuracy: ✔            ┃
@@ -614,7 +614,7 @@ Output:
 ┃   correctly states...  │
 ```
 
-### Access Programmatically
+### 以编程方式访问 {#access-programmatically}
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -640,9 +640,9 @@ for case in report.cases:
             #>   Reason: -
 ```
 
-### Compare Judges
+### 比较 Judges {#compare-judges}
 
-Test the same cases with different judge models:
+使用不同 judge models 测试相同 cases：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -665,9 +665,9 @@ for judge in judges:
     # Compare results
 ```
 
-## Advanced: Custom Judge Models
+## 高级：自定义 Judge Models {#advanced-custom-judge-models}
 
-Set a default judge model for all `LLMJudge` evaluators:
+为所有 `LLMJudge` evaluators 设置默认 judge model：
 
 ```python
 from pydantic_evals.evaluators import LLMJudge
@@ -680,7 +680,7 @@ set_default_judge_model('anthropic:claude-sonnet-4-6')
 LLMJudge(rubric='...')  # Uses Claude
 ```
 
-## Next Steps
+## 下一步 {#next-steps}
 
-- **[Custom Evaluators](custom.md)** - Write custom evaluation logic
-- **[Native Evaluators](built-in.md)** - Complete evaluator reference
+- **[自定义评估器](custom.md)** - 编写自定义评估逻辑
+- **[原生评估器](built-in.md)** - 完整评估器参考

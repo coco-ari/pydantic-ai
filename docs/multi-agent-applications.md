@@ -1,26 +1,26 @@
-# Multi-agent Applications
+# 多 Agent 应用 {#multi-agent-applications}
 
-There are roughly five levels of complexity when building applications with Pydantic AI:
+使用 Pydantic AI 构建应用时，大致有五个复杂度层级：
 
-1. Single agent workflows — what most of the `pydantic_ai` documentation covers
-2. [Agent delegation](#agent-delegation) — agents using another agent via tools
-3. [Programmatic agent hand-off](#programmatic-agent-hand-off) — one agent runs, then application code calls another agent
-4. [Graph based control flow](graph.md) — for the most complex cases, a graph-based state machine can be used to control the execution of multiple agents
-5. [Deep Agents](#deep-agents) — autonomous agents with planning, file operations, task delegation, and sandboxed code execution
+1. 单 agent 工作流：`pydantic_ai` 文档的大多数内容都覆盖这一层
+2. [Agent delegation](#agent-delegation)：agents 通过 tools 使用另一个 agent
+3. [Programmatic agent hand-off](#programmatic-agent-hand-off)：一个 agent 先运行，然后应用代码调用另一个 agent
+4. [基于 Graph 的控制流](graph.md)：对于最复杂的场景，可以使用基于 graph 的状态机来控制多个 agents 的执行
+5. [Deep Agents](#deep-agents)：带规划、文件操作、任务委派和沙箱代码执行能力的自主 agents
 
-Of course, you can combine multiple strategies in a single application.
+当然，你可以在单个应用中组合多种策略。
 
-## Agent delegation
+## Agent delegation {#agent-delegation}
 
-"Agent delegation" refers to the scenario where an agent delegates work to another agent, then takes back control when the delegate agent (the agent called from within a tool) finishes.
-If you want to hand off control to another agent completely, without coming back to the first agent, you can use an [output function](output.md#output-functions).
+"Agent delegation" 指的是一个 agent 将工作委派给另一个 agent，并在被委派 agent（也就是从 tool 内调用的 agent）完成后重新接管控制的场景。
+如果你想把控制完全交给另一个 agent，而不返回到第一个 agent，可以使用[输出函数](output.md#output-functions)。
 
-Since agents are stateless and designed to be global, you do not need to include the agent itself in agent [dependencies](dependencies.md).
+由于 agents 是无状态并被设计为全局对象，因此不需要把 agent 本身包含在 agent [dependencies](dependencies.md) 中。
 
-You'll generally want to pass [`ctx.usage`][pydantic_ai.tools.RunContext.usage] to the [`usage`][pydantic_ai.agent.AbstractAgent.run] keyword argument of the delegate agent run so usage within that run counts towards the total usage of the parent agent run.
+通常你会希望把 [`ctx.usage`][pydantic_ai.tools.RunContext.usage] 传给被委派 agent run 的 [`usage`][pydantic_ai.agent.AbstractAgent.run] 关键字参数，这样该 run 的 usage 会计入父 agent run 的总 usage。
 
-!!! note "Multiple models"
-    Agent delegation doesn't need to use the same model for each agent. If you choose to use different models within a run, calculating the monetary cost from the final [`result.usage`][pydantic_ai.agent.AgentRunResult.usage] of the run will not be possible, but you can still use [`UsageLimits`][pydantic_ai.usage.UsageLimits] — including `request_limit`, `total_tokens_limit`, and `tool_calls_limit` — to avoid unexpected costs or runaway tool loops.
+!!! note "多个模型"
+    Agent delegation 不需要每个 agent 都使用同一个模型。如果你选择在一次 run 内使用不同模型，则无法从该 run 最终的 [`result.usage`][pydantic_ai.agent.AgentRunResult.usage] 计算金钱成本；但你仍然可以使用 [`UsageLimits`][pydantic_ai.usage.UsageLimits]，包括 `request_limit`、`total_tokens_limit` 和 `tool_calls_limit`，以避免意外成本或失控的 tool loops。
 
 ```python {title="agent_delegation_simple.py"}
 from pydantic_ai import Agent, RunContext, UsageLimits
@@ -56,15 +56,15 @@ print(result.usage)
 #> RunUsage(input_tokens=165, output_tokens=24, requests=3, tool_calls=1)
 ```
 
-1. The "parent" or controlling agent.
-2. The "delegate" agent, which is called from within a tool of the parent agent.
-3. Call the delegate agent from within a tool of the parent agent.
-4. Pass the usage from the parent agent to the delegate agent so the final [`result.usage`][pydantic_ai.agent.AgentRunResult.usage] includes the usage from both agents.
-5. Since the function returns `#!python list[str]`, and the `output_type` of `joke_generation_agent` is also `#!python list[str]`, we can simply return `#!python r.output` from the tool.
+1. "父" agent 或控制 agent。
+2. "被委派" agent，也就是从父 agent 的 tool 内部调用的 agent。
+3. 从父 agent 的 tool 内调用被委派 agent。
+4. 将父 agent 的 usage 传给被委派 agent，这样最终的 [`result.usage`][pydantic_ai.agent.AgentRunResult.usage] 会同时包含两个 agents 的 usage。
+5. 因为函数返回 `#!python list[str]`，且 `joke_generation_agent` 的 `output_type` 也是 `#!python list[str]`，所以可以直接从 tool 返回 `#!python r.output`。
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以直接运行）_
 
-The control flow for this example is pretty simple and can be summarised as follows:
+这个示例的控制流相当简单，可以概括如下：
 
 ```mermaid
 graph TD
@@ -76,12 +76,12 @@ graph TD
   joke_selection_agent --> END
 ```
 
-### Agent delegation and dependencies
+### Agent delegation 和 dependencies {#agent-delegation-and-dependencies}
 
-Generally the delegate agent needs to either have the same [dependencies](dependencies.md) as the calling agent, or dependencies which are a subset of the calling agent's dependencies.
+通常，被委派 agent 需要拥有与调用方 agent 相同的 [dependencies](dependencies.md)，或拥有调用方 agent dependencies 的子集。
 
-!!! info "Initializing dependencies"
-    We say "generally" above since there's nothing to stop you initializing dependencies within a tool call and therefore using interdependencies in a delegate agent that are not available on the parent, this should often be avoided since it can be significantly slower than reusing connections etc. from the parent agent.
+!!! info "初始化 dependencies"
+    上面说 "通常"，是因为并没有什么阻止你在 tool call 内初始化 dependencies，并因此在被委派 agent 中使用父 agent 不可用的相互依赖项；但这通常应避免，因为相比复用父 agent 中的连接等资源，这可能明显更慢。
 
 ```python {title="agent_delegation_deps.py"}
 from dataclasses import dataclass
@@ -147,16 +147,16 @@ async def main():
         #> RunUsage(input_tokens=220, output_tokens=32, requests=4, tool_calls=2)
 ```
 
-1. Define a dataclass to hold the client and API key dependencies.
-2. Set the `deps_type` of the calling agent — `joke_selection_agent` here.
-3. Pass the dependencies to the delegate agent's run method within the tool call.
-4. Also set the `deps_type` of the delegate agent — `joke_generation_agent` here.
-5. Define a tool on the delegate agent that uses the dependencies to make an HTTP request.
-6. Usage now includes 4 requests — 2 from the calling agent and 2 from the delegate agent.
+1. 定义一个 dataclass，用来保存 client 和 API key dependencies。
+2. 设置调用方 agent（这里是 `joke_selection_agent`）的 `deps_type`。
+3. 在 tool call 内，将 dependencies 传给被委派 agent 的 run 方法。
+4. 同样设置被委派 agent（这里是 `joke_generation_agent`）的 `deps_type`。
+5. 在被委派 agent 上定义一个使用 dependencies 发起 HTTP 请求的 tool。
+6. Usage 现在包含 4 个 requests：2 个来自调用方 agent，2 个来自被委派 agent。
 
-_(This example is complete, it can be run "as is" — you'll need to add `asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以直接运行；你需要添加 `asyncio.run(main())` 来运行 `main`）_
 
-This example shows how even a fairly simple agent delegation can lead to a complex control flow:
+这个示例展示了，即使相当简单的 agent delegation，也可能带来复杂控制流：
 
 ```mermaid
 graph TD
@@ -172,13 +172,13 @@ graph TD
   joke_selection_agent --> END
 ```
 
-## Programmatic agent hand-off
+## Programmatic agent hand-off {#programmatic-agent-hand-off}
 
-"Programmatic agent hand-off" refers to the scenario where multiple agents are called in succession, with application code and/or a human in the loop responsible for deciding which agent to call next.
+"Programmatic agent hand-off" 指的是连续调用多个 agents 的场景，由应用代码和/或人在环路负责决定下一步调用哪个 agent。
 
-Here agents don't need to use the same deps.
+这里 agents 不需要使用相同 deps。
 
-Here we show two agents used in succession, the first to find a flight and the second to extract the user's seat preference.
+下面展示了连续使用两个 agents：第一个用于查找航班，第二个用于提取用户的座位偏好。
 
 ```python {title="programmatic_handoff.py"}
 from typing import Literal
@@ -287,17 +287,17 @@ async def main():  # (7)!
         #> Seat preference: row=1 seat='A'
 ```
 
-1. Define the first agent, which finds a flight. We use an explicit type annotation until [PEP-747](https://peps.python.org/pep-0747/) lands, see [structured output](output.md#structured-output). We use a union as the output type so the model can communicate if it's unable to find a satisfactory choice; internally, each member of the union will be registered as a separate tool.
-2. Define a tool on the agent to find a flight. In this simple case we could dispense with the tool and just define the agent to return structured data, then search for a flight, but in more complex scenarios the tool would be necessary.
-3. Define usage limits for the entire app.
-4. Define a function to find a flight, which asks the user for their preferences and then calls the agent to find a flight.
-5. As with `flight_search_agent` above, we use an explicit type annotation to define the agent.
-6. Define a function to find the user's seat preference, which asks the user for their seat preference and then calls the agent to extract the seat preference.
-7. Now that we've put our logic for running each agent into separate functions, our main app becomes very simple.
+1. 定义第一个 agent，用来查找航班。在 [PEP-747](https://peps.python.org/pep-0747/) 落地前，我们使用显式类型注解，见[结构化输出](output.md#structured-output)。这里使用 union 作为输出类型，让模型可以表达无法找到满意选项；内部会把 union 的每个成员注册为单独 tool。
+2. 在 agent 上定义一个查找航班的 tool。在这个简单场景中，可以不用 tool，而是直接定义 agent 返回结构化数据后再搜索航班；但在更复杂场景中，tool 会是必要的。
+3. 为整个应用定义 usage limits。
+4. 定义一个查找航班的函数，它询问用户偏好，然后调用 agent 查找航班。
+5. 与上面的 `flight_search_agent` 一样，我们使用显式类型注解定义 agent。
+6. 定义一个查找用户座位偏好的函数，它询问用户座位偏好，然后调用 agent 提取座位偏好。
+7. 现在我们已经把运行每个 agent 的逻辑放进单独函数中，主应用变得非常简单。
 
-_(This example is complete, it can be run "as is" — you'll need to add `asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以直接运行；你需要添加 `asyncio.run(main())` 来运行 `main`）_
 
-The control flow for this example can be summarised as follows:
+这个示例的控制流可以概括如下：
 
 ```mermaid
 graph TB
@@ -321,31 +321,31 @@ graph TB
 
 ## Pydantic Graphs
 
-See the [graph](graph.md) documentation on when and how to use graphs.
+关于何时以及如何使用 graphs，请参阅 [graph](graph.md) 文档。
 
-## Deep Agents
+## Deep Agents {#deep-agents}
 
-Deep agents are autonomous agents that combine multiple architectural patterns and capabilities to handle complex, multi-step tasks reliably. These patterns can be implemented using Pydantic AI's built-in features and (third-party) toolsets:
+Deep agents 是自主 agents，它们结合多种架构模式和能力，以可靠处理复杂的多步骤任务。这些模式可以用 Pydantic AI 的内置功能和（第三方）toolsets 实现：
 
-- **Planning and progress tracking** — agents break down complex tasks into steps and track their progress, giving users visibility into what the agent is working on. See [Task Management toolsets](toolsets.md#task-management).
-- **File system operations** — reading, writing, and editing files with proper abstraction layers that work across in-memory storage, real file systems, and sandboxed containers. See [File Operations toolsets](toolsets.md#file-operations).
-- **Task delegation** — spawning specialized sub-agents for specific tasks, with isolated context to prevent recursive delegation issues. See [Agent Delegation](#agent-delegation) above.
-- **Sandboxed code execution** — running AI-generated code in isolated environments (typically Docker containers) to prevent accidents. See [Code Execution toolsets](toolsets.md#code-execution).
-- **Context management** — automatic conversation summarization to handle long sessions that would otherwise exceed token limits. See [Processing Message History](message-history.md#processing-message-history).
-- **Human-in-the-loop** — approval workflows for dangerous operations like code execution or file deletion. See [Requiring Tool Approval](toolsets.md#requiring-tool-approval).
-- **Durable execution** — preserving agent state across transient API failures and application errors or restarts. See [Durable Execution](durable_execution/overview.md).
+- **规划和进度跟踪**：agents 将复杂任务拆成步骤并跟踪进度，让用户看到 agent 正在做什么。见 [Task Management toolsets](toolsets.md#task-management)。
+- **文件系统操作**：通过合适抽象层读取、写入和编辑文件，可跨内存存储、真实文件系统和沙箱容器工作。见 [File Operations toolsets](toolsets.md#file-operations)。
+- **任务委派**：为特定任务生成 specialized sub-agents，并使用隔离上下文防止递归委派问题。见上面的 [Agent Delegation](#agent-delegation)。
+- **沙箱代码执行**：在隔离环境（通常是 Docker containers）中运行 AI 生成的代码以防止意外。见 [Code Execution toolsets](toolsets.md#code-execution)。
+- **上下文管理**：自动总结对话，以处理否则会超过 token 限制的长会话。见[处理消息历史](message-history.md#processing-message-history)。
+- **人在环路**：为代码执行或文件删除等危险操作提供审批工作流。见[要求工具审批](toolsets.md#requiring-tool-approval)。
+- **持久化执行**：跨瞬时 API 失败、应用错误或重启保留 agent 状态。见[持久化执行](durable_execution/overview.md)。
 
-In addition, the community maintains packages that bring these concepts together in a more opinionated way:
+此外，社区维护了一些 packages，以更 opinionated 的方式把这些概念组合起来：
 
-- [`pydantic-deep`](https://github.com/vstorm-co/pydantic-deepagents) by [Vstorm](https://vstorm.co/)
+- [`pydantic-deep`](https://github.com/vstorm-co/pydantic-deepagents)，由 [Vstorm](https://vstorm.co/) 维护
 
-## Observing Multi-Agent Systems
+## 观察多 Agent 系统 {#observing-multi-agent-systems}
 
-Multi-agent systems can be challenging to debug due to their complexity; when multiple agents interact, understanding the flow of execution becomes essential.
+由于复杂性，多 agent 系统可能很难调试；当多个 agents 交互时，理解执行流就变得非常重要。
 
-### Tracing Agent Delegation
+### 跟踪 Agent Delegation {#tracing-agent-delegation}
 
-With [Logfire](logfire.md), you can trace the entire flow across multiple agents:
+借助 [Logfire](logfire.md)，你可以跟踪跨多个 agents 的完整流程：
 
 ```python
 import logfire
@@ -356,25 +356,25 @@ logfire.instrument_pydantic_ai()
 # Your multi-agent code here...
 ```
 
-Logfire shows you:
+Logfire 会展示：
 
-- **Which agent handled which part** of the request
-- **Delegation decisions**—when and why one agent called another
-- **End-to-end latency** broken down by agent
-- **Token usage and costs** per agent
-- **What triggered the agent run**—the HTTP request, scheduled job, or user action that started it all
-- **What happened inside tool calls**—database queries, HTTP requests, file operations, and any other instrumented code that tools execute
+- **哪个 agent 处理了请求的哪一部分**
+- **Delegation 决策**：一个 agent 何时以及为什么调用另一个 agent
+- **端到端延迟**，按 agent 拆分
+- **每个 agent 的 token usage 和 costs**
+- **是什么触发了 agent run**：HTTP request、scheduled job 或启动它的用户动作
+- **tool calls 内部发生了什么**：database queries、HTTP requests、file operations，以及 tools 执行的任何其他 instrumented code
 
-This is essential for understanding and optimizing complex agent workflows. When something goes wrong in a multi-agent system, you'll see exactly which agent failed and what it was trying to do, and whether the problem was in the agent's reasoning or in the backend systems it called.
+这对于理解和优化复杂 agent 工作流非常重要。当多 agent 系统中出现问题时，你会准确看到哪个 agent 失败了、它当时试图做什么，以及问题是在 agent 推理中，还是在它调用的后端系统中。
 
-### Full-Stack Visibility
+### 全栈可见性 {#full-stack-visibility}
 
-If your Pydantic AI application includes a TypeScript frontend, API gateway, or services in other languages, Logfire can trace them too—Logfire provides SDKs for Python, JavaScript/TypeScript, and Rust, plus compatibility with any OpenTelemetry-instrumented application. See traces from your entire stack in a unified view. For details on sending data from other languages using standard OpenTelemetry, see the [alternative clients guide](https://logfire.pydantic.dev/docs/how-to-guides/alternative-clients/).
+如果你的 Pydantic AI 应用包含 TypeScript frontend、API gateway，或其他语言编写的 services，Logfire 也可以跟踪它们。Logfire 提供 Python、JavaScript/TypeScript 和 Rust SDK，并兼容任何 OpenTelemetry-instrumented 应用。你可以在统一视图中查看整个 stack 的 traces。关于使用标准 OpenTelemetry 从其他语言发送数据的细节，请参阅[替代客户端指南](https://logfire.pydantic.dev/docs/how-to-guides/alternative-clients/)。
 
-Pydantic AI's instrumentation is built on [OpenTelemetry](https://opentelemetry.io/), so you can also use any OTel-compatible backend. See the [Logfire integration guide](logfire.md) for details.
+Pydantic AI 的 instrumentation 基于 [OpenTelemetry](https://opentelemetry.io/)，因此你也可以使用任何 OTel-compatible 后端。详情见 [Logfire 集成指南](logfire.md)。
 
-## Examples
+## 示例 {#examples}
 
-The following examples demonstrate how to use multi-agent patterns in Pydantic AI:
+下面的示例演示如何在 Pydantic AI 中使用多 agent 模式：
 
 - [Flight booking](examples/flight-booking.md)
