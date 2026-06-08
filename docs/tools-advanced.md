@@ -1,10 +1,10 @@
-# Advanced Tool Features
+# 高级工具功能 {#advanced-tool-features}
 
-This page covers advanced features for function tools in Pydantic AI. For basic tool usage, see the [Function Tools](tools.md) documentation.
+本页介绍 Pydantic AI 中 function tools 的高级功能。基础工具用法请参阅 [Function Tools](tools.md) 文档。
 
-## Tool Output {#function-tool-output}
+## 工具输出 {#function-tool-output}
 
-Tools can return anything that Pydantic can serialize to JSON, as well as audio, video, image or document content depending on the types of [multi-modal input](input.md) the model supports:
+工具可以返回任何 Pydantic 能序列化为 JSON 的值；根据模型支持的 [multi-modal input](input.md) 类型，也可以返回音频、视频、图片或文档内容：
 
 ```python {title="function_tool_output.py"}
 from datetime import datetime
@@ -60,19 +60,19 @@ print(result.output)
 #> The document contains just the text "Dummy PDF file."
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-Some models (e.g. Gemini) natively support semi-structured return values, while some expect text (OpenAI) but seem to be just as good at extracting meaning from the data. If a Python object is returned and the model expects a string, the value will be serialized to JSON.
+有些模型（例如 Gemini）原生支持半结构化返回值，而有些模型期望文本（OpenAI），但似乎同样能从数据中提取含义。如果返回 Python object 而模型期望字符串，该值会被序列化为 JSON。
 
-### Advanced Tool Returns
+### 高级工具返回值 {#advanced-tool-returns}
 
-For scenarios where you need more control over both the tool's return value and the content sent to the model, you can use [`ToolReturn`][pydantic_ai.messages.ToolReturn]. This is particularly useful when you want to:
+当你需要更细粒度控制工具返回值以及发送给模型的内容时，可以使用 [`ToolReturn`][pydantic_ai.messages.ToolReturn]。它在以下场景尤其有用：
 
-- Separate the structured return value from additional content sent to the model
-- Explicitly send content as a separate user message (rather than in the tool result)
-- Include additional metadata that shouldn't be sent to the LLM
+- 将结构化返回值与发送给模型的额外内容分离
+- 将内容作为单独 user message 显式发送，而不是放进 tool result
+- 包含不应发送给 LLM 的额外 metadata
 
-Here's an example of a computer automation tool that captures screenshots and provides visual feedback:
+下面是一个 computer automation tool 示例，它捕获 screenshots 并提供视觉反馈：
 
 ```python {title="advanced_tool_return.py"}
 from pydantic_ai import Agent, BinaryContent, ToolReturn
@@ -107,15 +107,15 @@ print(result.output)
 #> {"click_and_capture":"Successfully clicked at (0, 0)"}
 ```
 
-- **`return_value`**: The actual return value used in the tool response. This is what gets serialized and sent back to the model as the tool's result. Can include multimodal content directly (see [Tool Output](#function-tool-output) above).
-- **`content`**: Content sent as a **separate user message** after the tool result. Use this when you explicitly want content to appear outside the tool result, or when combining structured return values with rich content.
-- **`metadata`**: Optional metadata that your application can access but is not sent to the LLM. Useful for logging, debugging, or additional processing. Some other AI frameworks call this feature 'artifacts'.
+- **`return_value`**：tool response 中使用的实际返回值。它会被序列化，并作为工具结果发回给模型。它可以直接包含 multimodal content（见上面的[工具输出](#function-tool-output)）。
+- **`content`**：在 tool result 之后作为**单独 user message** 发送的内容。当你明确希望内容位于 tool result 外部，或想组合结构化返回值和 rich content 时使用。
+- **`metadata`**：应用可以访问、但不会发送给 LLM 的可选 metadata。它适合 logging、debugging 或额外处理。其他一些 AI frameworks 将此功能称为 "artifacts"。
 
-This separation allows you to provide rich context to the model while maintaining clean, structured return values for your application logic. For multimodal content that should be sent natively in the tool result (when supported by the model), return it directly from the tool function or include it in `return_value` (see [Tool Output](#function-tool-output) above).
+这种分离让你既能向模型提供丰富上下文，也能为应用逻辑保留干净的结构化返回值。对于应该原生包含在 tool result 中的 multimodal content（当模型支持时），请直接从 tool function 返回，或放在 `return_value` 中（见上面的[工具输出](#function-tool-output)）。
 
-## Custom Tool Schema
+## 自定义工具 Schema {#custom-tool-schema}
 
-If you have a function that lacks appropriate documentation (i.e. poorly named, no type information, poor docstring, use of \*args or \*\*kwargs and suchlike) then you can still turn it into a tool that can be effectively used by the agent with the [`Tool.from_schema`][pydantic_ai.tools.Tool.from_schema] function. With this you provide the name, description, JSON schema, and whether the function takes a `RunContext` for the function directly:
+如果某个函数缺少合适文档（例如命名不佳、没有类型信息、docstring 很差、使用 `*args` 或 `**kwargs` 等），你仍然可以通过 [`Tool.from_schema`][pydantic_ai.tools.Tool.from_schema] 将它转换成 agent 能有效使用的工具。通过它，你可以直接为函数提供 name、description、JSON schema，以及函数是否接受 `RunContext`：
 
 ```python
 from pydantic_ai import Agent, Tool
@@ -149,24 +149,23 @@ print(result.output)
 #> {"sum":0}
 ```
 
-Please note that validation of the tool arguments will not be performed, and this will pass all arguments as keyword arguments.
+请注意，工具参数不会执行验证，所有参数都会作为 keyword arguments 传入。
 
-## Dynamic Tools {#tool-prepare}
+## 动态工具 {#tool-prepare}
 
-Tools can optionally be defined with another function: `prepare`, which is called at each step of a run to
-customize the definition of the tool passed to the model, or omit the tool completely from that step.
+工具可以选择定义另一个函数 `prepare`，它会在 run 的每一步被调用，用于定制传给模型的工具定义，或在该步骤完全省略该工具。
 
-A `prepare` method can be registered via the `prepare` kwarg to any of the tool registration mechanisms:
+`prepare` method 可以通过任意工具注册机制的 `prepare` kwarg 注册：
 
 - [`@agent.tool`][pydantic_ai.agent.Agent.tool] decorator
 - [`@agent.tool_plain`][pydantic_ai.agent.Agent.tool_plain] decorator
 - [`Tool`][pydantic_ai.tools.Tool] dataclass
 
-The `prepare` method, should be of type [`ToolPrepareFunc`][pydantic_ai.tools.ToolPrepareFunc], a function which takes [`RunContext`][pydantic_ai.tools.RunContext] and a pre-built [`ToolDefinition`][pydantic_ai.tools.ToolDefinition], and should either return that `ToolDefinition` with or without modifying it, return a new `ToolDefinition`, or return `None` to indicate this tools should not be registered for that step.
+`prepare` method 应为 [`ToolPrepareFunc`][pydantic_ai.tools.ToolPrepareFunc] 类型：一个接受 [`RunContext`][pydantic_ai.tools.RunContext] 和预构建 [`ToolDefinition`][pydantic_ai.tools.ToolDefinition] 的函数。它应返回原 `ToolDefinition`（可修改或不修改）、返回新的 `ToolDefinition`，或返回 `None` 表示该步骤不注册此工具。
 
-Here's a simple `prepare` method that only includes the tool if the value of the dependency is `42`.
+下面是一个简单的 `prepare` method：仅当 dependency 值为 `42` 时才包含该工具。
 
-As with the previous example, we use [`TestModel`][pydantic_ai.models.test.TestModel] to demonstrate the behavior without calling a real model.
+与前一个示例一样，我们使用 [`TestModel`][pydantic_ai.models.test.TestModel] 演示行为，而不调用真实模型。
 
 ```python {title="tool_only_if_42.py"}
 
@@ -195,11 +194,11 @@ print(result.output)
 #> {"hitchhiker":"42 a"}
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-Here's a more complex example where we change the description of the `name` parameter to based on the value of `deps`
+下面是一个更复杂的示例：根据 `deps` 的值修改 `name` 参数的 description。
 
-For the sake of variation, we create this tool using the [`Tool`][pydantic_ai.tools.Tool] dataclass.
+为了展示不同写法，我们用 [`Tool`][pydantic_ai.tools.Tool] dataclass 创建这个工具。
 
 ```python {title="customize_name.py"}
 from __future__ import annotations
@@ -247,22 +246,22 @@ print(test_model.last_model_request_parameters.function_tools)
 """
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-### Agent-wide Dynamic Tools {#prepare-tools}
+### Agent 级动态工具 {#prepare-tools}
 
-In addition to per-tool `prepare` methods, you can also define an agent-wide `prepare_tools` function. This function is called at each step of a run and allows you to filter or modify the list of all tool definitions available to the agent for that step. This is especially useful if you want to enable or disable multiple tools at once, or apply global logic based on the current context.
+除了 per-tool 的 `prepare` methods，你还可以定义 agent-wide 的 `prepare_tools` 函数。这个函数会在 run 的每一步被调用，并允许你过滤或修改该步骤 agent 可用的全部 tool definitions。若你想一次启用或禁用多个工具，或基于当前上下文应用全局逻辑，它尤其有用。
 
-The `prepare_tools` function should be of type [`ToolsPrepareFunc`][pydantic_ai.tools.ToolsPrepareFunc], which takes the [`RunContext`][pydantic_ai.tools.RunContext] and a list of [`ToolDefinition`][pydantic_ai.tools.ToolDefinition], and returns a new list of tool definitions (or `None` to disable all tools for that step).
+`prepare_tools` 函数应为 [`ToolsPrepareFunc`][pydantic_ai.tools.ToolsPrepareFunc] 类型，接受 [`RunContext`][pydantic_ai.tools.RunContext] 和 [`ToolDefinition`][pydantic_ai.tools.ToolDefinition] list，并返回新的 tool definitions list（或返回 `None` 以禁用该步骤的所有工具）。
 
 !!! warning
-    Returning `None` from the callback disables **all** tools for that step and emits a `PydanticAIDeprecationWarning`; it is not a "pass through unchanged" shortcut. Return the `tool_defs` argument to keep every tool as-is, or `[]` to expose no tools intentionally.
+    从 callback 返回 `None` 会禁用该步骤的**所有**工具，并发出 `PydanticAIDeprecationWarning`；它不是"保持不变并透传"的快捷方式。要保留所有工具，请返回 `tool_defs` 参数；若有意暴露零个工具，请返回 `[]`。
 
 !!! note
-    The list of tool definitions passed to `prepare_tools` includes both regular function tools and tools from any [toolsets](toolsets.md) registered on the agent, but not [output tools](output.md#tool-output).
-To modify output tools, you can set a `prepare_output_tools` function instead.
+    传给 `prepare_tools` 的 tool definitions list 包含普通 function tools 和 agent 上注册的任何 [toolsets](toolsets.md) 中的工具，但不包含 [output tools](output.md#tool-output)。
+    要修改 output tools，可以改为设置 `prepare_output_tools` 函数。
 
-Here's an example that makes all tools strict if the model is an OpenAI model:
+下面是一个当模型是 OpenAI model 时让所有工具变为 strict 的示例：
 
 ```python {title="agent_prepare_tools_customize.py" noqa="I001"}
 from dataclasses import replace
@@ -299,9 +298,9 @@ agent.run_sync('testing with openai...')
 assert test_model.last_model_request_parameters.function_tools[0].strict
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-Here's another example that conditionally filters out the tools by name if the dependency (`ctx.deps`) is `True`:
+下面是另一个示例：当 dependency（`ctx.deps`）为 `True` 时，按名称过滤掉工具：
 
 ```python {title="agent_prepare_tools_filter_out.py" noqa="I001"}
 
@@ -336,32 +335,32 @@ print(result.output)
 #> success (no tool calls)
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-You can use `prepare_tools` to:
+你可以使用 `prepare_tools` 来：
 
-- Dynamically enable or disable tools based on the current model, dependencies, or other context
-- Modify tool definitions globally (e.g., set all tools to strict mode, change descriptions, etc.)
+- 根据当前 model、dependencies 或其他上下文动态启用或禁用工具
+- 全局修改 tool definitions（例如将所有工具设置为 strict mode、修改 descriptions 等）
 
-If both per-tool `prepare` and agent-wide `prepare_tools` are used, the per-tool `prepare` is applied first to each tool, and then `prepare_tools` is called with the resulting list of tool definitions.
+如果同时使用 per-tool `prepare` 和 agent-wide `prepare_tools`，会先对每个工具应用 per-tool `prepare`，然后用得到的 tool definitions list 调用 `prepare_tools`。
 
 ## Tool Choice {#tool-choice}
 
-The `tool_choice` setting in [`ModelSettings`][pydantic_ai.settings.ModelSettings] controls which tools the model can use during a request. This is useful for disabling tools, forcing tool use, or restricting which tools are available.
+[`ModelSettings`][pydantic_ai.settings.ModelSettings] 中的 `tool_choice` 设置控制模型在请求期间可以使用哪些工具。它适合用于禁用工具、强制使用工具，或限制可用工具。
 
-Pydantic AI distinguishes between **[function tools](tools.md)** (tools you register via `@agent.tool`, [toolsets](toolsets.md), or [MCP](mcp/client.md)), and **output tools** (internal tools used for [structured output](output.md#tool-output)).
+Pydantic AI 区分 **[function tools](tools.md)**（通过 `@agent.tool`、[toolsets](toolsets.md) 或 [MCP](mcp/client.md) 注册的工具）和 **output tools**（用于[结构化输出](output.md#tool-output)的内部工具）。
 
-### Options
+### 选项 {#options}
 
-| Value | Description |
-|-------|-------------|
-| `'auto'` (default) | Model decides whether to use tools. All tools available. |
-| `'none'` | Disable function tools. Model can respond with text or use output tools. |
-| `'required'` | Force the model to use a function tool. Excludes output tools, so set dynamically via a [capability](#dynamic-tool-choice-via-capabilities) or use [direct model requests](direct.md); raises an error when set statically in `agent.run()`. |
-| `['tool_a', ...]` | Restrict to specific tools by name. Excludes output tools — same dynamic/direct requirement as `'required'`. |
-| [`ToolOrOutput`][pydantic_ai.settings.ToolOrOutput]`(function_tools=['...'])` | Restrict function tools while auto-including all output tools. |
+| 值 | 说明 |
+| --- | --- |
+| `'auto'`（默认） | 模型决定是否使用工具。所有工具可用。 |
+| `'none'` | 禁用 function tools。模型可以返回文本或使用 output tools。 |
+| `'required'` | 强制模型使用 function tool。它会排除 output tools，因此请通过 [capability](#dynamic-tool-choice-via-capabilities) 动态设置，或使用 [direct model requests](direct.md)；在 `agent.run()` 中静态设置会引发错误。 |
+| `['tool_a', ...]` | 按名称限制为特定工具。它会排除 output tools，与 `'required'` 一样需要动态/直接请求。 |
+| [`ToolOrOutput`][pydantic_ai.settings.ToolOrOutput]`(function_tools=['...'])` | 限制 function tools，同时自动包含所有 output tools。 |
 
-### Example
+### 示例 {#example}
 
 ```python
 from pydantic_ai import Agent
@@ -390,11 +389,11 @@ result = agent.run_sync(
 )
 ```
 
-### Dynamic tool choice via capabilities {#dynamic-tool-choice-via-capabilities}
+### 通过 capabilities 动态选择工具 {#dynamic-tool-choice-via-capabilities}
 
-`tool_choice='required'` and `['tool_a', ...]` exclude output tools, so setting either one *statically* would force a tool call on every step and leave the agent unable to produce a final response. `agent.run()` raises a `UserError` when it detects these values on the static baseline (the `model_settings` argument of [`Agent.run`][pydantic_ai.Agent.run], the agent's own `model_settings`, or the underlying model's defaults).
+`tool_choice='required'` 和 `['tool_a', ...]` 会排除 output tools，因此若*静态*设置任一值，会强制每一步都调用工具，让 agent 无法生成最终响应。当 Pydantic AI 在静态基线（[`Agent.run`][pydantic_ai.Agent.run] 的 `model_settings` 参数、agent 自身的 `model_settings`，或底层 model 的 defaults）上检测到这些值时，`agent.run()` 会引发 `UserError`。
 
-To vary `tool_choice` *per step* — for example, to force a specific tool on the first step and then let the model decide — return a callable from a capability's [`get_model_settings`][pydantic_ai.capabilities.AbstractCapability.get_model_settings]. The callable receives a [`RunContext`][pydantic_ai.tools.RunContext] with full access to `ctx.messages` and `ctx.run_step`, so it can inspect what has already happened in the run and adapt.
+要按步骤改变 `tool_choice`，例如第一步强制调用某个特定工具，然后让模型自行决定，请从 capability 的 [`get_model_settings`][pydantic_ai.capabilities.AbstractCapability.get_model_settings] 返回 callable。该 callable 会收到一个 [`RunContext`][pydantic_ai.tools.RunContext]，可完整访问 `ctx.messages` 和 `ctx.run_step`，因此可以检查 run 中已经发生的事情并自适应。
 
 ```python {title="force_first_call.py"}
 from pydantic_ai import Agent, ModelSettings, RunContext
@@ -431,49 +430,49 @@ def get_weather(city: str) -> str:
     return f'Sunny in {city}'
 ```
 
-Because capability-supplied settings are resolved per step, the callable's returned `tool_choice` is trusted to change across steps and is not rejected by the baseline validator. For a single model request without an agent loop, use [`pydantic_ai.direct.model_request`][pydantic_ai.direct.model_request] instead.
+由于 capability 提供的 settings 会按步骤解析，callable 返回的 `tool_choice` 被信任为可跨步骤变化，因此不会被 baseline validator 拒绝。对于没有 agent loop 的单次 model request，请改用 [`pydantic_ai.direct.model_request`][pydantic_ai.direct.model_request]。
 
-### Provider Support
+### Provider 支持 {#provider-support}
 
-All providers support `'auto'` and `'none'`. Key differences for other options:
+所有 providers 都支持 `'auto'` 和 `'none'`。其他选项的关键差异如下：
 
-| Provider | `'required'` | Specific tools | Notes |
-|----------|:------------:|:--------------:|-------|
+| Provider | `'required'` | 特定工具 | Notes |
+| --- | :---: | :---: | --- |
 | OpenAI | ✓ | ✓ | Full support |
-| Anthropic | ⚠️ | ⚠️ | Not supported with thinking enabled |
+| Anthropic | ⚠️ | ⚠️ | thinking enabled 时不支持 |
 | Google | ✓ | ✓ | |
-| Bedrock | ✓ | Single only | Multiple tools fall back to 'any' mode |
-| Groq/HuggingFace | ✓ | Single only | Multiple tools fall back to 'required' mode |
-| Mistral | ✓ | ✓ | Maps `'required'` to `'any'` mode |
-| xAI | ✓ | ✓ | Some models may not support forcing; falls back to 'auto' |
+| Bedrock | ✓ | Single only | 多个工具会 fallback 到 'any' mode |
+| Groq/HuggingFace | ✓ | Single only | 多个工具会 fallback 到 'required' mode |
+| Mistral | ✓ | ✓ | 将 `'required'` 映射到 `'any'` mode |
+| xAI | ✓ | ✓ | 某些 models 可能不支持 forcing；会 fallback 到 'auto' |
 
-### Prompt caching implications {#tool-choice-caching}
+### Prompt caching 影响 {#tool-choice-caching}
 
-Restricting the available tool set via `tool_choice` can invalidate provider prompt caches because most provider APIs cache on the full tools array. Pydantic AI restricts the tool set in two ways:
+通过 `tool_choice` 限制可用工具集可能会让 provider prompt caches 失效，因为大多数 provider APIs 会基于完整 tools array 缓存。Pydantic AI 以两种方式限制工具集：
 
-- **API-level filtering** (cache-preserving): the full tools array is sent and the provider is told to only allow a subset. Used by OpenAI Responses (`allowed_tools`), Google (`allowed_function_names`), and Bedrock when forcing a single tool.
-- **Client-side filtering** (breaks cache): the tools array is trimmed before the request. Used when the provider API has no native filter for the given case.
+- **API-level filtering**（保留 cache）：发送完整 tools array，并告知 provider 只允许其中一个子集。OpenAI Responses（`allowed_tools`）、Google（`allowed_function_names`）以及 Bedrock 在强制单个工具时使用这种方式。
+- **Client-side filtering**（破坏 cache）：在请求前裁剪 tools array。当 provider API 对给定情况没有原生 filter 时使用。
 
-The table below covers the cases where Pydantic AI must filter client-side and therefore breaks cache:
+下表列出 Pydantic AI 必须 client-side filter、因此会破坏 cache 的情况：
 
-| Provider | Cache-breaking case |
-|----------|---------------------|
-| Anthropic | `tool_choice` is a list of multiple tools, OR a single tool with thinking enabled |
-| OpenAI Chat | `tool_choice` is a list of multiple tools, OR a single tool on a model that doesn't support forcing |
-| Bedrock | `tool_choice` is a list of multiple tools, OR a single tool with thinking enabled or on a model that doesn't support forcing |
-| Groq / HuggingFace | `tool_choice` is a list of multiple tools |
-| Mistral | `tool_choice` is a list (any size) — the API doesn't accept specific tool names |
-| xAI | `tool_choice` is a list of multiple tools, OR a single tool on a model that doesn't support forcing |
-| OpenAI Responses | Never — `allowed_tools` handles all cases natively |
-| Google | Never — `allowed_function_names` handles all cases natively |
+| Provider | 会破坏 cache 的情况 |
+| --- | --- |
+| Anthropic | `tool_choice` 是多个工具的 list，或 thinking enabled 时的单个工具 |
+| OpenAI Chat | `tool_choice` 是多个工具的 list，或模型不支持 forcing 时的单个工具 |
+| Bedrock | `tool_choice` 是多个工具的 list，或 thinking enabled / 模型不支持 forcing 时的单个工具 |
+| Groq / HuggingFace | `tool_choice` 是多个工具的 list |
+| Mistral | `tool_choice` 是 list（任意大小），API 不接受特定 tool names |
+| xAI | `tool_choice` 是多个工具的 list，或模型不支持 forcing 时的单个工具 |
+| OpenAI Responses | 从不；`allowed_tools` 原生处理所有情况 |
+| Google | 从不；`allowed_function_names` 原生处理所有情况 |
 
-If preserving cache hits matters, prefer providers/cases marked "Never", or use `ToolOrOutput` (which keeps the full set) instead of a restrictive list.
+如果保留 cache hits 很重要，请优先选择标记为 "Never" 的 providers/cases，或使用 `ToolOrOutput`（它会保持完整集合），而不是 restrictive list。
 
-## Tool Execution and Retries {#tool-retries}
+## 工具执行和重试 {#tool-retries}
 
-When a tool is executed, its arguments (provided by the LLM) are first validated against the function's signature using Pydantic (with optional [validation context](output.md#validation-context)). If validation fails (e.g., due to incorrect types or missing required arguments), a `ValidationError` is raised, and the framework automatically generates a [`RetryPromptPart`][pydantic_ai.messages.RetryPromptPart] containing the validation details. This prompt is sent back to the LLM, informing it of the error and allowing it to correct the parameters and retry the tool call.
+工具执行时，其参数（由 LLM 提供）会先使用 Pydantic 根据函数签名进行验证（可选使用 [validation context](output.md#validation-context)）。如果验证失败（例如类型错误或缺少必需参数），会引发 `ValidationError`，framework 会自动生成包含验证详情的 [`RetryPromptPart`][pydantic_ai.messages.RetryPromptPart]。该 prompt 会发回给 LLM，告知错误并允许它修正参数后重试 tool call。
 
-Beyond automatic validation errors, the tool's own internal logic can also explicitly request a retry by raising the [`ModelRetry`][pydantic_ai.exceptions.ModelRetry] exception. This is useful for situations where the parameters were technically valid, but an issue occurred during execution (like a transient network error, or the tool determining the initial attempt needs modification).
+除了自动验证错误，工具自己的内部逻辑也可以通过引发 [`ModelRetry`][pydantic_ai.exceptions.ModelRetry] exception 显式请求重试。这适用于参数技术上有效，但执行期间出现问题的情况（例如 transient network error，或工具判断初次尝试需要修改）。
 
 ```python
 from pydantic_ai import ModelRetry
@@ -487,13 +486,13 @@ def my_flaky_tool(query: str) -> str:
     return 'Success!'
 ```
 
-Raising `ModelRetry` also generates a `RetryPromptPart` containing the exception message, which is sent back to the LLM to guide its next attempt. Both `ValidationError` and `ModelRetry` respect the configured retry limit — set per-tool via [`Tool(max_retries=N)`][pydantic_ai.tools.Tool] (or `@agent.tool(retries=N)`), per-toolset via [`FunctionToolset(max_retries=N)`][pydantic_ai.toolsets.FunctionToolset], or agent-wide via [`Agent(retries={'tools': N})`][pydantic_ai.agent.Agent.__init__], applied in that order of precedence.
+引发 `ModelRetry` 也会生成包含 exception message 的 `RetryPromptPart`，并将其发回给 LLM 指导下一次尝试。`ValidationError` 和 `ModelRetry` 都遵守配置的 retry limit：可通过 [`Tool(max_retries=N)`][pydantic_ai.tools.Tool]（或 `@agent.tool(retries=N)`）按工具设置，通过 [`FunctionToolset(max_retries=N)`][pydantic_ai.toolsets.FunctionToolset] 按 toolset 设置，或通过 [`Agent(retries={'tools': N})`][pydantic_ai.agent.Agent.__init__] 按 agent 设置，并按此顺序确定优先级。
 
-Tool retries are tracked **per tool**: every function tool has its own counter, with no global 'tool call' budget shared across the run. When a tool raises `ModelRetry` or its arguments fail validation, only that tool's counter advances. Inside a tool function, [`ctx.max_retries`][pydantic_ai.tools.RunContext.max_retries] reflects that tool's enforcement limit and [`ctx.retry`][pydantic_ai.tools.RunContext.retry] is that tool's own counter. When a tool exhausts its counter, the run raises [`UnexpectedModelBehavior`][pydantic_ai.exceptions.UnexpectedModelBehavior] with message `'Tool {name!r} exceeded max retries count of {N}'`. User-provided toolsets inherit `Agent(retries={'tools': ...})` as their default when no per-toolset value is set.
+Tool retries 是**按工具**跟踪的：每个 function tool 都有自己的 counter，run 中没有共享的全局 "tool call" budget。当某个工具引发 `ModelRetry` 或其参数验证失败时，只会推进该工具自己的 counter。在 tool function 内部，[`ctx.max_retries`][pydantic_ai.tools.RunContext.max_retries] 反映该工具的 enforcement limit，而 [`ctx.retry`][pydantic_ai.tools.RunContext.retry] 是该工具自己的 counter。当工具耗尽 counter 时，run 会引发 [`UnexpectedModelBehavior`][pydantic_ai.exceptions.UnexpectedModelBehavior]，message 为 `'Tool {name!r} exceeded max retries count of {N}'`。用户提供的 toolsets 在未设置 per-toolset 值时，会继承 `Agent(retries={'tools': ...})` 作为默认值。
 
-### Tool Timeout
+### 工具超时 {#tool-timeout}
 
-You can set a timeout for tool execution to prevent tools from running indefinitely. If a tool exceeds its timeout, it is treated as a failure and a retry prompt is sent to the model (counting towards the retry limit).
+你可以为工具执行设置 timeout，防止工具无限运行。如果工具超过 timeout，会被视为失败，并向模型发送 retry prompt（计入 retry limit）。
 
 ```python
 import asyncio
@@ -518,16 +517,16 @@ async def fast_tool() -> str:
     return 'Done'
 ```
 
-- **Agent-level timeout**: Set `tool_timeout` on the [`Agent`][pydantic_ai.agent.Agent] to apply a default timeout to all tools.
-- **Per-tool timeout**: Set `timeout` on individual tools via [`@agent.tool`][pydantic_ai.agent.Agent.tool], [`@agent.tool_plain`][pydantic_ai.agent.Agent.tool_plain], or the [`Tool`][pydantic_ai.tools.Tool] dataclass. This overrides the agent-level default.
+- **Agent-level timeout**：在 [`Agent`][pydantic_ai.agent.Agent] 上设置 `tool_timeout`，为所有工具应用默认 timeout。
+- **Per-tool timeout**：通过 [`@agent.tool`][pydantic_ai.agent.Agent.tool]、[`@agent.tool_plain`][pydantic_ai.agent.Agent.tool_plain] 或 [`Tool`][pydantic_ai.tools.Tool] dataclass 在单个工具上设置 `timeout`。它会覆盖 agent-level 默认值。
 
-When a timeout occurs, the tool is considered to have failed and the model receives a retry prompt with the message `"Timed out after {timeout} seconds."`. This counts towards the tool's retry limit just like validation errors or explicit [`ModelRetry`][pydantic_ai.exceptions.ModelRetry] exceptions.
+当 timeout 发生时，工具被视为失败，模型会收到 message 为 `"Timed out after {timeout} seconds."` 的 retry prompt。它和 validation errors 或显式 [`ModelRetry`][pydantic_ai.exceptions.ModelRetry] exceptions 一样，会计入该工具的 retry limit。
 
-### Custom Args Validator {#args-validator}
+### 自定义 Args Validator {#args-validator}
 
-The `args_validator` parameter lets you define custom validation that runs after Pydantic schema validation but before the tool executes. This is useful for business logic validation, cross-field validation, or validating arguments before requesting [human approval](deferred-tools.md) for deferred tools.
+`args_validator` 参数允许你定义自定义验证：它会在 Pydantic schema validation 之后、工具执行之前运行。它适用于业务逻辑验证、跨字段验证，或在为 deferred tools 请求 [human approval](deferred-tools.md) 前验证参数。
 
-The validator receives [`RunContext`][pydantic_ai.tools.RunContext] as its first argument, followed by the same parameters as the tool function. Return `None` on success, or raise [`ModelRetry`][pydantic_ai.exceptions.ModelRetry] on failure.
+Validator 的第一个参数是 [`RunContext`][pydantic_ai.tools.RunContext]，后面跟与 tool function 相同的参数。成功时返回 `None`，失败时引发 [`ModelRetry`][pydantic_ai.exceptions.ModelRetry]。
 
 ```python {title="args_validator_approval.py"}
 from pydantic_ai import Agent, DeferredToolRequests, ModelRetry, RunContext
@@ -556,26 +555,26 @@ print(result.output.approvals[0].args)
 #> {'x': 0, 'y': 0}
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-When validation fails, the error message is sent back to the LLM as a retry prompt. This respects the `retries` setting on the tool. For [deferred tools](deferred-tools.md), validation runs at deferral time — only tool calls with valid arguments are deferred, while failed validation triggers a retry just like regular tools.
+验证失败时，error message 会作为 retry prompt 发回给 LLM。它遵守工具上的 `retries` 设置。对于 [deferred tools](deferred-tools.md)，验证会在 deferral time 运行；只有参数有效的 tool calls 会被 deferred，验证失败会像普通工具一样触发 retry。
 
-The `args_validator` parameter is available on [`@agent.tool`][pydantic_ai.agent.Agent.tool], [`@agent.tool_plain`][pydantic_ai.agent.Agent.tool_plain], [`Tool`][pydantic_ai.tools.Tool], [`Tool.from_schema`][pydantic_ai.tools.Tool.from_schema], and [`FunctionToolset`][pydantic_ai.toolsets.function.FunctionToolset]. Validators can be sync or async functions.
+`args_validator` 参数可用于 [`@agent.tool`][pydantic_ai.agent.Agent.tool]、[`@agent.tool_plain`][pydantic_ai.agent.Agent.tool_plain]、[`Tool`][pydantic_ai.tools.Tool]、[`Tool.from_schema`][pydantic_ai.tools.Tool.from_schema] 和 [`FunctionToolset`][pydantic_ai.toolsets.function.FunctionToolset]。Validators 可以是同步或异步函数。
 
-The validation result is exposed via the `args_valid` field on [`FunctionToolCallEvent`][pydantic_ai.messages.FunctionToolCallEvent]. This reflects all validation — both schema validation and custom `args_validator` validation (if configured): `True` means all validation passed, `False` means validation failed, and `None` means validation was not performed (e.g. tool calls skipped due to the `'early'` end strategy, or deferred tool calls resolved without execution).
+验证结果通过 [`FunctionToolCallEvent`][pydantic_ai.messages.FunctionToolCallEvent] 上的 `args_valid` 字段暴露。它反映所有验证：schema validation 和自定义 `args_validator` validation（如果已配置）。`True` 表示所有验证通过，`False` 表示验证失败，`None` 表示未执行验证（例如因为 `'early'` end strategy 跳过 tool calls，或 deferred tool calls 未执行就被解析）。
 
-### Parallel tool calls & concurrency
+### 并行工具调用和并发 {#parallel-tool-calls-concurrency}
 
-When a model returns multiple tool calls in one response, Pydantic AI schedules them concurrently using `asyncio.create_task`.
-If a tool requires sequential/serial execution, you can pass the [`sequential`][pydantic_ai.tools.ToolDefinition.sequential] flag when registering the tool, or wrap the agent run in the [`with agent.parallel_tool_call_execution_mode('sequential')`][pydantic_ai.agent.AbstractAgent.parallel_tool_call_execution_mode] context manager.
+当模型在一个 response 中返回多个 tool calls 时，Pydantic AI 会使用 `asyncio.create_task` 并发调度它们。
+如果工具需要 sequential/serial execution，可以在注册工具时传入 [`sequential`][pydantic_ai.tools.ToolDefinition.sequential] 标志，或用 [`with agent.parallel_tool_call_execution_mode('sequential')`][pydantic_ai.agent.AbstractAgent.parallel_tool_call_execution_mode] context manager 包裹 agent run。
 
-Async functions are run on the event loop, while sync functions are offloaded to threads. To get the best performance, _always_ use an async function _unless_ you're doing blocking I/O (and there's no way to use a non-blocking library instead) or CPU-bound work (like `numpy` or `scikit-learn` operations), so that simple functions are not offloaded to threads unnecessarily.
+Async functions 会在 event loop 上运行，sync functions 会被 offload 到 threads。为了获得最佳性能，除非你正在执行 blocking I/O（且没有办法使用 non-blocking library）或 CPU-bound work（例如 `numpy` 或 `scikit-learn` operations），请_始终_使用 async function，避免简单函数被不必要地 offload 到 threads。
 
-#### Thread executor for long-running servers
+#### 长运行 servers 的 thread executor {#thread-executor-for-long-running-servers}
 
-By default, sync functions are offloaded to threads using [`anyio.to_thread.run_sync`][anyio.to_thread.run_sync], which creates ephemeral threads on demand. In long-running servers (e.g. FastAPI), these threads can accumulate under sustained traffic, leading to memory growth.
+默认情况下，sync functions 会通过 [`anyio.to_thread.run_sync`][anyio.to_thread.run_sync] offload 到 threads，这会按需创建短生命周期 threads。在长运行 servers（例如 FastAPI）中，这些 threads 在持续流量下可能累积，导致 memory growth。
 
-To control thread lifecycle, provide a bounded [`ThreadPoolExecutor`][concurrent.futures.ThreadPoolExecutor] using the [`ThreadExecutor`][pydantic_ai.capabilities.ThreadExecutor] capability (per-agent) or the [`Agent.using_thread_executor()`][pydantic_ai.agent.AbstractAgent.using_thread_executor] context manager (global):
+要控制 thread lifecycle，请使用 [`ThreadExecutor`][pydantic_ai.capabilities.ThreadExecutor] capability（per-agent）或 [`Agent.using_thread_executor()`][pydantic_ai.agent.AbstractAgent.using_thread_executor] context manager（global）提供一个有界 [`ThreadPoolExecutor`][concurrent.futures.ThreadPoolExecutor]：
 
 ```python {test="skip"}
 from concurrent.futures import ThreadPoolExecutor
@@ -597,39 +596,39 @@ async def lifespan(app):
     executor.shutdown(wait=True)
 ```
 
-!!! note "Limiting tool executions"
-    You can cap tool executions within a run using [`UsageLimits(tool_calls_limit=...)`](agent.md#usage-limits). The counter increments only after a successful tool invocation. Output tools (used for [structured output](output.md)) are not counted in the `tool_calls` metric.
+!!! note "限制工具执行"
+    你可以使用 [`UsageLimits(tool_calls_limit=...)`](agent.md#usage-limits) 限制单次 run 内的 tool executions。Counter 只会在一次成功的工具调用后递增。用于[结构化输出](output.md)的 Output tools 不会计入 `tool_calls` metric。
 
-#### Output Tool Calls
+#### Output Tool Calls {#output-tool-calls}
 
-When a model calls an [output tool](output.md#tool-output) in parallel with other tools, the agent's [`end_strategy`][pydantic_ai.agent.Agent.end_strategy] parameter controls how these tool calls are executed.
-The `'graceful'` strategy ensures all function tools are executed even after a final result is found, while skipping remaining output tools. The `'exhaustive'` strategy goes further and also executes all output tools. Both are useful when tools have side effects (like logging, sending notifications, or updating metrics) that should always execute.
+当模型在调用其他工具的同时并行调用 [output tool](output.md#tool-output) 时，agent 的 [`end_strategy`][pydantic_ai.agent.Agent.end_strategy] 参数会控制这些 tool calls 如何执行。
+`'graceful'` strategy 确保即使找到 final result 后，也会执行所有 function tools，同时跳过剩余 output tools。`'exhaustive'` strategy 更进一步，也会执行所有 output tools。当工具有 side effects（例如 logging、发送 notifications 或更新 metrics）并且应始终执行时，两者都很有用。
 
-For more information on how `end_strategy` works with both function tools and output tools, see the [Output Tool](output.md#parallel-output-tool-calls) docs.
+有关 `end_strategy` 如何同时作用于 function tools 和 output tools 的更多信息，请参阅 [Output Tool](output.md#parallel-output-tool-calls) 文档。
 
-## Tool Search
+## 工具搜索 {#tool-search}
 
-Agents with many tools (e.g. [MCP servers](mcp/client.md) exposing dozens of endpoints) can spend a lot of input tokens on tool definitions before any work happens, and tool selection accuracy noticeably degrades past ~30–50 available tools. Marking tools for deferred loading hides them from the model's initial context; the model discovers hidden tools by keyword when it needs them.
+拥有大量工具的 agents（例如暴露几十个 endpoints 的 [MCP servers](mcp/client.md)）会在真正工作前消耗大量 input tokens 来传递 tool definitions，而且当可用工具超过约 30-50 个时，tool selection accuracy 会明显下降。将工具标记为 deferred loading 会把它们从模型初始上下文中隐藏起来；当模型需要时，它会通过 keyword 发现 hidden tools。
 
-Reach for it when:
+适合在以下情况使用：
 
-* the agent exposes ~10+ tools or more than ~10k tokens of tool definitions
-* tools cover distinct domains (e.g. multiple MCP servers) and only a subset is relevant per request
-* the toolset is growing and you want headroom
+* agent 暴露约 10+ 个工具，或 tool definitions 超过约 10k tokens
+* 工具覆盖不同领域（例如多个 MCP servers），且每个请求只相关其中一部分
+* toolset 正在增长，你想保留余量
 
-Skip it when you have a small, hot toolset where every tool is used most turns — deferring everything would just add a discovery round-trip for no benefit. As a rule of thumb, keep your handful of most-used tools eagerly loaded; defer the long tail.
+如果你只有少量高频工具，并且几乎每轮都会用到每个工具，则不要使用。把所有工具都 defer 只会增加一次 discovery round-trip，而没有收益。经验法则是：保持少数最常用工具 eager loaded，将长尾工具 defer。
 
-To opt in, set `defer_loading=True` on individual [`Tool`][pydantic_ai.tools.Tool] / [`@agent.tool`][pydantic_ai.agent.Agent.tool] / [`@agent.tool_plain`][pydantic_ai.agent.Agent.tool_plain] registrations, or use [`.defer_loading()`][pydantic_ai.toolsets.AbstractToolset.defer_loading] on a whole toolset (including [MCP servers](mcp/client.md) and [`FastMCPToolset`][pydantic_ai.toolsets.fastmcp.FastMCPToolset]) — pass a list of tool names to hide specific ones, or `None` to hide all.
+要启用，请在单个 [`Tool`][pydantic_ai.tools.Tool] / [`@agent.tool`][pydantic_ai.agent.Agent.tool] / [`@agent.tool_plain`][pydantic_ai.agent.Agent.tool_plain] 注册上设置 `defer_loading=True`，或在整个 toolset（包括 [MCP servers](mcp/client.md) 和 [`FastMCPToolset`][pydantic_ai.toolsets.fastmcp.FastMCPToolset]）上使用 [`.defer_loading()`][pydantic_ai.toolsets.AbstractToolset.defer_loading]。传入 tool names list 可隐藏特定工具，传入 `None` 可隐藏所有工具。
 
-Once deferred tools exist, search is handled by the auto-injected [`ToolSearch`][pydantic_ai.capabilities.ToolSearch] capability:
+一旦存在 deferred tools，search 会由自动注入的 [`ToolSearch`][pydantic_ai.capabilities.ToolSearch] capability 处理：
 
-* **Native provider search** on supporting models (Anthropic Sonnet 4.5+, Opus 4.5+, Haiku 4.5+ via [BM25/regex](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool); OpenAI Responses on GPT-5.4+). Deferred tools are sent to the provider with `defer_loading` on the wire and the provider manages their visibility.
-* **Custom callable** via [`ToolSearch(strategy=...)`][pydantic_ai.capabilities.ToolSearch] — a user-supplied search function. Executed on our side, but routed through the provider's client-executed native surface (Anthropic `tool_reference` blocks, OpenAI `execution='client'`) where supported so the model sees a tool-search call rather than a regular function tool.
-* **Local fallback** on every other model: a `search_tools` function tool matches keywords against tool names and descriptions.
+* **Native provider search**：支持模型上的原生搜索（Anthropic Sonnet 4.5+、Opus 4.5+、Haiku 4.5+ 通过 [BM25/regex](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool)；OpenAI Responses on GPT-5.4+）。Deferred tools 会在 wire 上带着 `defer_loading` 发给 provider，由 provider 管理其可见性。
+* **Custom callable**：通过 [`ToolSearch(strategy=...)`][pydantic_ai.capabilities.ToolSearch] 提供用户自定义 search function。它在我们这一侧执行，但在支持时会通过 provider 的 client-executed native surface（Anthropic `tool_reference` blocks、OpenAI `execution='client'`）路由，让模型看到 tool-search call，而不是普通 function tool。
+* **Local fallback**：其他所有模型上使用 `search_tools` function tool，根据 tool names 和 descriptions 匹配 keywords。
 
-Pydantic AI prefers native search whenever available because the discovery exchange happens append-only (a `tool_search_call` + `tool_search_output` pair) — the deferred tools never enter the prompt prefix, so prompt caching is preserved across rounds. The local fallback, by contrast, flips each discovered tool's `defer_loading=False` between rounds, which changes the tool-definition prefix and invalidates the cached request prefix on every discovery turn.
+Pydantic AI 优先使用 native search，因为 discovery exchange 是 append-only（一对 `tool_search_call` + `tool_search_output`）；deferred tools 永远不会进入 prompt prefix，因此 prompt caching 能跨 rounds 保留。相反，local fallback 会在 rounds 之间把每个已发现工具的 `defer_loading` 改为 `False`，从而改变 tool-definition prefix，并在每个 discovery turn 让 cached request prefix 失效。
 
-For the model to find tools well, give them descriptive names with consistent prefixes (`github_*`, `slack_*`, `mortgage_*`) and put the keywords a user might search for in the tool's description. A search returns a handful of matches at a time, so the model may iterate (search → discover → call → search again) — instructions can nudge it: "Search by topic when you don't see a tool you need."
+为了让模型更好地找到工具，请使用描述性名称和一致 prefixes（`github_*`、`slack_*`、`mortgage_*`），并在工具 description 中放入用户可能搜索的 keywords。一次 search 会返回少量 matches，因此模型可能迭代（search -> discover -> call -> 再 search）；instructions 可以提示它："Search by topic when you don't see a tool you need."
 
 ```python {title="tool_search.py"}
 from pydantic_ai import Agent
@@ -646,7 +645,7 @@ def mortgage_calculator(principal: float, rate: float, years: int) -> str:
     return f'${payment:.2f}/month'
 ```
 
-For MCP servers, use [`.defer_loading()`][pydantic_ai.toolsets.AbstractToolset.defer_loading] to hide all tools behind search:
+对于 MCP servers，使用 [`.defer_loading()`][pydantic_ai.toolsets.AbstractToolset.defer_loading] 将所有工具隐藏到 search 后面：
 
 ```python {title="tool_search_mcp.py" lint="skip" test="skip"}
 from pydantic_ai import Agent
@@ -656,9 +655,9 @@ mcp = MCPServerHTTP('http://localhost:8000/mcp')
 agent = Agent('anthropic:claude-sonnet-4-6', toolsets=[mcp.defer_loading()])
 ```
 
-### Configuring `ToolSearch`
+### 配置 `ToolSearch` {#configuring-toolsearch}
 
-Pass an explicit [`ToolSearch`][pydantic_ai.capabilities.ToolSearch] capability to control the strategy or provide a custom search function:
+传入显式 [`ToolSearch`][pydantic_ai.capabilities.ToolSearch] capability，可以控制 strategy 或提供自定义 search function：
 
 ```python {title="tool_search_custom.py"}
 from collections.abc import Sequence
@@ -692,33 +691,33 @@ def mortgage_calculator(principal: float, rate: float, years: int) -> str:
     return f'${payment:.2f}/month'
 ```
 
-Available strategy values:
+可用 strategy values：
 
 | `strategy` | Algorithm | Behavior |
-|---|---|---|
-| `None` (default) | Provider's native algorithm where available, else local keyword matching | Anthropic native BM25 on Sonnet 4.5+/Opus 4.5+/Haiku 4.5+, OpenAI server-executed `tool_search` on GPT-5.4+, local keyword matching elsewhere. |
-| `'keywords'` | Local keyword-overlap | The keyword algorithm runs on our side, but the wire shape adapts: client-executed native (Anthropic, OpenAI) where supported so the prompt cache stays warm, regular `search_tools` function tool elsewhere. |
-| `'bm25'` / `'regex'` | Anthropic native | Server-executed by Anthropic. The request fails on other providers (OpenAI, Google, etc.) rather than silently substituting a different algorithm. |
-| Callable `(ctx, queries, tools) -> names` | User-defined | Same execution-mode handling as `'keywords'`: client-executed native on supporting providers, local `search_tools` function tool elsewhere. |
+| --- | --- | --- |
+| `None`（默认） | provider 原生 algorithm（可用时），否则 local keyword matching | Anthropic 在 Sonnet 4.5+/Opus 4.5+/Haiku 4.5+ 上使用 native BM25；OpenAI 在 GPT-5.4+ 上使用 server-executed `tool_search`；其他地方使用 local keyword matching。 |
+| `'keywords'` | Local keyword-overlap | keyword algorithm 在我们这一侧运行，但 wire shape 会适配：支持时使用 client-executed native（Anthropic、OpenAI），以保持 prompt cache 温热；其他地方使用普通 `search_tools` function tool。 |
+| `'bm25'` / `'regex'` | Anthropic native | 由 Anthropic server-executed。其他 providers（OpenAI、Google 等）上的请求会失败，而不是静默替换成另一个 algorithm。 |
+| Callable `(ctx, queries, tools) -> names` | User-defined | 与 `'keywords'` 相同的 execution-mode handling：支持 providers 上使用 client-executed native，其他地方使用 local `search_tools` function tool。 |
 
-The execution mode (server-executed, client-executed-native, or local fallback) is auto-derived from the chosen algorithm and the current provider — users don't pick it directly. Native execution is preferred whenever available because it keeps the model-facing tool list stable across discovery rounds, which preserves Anthropic and OpenAI prompt caching.
+Execution mode（server-executed、client-executed-native 或 local fallback）会从所选 algorithm 和当前 provider 自动推导；用户不直接选择。只要可用，就优先使用 native execution，因为它能在 discovery rounds 之间保持模型看到的 tool list 稳定，从而保留 Anthropic 和 OpenAI prompt caching。
 
-To force the local `keywords` algorithm on a provider that natively supports tool search, override [`ModelProfile.supported_builtin_tools`][pydantic_ai.profiles.ModelProfile.supported_builtin_tools] to exclude `ToolSearchTool` — the capability then falls through to the local `search_tools` function tool.
+如果要在原生支持 tool search 的 provider 上强制使用 local `keywords` algorithm，请 override [`ModelProfile.supported_builtin_tools`][pydantic_ai.profiles.ModelProfile.supported_builtin_tools] 以排除 `ToolSearchTool`；该 capability 随后会 fall through 到 local `search_tools` function tool。
 
-!!! note "Cross-provider history replay"
-    A turn can run on one provider and the next on another (e.g. via [`FallbackModel`][pydantic_ai.models.fallback.FallbackModel] or by switching `model=` between runs). Discovered-tool state is preserved across the switch:
+!!! note "跨 provider history replay"
+    一个 turn 可以在某个 provider 上运行，而下一个 turn 在另一个 provider 上运行（例如通过 [`FallbackModel`][pydantic_ai.models.fallback.FallbackModel] 或在 runs 之间切换 `model=`）。Discovered-tool state 会跨切换保留：
 
-    * Local-shape `search_tools` history rendered onto a native-supporting provider (Anthropic, OpenAI) is promoted to the provider's native tool-search wire so the discovered tools' schemas get unlocked from `defer_loading=True` without forcing the model to re-search.
-    * Native-shape `tool_search` history rendered onto a non-supporting provider is translated to the local `search_tools` function-tool exchange shape so the model sees the discoveries as a normal function-call exchange.
+    * Local-shape `search_tools` history 渲染到原生支持 provider（Anthropic、OpenAI）时，会提升为 provider 的 native tool-search wire，因此已发现工具的 schemas 会从 `defer_loading=True` 解锁，无需强制模型重新 search。
+    * Native-shape `tool_search` history 渲染到不支持的 provider 时，会转换为 local `search_tools` function-tool exchange shape，让模型把 discoveries 看作普通 function-call exchange。
 
-!!! note "Tool discovery and message history"
-    Discovered tools are tracked via metadata in the [message history](message-history.md). If a [history processor](message-history.md#processing-message-history) truncates messages containing discovery metadata, previously discovered tools will require re-discovery.
+!!! note "工具发现和 message history"
+    Discovered tools 通过 [message history](message-history.md) 中的 metadata 跟踪。如果 [history processor](message-history.md#processing-message-history) 截断了包含 discovery metadata 的 messages，之前发现的工具将需要重新 discovery。
 
-See [`ToolDefinition.defer_loading`][pydantic_ai.tools.ToolDefinition.defer_loading] and [Deferred Loading](toolsets.md#deferred-loading) for more details.
+更多细节请参阅 [`ToolDefinition.defer_loading`][pydantic_ai.tools.ToolDefinition.defer_loading] 和 [Deferred Loading](toolsets.md#deferred-loading)。
 
-## See Also
+## 另请参阅 {#see-also}
 
-- [Function Tools](tools.md) - Basic tool concepts and registration
-- [Toolsets](toolsets.md) - Managing collections of tools
-- [Deferred Tools](deferred-tools.md) - Tools requiring approval or external execution
-- [Third-Party Tools](third-party-tools.md) - Integrations with external tool libraries
+- [Function Tools](tools.md) - 基础工具概念和注册
+- [Toolsets](toolsets.md) - 管理工具集合
+- [Deferred Tools](deferred-tools.md) - 需要 approval 或 external execution 的工具
+- [Third-Party Tools](third-party-tools.md) - 与外部工具库的集成
