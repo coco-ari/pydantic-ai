@@ -1,35 +1,35 @@
-# Native Tools
+# 原生工具 {#native-tools}
 
-Native tools are native tools provided by LLM providers that can be used to enhance your agent's capabilities. Unlike [common tools](common-tools.md), which are custom implementations that Pydantic AI executes, native tools are executed directly by the model provider.
+原生工具是 LLM providers 提供的工具，可用于增强 agent 的能力。与由 Pydantic AI 执行的自定义实现 [common tools](common-tools.md) 不同，原生工具由模型提供商直接执行。
 
-## Overview
+## 概览 {#overview}
 
-Pydantic AI supports the following native tools:
+Pydantic AI 支持以下原生工具：
 
-- **[`WebSearchTool`][pydantic_ai.native_tools.WebSearchTool]**: Allows agents to search the web
-- **[`XSearchTool`][pydantic_ai.native_tools.XSearchTool]**: Allows agents to search X/Twitter (xAI only)
-- **[`CodeExecutionTool`][pydantic_ai.native_tools.CodeExecutionTool]**: Enables agents to execute code in a secure environment
-- **[`ImageGenerationTool`][pydantic_ai.native_tools.ImageGenerationTool]**: Enables agents to generate images
-- **[`WebFetchTool`][pydantic_ai.native_tools.WebFetchTool]**: Enables agents to fetch web pages
-- **[`MemoryTool`][pydantic_ai.native_tools.MemoryTool]**: Enables agents to use memory
-- **[`MCPServerTool`][pydantic_ai.native_tools.MCPServerTool]**: Enables agents to use remote MCP servers with communication handled by the model provider
-- **[`FileSearchTool`][pydantic_ai.native_tools.FileSearchTool]**: Enables agents to search through uploaded files using vector search (RAG)
+- **[`WebSearchTool`][pydantic_ai.native_tools.WebSearchTool]**：允许 agents 搜索 Web
+- **[`XSearchTool`][pydantic_ai.native_tools.XSearchTool]**：允许 agents 搜索 X/Twitter（仅 xAI）
+- **[`CodeExecutionTool`][pydantic_ai.native_tools.CodeExecutionTool]**：允许 agents 在安全环境中执行代码
+- **[`ImageGenerationTool`][pydantic_ai.native_tools.ImageGenerationTool]**：允许 agents 生成图片
+- **[`WebFetchTool`][pydantic_ai.native_tools.WebFetchTool]**：允许 agents 获取网页
+- **[`MemoryTool`][pydantic_ai.native_tools.MemoryTool]**：允许 agents 使用 memory
+- **[`MCPServerTool`][pydantic_ai.native_tools.MCPServerTool]**：允许 agents 使用远程 MCP servers，并由模型提供商处理通信
+- **[`FileSearchTool`][pydantic_ai.native_tools.FileSearchTool]**：允许 agents 使用 vector search（RAG）搜索已上传文件
 
-These tools are passed to the agent's `capabilities` list, wrapped in [`NativeTool`][pydantic_ai.capabilities.NativeTool], and are executed by the model provider's infrastructure.
+这些工具会包装在 [`NativeTool`][pydantic_ai.capabilities.NativeTool] 中，并传给 agent 的 `capabilities` list；它们由模型提供商的基础设施执行。
 
-!!! warning "Provider Support"
-    Not all model providers support native tools. If you use a native tool with an unsupported provider, Pydantic AI will raise a [`UserError`][pydantic_ai.exceptions.UserError] when you try to run the agent.
+!!! warning "Provider 支持"
+    并非所有模型提供商都支持原生工具。如果你在不支持的 provider 上使用原生工具，Pydantic AI 会在你尝试运行 agent 时引发 [`UserError`][pydantic_ai.exceptions.UserError]。
 
-    If a provider supports a native tool that is not currently supported by Pydantic AI, please file an issue.
+    如果某个 provider 支持的原生工具目前还未被 Pydantic AI 支持，请提交 issue。
 
-!!! tip "Provider-adaptive capabilities"
-    For a higher-level, model-agnostic approach, consider the [provider-adaptive tool capabilities](capabilities.md#provider-adaptive-tools): [`WebSearch`][pydantic_ai.capabilities.WebSearch], [`WebFetch`][pydantic_ai.capabilities.WebFetch], [`ImageGeneration`][pydantic_ai.capabilities.ImageGeneration], and [`MCP`][pydantic_ai.capabilities.MCP]. These automatically use the model's native tool when supported and fall back to a local implementation, so your agent works across providers without code changes.
+!!! tip "Provider-adaptive capabilities（自适应 provider 的 capabilities）"
+    如果想使用更高层、model-agnostic 的方式，请考虑 [provider-adaptive tool capabilities](capabilities.md#provider-adaptive-tools)：[`WebSearch`][pydantic_ai.capabilities.WebSearch]、[`WebFetch`][pydantic_ai.capabilities.WebFetch]、[`ImageGeneration`][pydantic_ai.capabilities.ImageGeneration] 和 [`MCP`][pydantic_ai.capabilities.MCP]。它们会在模型支持时自动使用原生工具，并在不支持时回退到本地实现，因此你的 agent 可以跨 providers 工作而无需修改代码。
 
-## Dynamic Configuration
+## 动态配置 {#dynamic-configuration}
 
-Sometimes you need to configure a native tool dynamically based on the [run context][pydantic_ai.tools.RunContext] (e.g., user dependencies), or conditionally omit it. You can achieve this by wrapping a function with [`NativeTool`][pydantic_ai.capabilities.NativeTool] in `capabilities`. The function takes [`RunContext`][pydantic_ai.tools.RunContext] as an argument and returns an [`AbstractNativeTool`][pydantic_ai.native_tools.AbstractNativeTool] or `None`.
+有时你需要基于 [run context][pydantic_ai.tools.RunContext]（例如 user dependencies）动态配置原生工具，或有条件地省略它。可以在 `capabilities` 中用 [`NativeTool`][pydantic_ai.capabilities.NativeTool] 包装一个函数来实现。该函数接受 [`RunContext`][pydantic_ai.tools.RunContext] 作为参数，并返回 [`AbstractNativeTool`][pydantic_ai.native_tools.AbstractNativeTool] 或 `None`。
 
-This is particularly useful for tools like [`WebSearchTool`][pydantic_ai.native_tools.WebSearchTool] where you might want to set the user's location based on the current request, or disable the tool if the user provides no location.
+这对 [`WebSearchTool`][pydantic_ai.native_tools.WebSearchTool] 这类工具尤其有用，因为你可能想根据当前请求设置用户位置，或在用户未提供位置时禁用该工具。
 
 ```python {title="dynamic_native_tool.py"}
 from pydantic_ai import Agent, RunContext, WebSearchTool
@@ -67,32 +67,31 @@ print(result.output)
 #> The capital of France is Paris.
 ```
 
-## Web Search Tool
+## Web Search Tool（Web 搜索工具） {#web-search-tool}
 
 !!! tip
-    For a model-agnostic approach with automatic local fallback, see the [`WebSearch`][pydantic_ai.capabilities.WebSearch] [capability](capabilities.md#provider-adaptive-tools).
+    如需带自动本地 fallback 的 model-agnostic 方式，请参阅 [`WebSearch`][pydantic_ai.capabilities.WebSearch] [capability](capabilities.md#provider-adaptive-tools)。
 
-The [`WebSearchTool`][pydantic_ai.native_tools.WebSearchTool] allows your agent to search the web,
-making it ideal for queries that require up-to-date data.
+[`WebSearchTool`][pydantic_ai.native_tools.WebSearchTool] 允许 agent 搜索 Web，适合需要最新数据的查询。
 
-### Provider Support
+### Provider 支持 {#provider-support}
 
-| Provider | Supported | Notes |
+| Provider | 支持 | Notes |
 |----------|-----------|-------|
-| OpenAI Responses | ✅ | Full feature support. To include search results on the [`NativeToolReturnPart`][pydantic_ai.messages.NativeToolReturnPart] that's available via [`ModelResponse.native_tool_calls`][pydantic_ai.messages.ModelResponse.native_tool_calls], enable the [`OpenAIResponsesModelSettings.openai_include_web_search_sources`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_include_web_search_sources] [model setting](agent.md#model-run-settings). |
-| Anthropic | ✅ | Full feature support |
-| Google | ✅ | No parameter support. No [`NativeToolCallPart`][pydantic_ai.messages.NativeToolCallPart] or [`NativeToolReturnPart`][pydantic_ai.messages.NativeToolReturnPart] is generated when streaming. Using native tools and function tools (including [output tools](output.md#tool-output)) at the same time is not supported; to use structured output, use [`PromptedOutput`](output.md#prompted-output) instead. |
-| xAI | ✅ | Supports `blocked_domains` and `allowed_domains` parameters. |
-| Groq | ✅ | Limited parameter support. To use web search capabilities with Groq, you need to use the [compound models](https://console.groq.com/docs/compound). |
-| OpenRouter | ✅ | Web search via [plugins](https://openrouter.ai/docs/features/web-search). Supports `search_context_size`. Uses native search for supported providers (OpenAI, Anthropic, Perplexity, xAI), Exa for others. |
-| OpenAI Chat Completions | ❌ | Not supported |
-| Bedrock | ❌ | Not supported |
-| Mistral | ❌ | Not supported |
-| Cohere | ❌ | Not supported |
-| HuggingFace | ❌ | Not supported |
-| Outlines | ❌ | Not supported |
+| OpenAI Responses | ✅ | Full feature support。若要在可通过 [`ModelResponse.native_tool_calls`][pydantic_ai.messages.ModelResponse.native_tool_calls] 访问的 [`NativeToolReturnPart`][pydantic_ai.messages.NativeToolReturnPart] 中包含 search results，请启用 [`OpenAIResponsesModelSettings.openai_include_web_search_sources`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_include_web_search_sources] [model setting](agent.md#model-run-settings)。 |
+| Anthropic | ✅ | 完整功能支持 |
+| Google | ✅ | 不支持参数。Streaming 时不会生成 [`NativeToolCallPart`][pydantic_ai.messages.NativeToolCallPart] 或 [`NativeToolReturnPart`][pydantic_ai.messages.NativeToolReturnPart]。不支持同时使用 native tools 和 function tools（包括 [output tools](output.md#tool-output)）；若要使用 structured output，请改用 [`PromptedOutput`](output.md#prompted-output)。 |
+| xAI | ✅ | 支持 `blocked_domains` 和 `allowed_domains` 参数。 |
+| Groq | ✅ | Limited parameter support。若要在 Groq 上使用 web search capabilities，需要使用 [compound models](https://console.groq.com/docs/compound)。 |
+| OpenRouter | ✅ | 通过 [plugins](https://openrouter.ai/docs/features/web-search) 提供 Web search。支持 `search_context_size`。对受支持 providers（OpenAI、Anthropic、Perplexity、xAI）使用 native search，对其他 providers 使用 Exa。 |
+| OpenAI Chat Completions | ❌ | 不支持 |
+| Bedrock | ❌ | 不支持 |
+| Mistral | ❌ | 不支持 |
+| Cohere | ❌ | 不支持 |
+| HuggingFace | ❌ | 不支持 |
+| Outlines | ❌ | 不支持 |
 
-### Usage
+### 用法 {#usage}
 
 ```py {title="web_search_anthropic.py"}
 from pydantic_ai import Agent, WebSearchTool
@@ -105,9 +104,9 @@ print(result.output)
 #> Scientists have developed a universal AI detector that can identify deepfake videos.
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-With OpenAI, you must use their Responses API to access the web search tool.
+使用 OpenAI 时，你必须通过 Responses API 访问 web search tool。
 
 ```py {title="web_search_openai.py"}
 from pydantic_ai import Agent, WebSearchTool
@@ -120,11 +119,11 @@ print(result.output)
 #> Scientists have developed a universal AI detector that can identify deepfake videos.
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-### Configuration Options
+### 配置选项 {#configuration-options}
 
-The `WebSearchTool` supports several configuration parameters:
+`WebSearchTool` 支持几个配置参数：
 
 ```py {title="web_search_configured.py"}
 from pydantic_ai import Agent, WebSearchTool, WebSearchUserLocation
@@ -155,11 +154,11 @@ print(result.output)
 #> In San Francisco, it's 8:21:41 pm PDT on Wednesday, August 6, 2025.
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-#### Provider Support
+#### Provider 支持 {#provider-support-1}
 
-| Parameter | OpenAI | Anthropic | xAI | Groq | OpenRouter |
+| 参数 | OpenAI | Anthropic | xAI | Groq | OpenRouter |
 |-----------|--------|-----------|-----|------|------------|
 | `search_context_size` | ✅ | ❌ | ❌ | ❌ | ✅ |
 | `user_location` | ✅ | ✅ | ❌ | ❌ | ❌ |
@@ -167,17 +166,17 @@ _(This example is complete, it can be run "as is")_
 | `allowed_domains` | ✅ | ✅ | ✅ | ✅ | ❌ |
 | `max_uses` | ❌ | ✅ | ❌ | ❌ | ❌ |
 
-!!! note "Anthropic Domain Filtering"
-    With Anthropic, you can only use either `blocked_domains` or `allowed_domains`, not both.
+!!! note "Anthropic domain filtering（Anthropic 域名过滤）"
+    使用 Anthropic 时，只能使用 `blocked_domains` 或 `allowed_domains` 其中之一，不能同时使用。
 
-## X Search Tool
+## X Search Tool（X 搜索工具） {#x-search-tool}
 
 !!! tip
-    For a model-agnostic approach with a subagent fallback, see the [`XSearch`][pydantic_ai.capabilities.XSearch] [capability](capabilities.md#provider-adaptive-tools).
+    如需带 subagent fallback 的 model-agnostic 方式，请参阅 [`XSearch`][pydantic_ai.capabilities.XSearch] [capability](capabilities.md#provider-adaptive-tools)。
 
-The [`XSearchTool`][pydantic_ai.native_tools.XSearchTool] allows your agent to search X/Twitter for real-time posts and content. Natively supported by xAI models; usable on other models via the [`XSearch`][pydantic_ai.capabilities.XSearch] capability with `fallback_model` set. See the [xAI X Search documentation](https://docs.x.ai/developers/tools/x-search) for more details.
+[`XSearchTool`][pydantic_ai.native_tools.XSearchTool] 允许 agent 搜索 X/Twitter 上的实时 posts 和内容。它由 xAI models 原生支持；在设置 `fallback_model` 后，也可通过 [`XSearch`][pydantic_ai.capabilities.XSearch] capability 用于其他 models。更多细节请参阅 [xAI X Search documentation](https://docs.x.ai/developers/tools/x-search)。
 
-### Usage
+### 用法 {#usage-1}
 
 ```py {title="x_search_xai.py"}
 from pydantic_ai import Agent, XSearchTool
@@ -190,11 +189,11 @@ print(result.output)
 #> There's a lot of excitement about new AI models being released...
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-### Configuration Options
+### 配置选项 {#configuration-options-1}
 
-The `XSearchTool` supports several configuration parameters:
+`XSearchTool` 支持几个配置参数：
 
 ```py {title="x_search_configured.py"}
 from datetime import datetime
@@ -224,35 +223,34 @@ OpenAI announced their latest model updates, while Anthropic shared research on 
 """
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-!!! note "Handle Filtering"
-    You can only use one of `allowed_x_handles` or `excluded_x_handles`, not both. Each list is limited to 10 handles maximum.
+!!! note "Handle filtering（handle 过滤）"
+    `allowed_x_handles` 和 `excluded_x_handles` 只能二选一，不能同时使用。每个 list 最多包含 10 个 handles。
 
-!!! note "Including raw search results"
-    By default, xAI only returns the model's text summary of the search. To get programmatic access to the underlying posts, sources, and metadata, set `include_output=True` on [`XSearchTool`][pydantic_ai.native_tools.XSearchTool] (analogous to [`OpenAIResponsesModelSettings.openai_include_web_search_sources`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_include_web_search_sources] for OpenAI web search). The raw results are then available on the [`NativeToolReturnPart`][pydantic_ai.messages.NativeToolReturnPart] exposed via [`ModelResponse.native_tool_calls`][pydantic_ai.messages.ModelResponse.native_tool_calls]. As an alternative, you can enable it globally via the [`XaiModelSettings.xai_include_x_search_output`][pydantic_ai.models.xai.XaiModelSettings.xai_include_x_search_output] [model setting](agent.md#model-run-settings). See the [xAI docs](models/xai.md#x-search) for the recommended `XSearch` capability-based approach.
+!!! note "包含原始搜索结果"
+    默认情况下，xAI 只返回模型对搜索的文本摘要。若要通过程序访问底层 posts、sources 和 metadata，请在 [`XSearchTool`][pydantic_ai.native_tools.XSearchTool] 上设置 `include_output=True`（类似 OpenAI web search 的 [`OpenAIResponsesModelSettings.openai_include_web_search_sources`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_include_web_search_sources]）。之后可以在通过 [`ModelResponse.native_tool_calls`][pydantic_ai.messages.ModelResponse.native_tool_calls] 暴露的 [`NativeToolReturnPart`][pydantic_ai.messages.NativeToolReturnPart] 上获取原始结果。作为替代，也可以通过 [`XaiModelSettings.xai_include_x_search_output`][pydantic_ai.models.xai.XaiModelSettings.xai_include_x_search_output] [model setting](agent.md#model-run-settings) 全局启用。推荐的基于 `XSearch` capability 的方式见 [xAI docs](models/xai.md#x-search)。
 
-## Code Execution Tool
+## Code Execution Tool（代码执行工具） {#code-execution-tool}
 
-The [`CodeExecutionTool`][pydantic_ai.native_tools.CodeExecutionTool] enables your agent to execute code
-in a secure environment, making it perfect for computational tasks, data analysis, and mathematical operations.
+[`CodeExecutionTool`][pydantic_ai.native_tools.CodeExecutionTool] 允许 agent 在安全环境中执行代码，非常适合计算任务、数据分析和数学运算。
 
-### Provider Support
+### Provider 支持 {#provider-support-2}
 
-| Provider | Supported | Notes |
+| Provider | 支持 | Notes |
 |----------|-----------|-------|
-| OpenAI | ✅ | To include code execution output on the [`NativeToolReturnPart`][pydantic_ai.messages.NativeToolReturnPart] that's available via [`ModelResponse.native_tool_calls`][pydantic_ai.messages.ModelResponse.native_tool_calls], enable the [`OpenAIResponsesModelSettings.openai_include_code_execution_outputs`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_include_code_execution_outputs] [model setting](agent.md#model-run-settings). If the code execution generated images, like charts, they will be available on [`ModelResponse.images`][pydantic_ai.messages.ModelResponse.images] as [`BinaryImage`][pydantic_ai.messages.BinaryImage] objects. The generated image can also be used as [image output](output.md#image-output) for the agent run. |
-| Google | ✅ | Using native tools and function tools (including [output tools](output.md#tool-output)) at the same time is not supported; to use structured output, use [`PromptedOutput`](output.md#prompted-output) instead. |
-| Anthropic | ✅ | Available on compatible Anthropic models. Pydantic AI selects a compatible code execution tool version automatically; see [Anthropic code execution tool version](models/anthropic.md#code-execution-tool-version) to override it. |
-| xAI | ✅ | Full feature support. |
-| Groq | ❌ | |
-| Bedrock | ✅ | Only available for Nova 2.0 models. |
-| Mistral | ❌ | |
-| Cohere | ❌ | |
-| HuggingFace | ❌ | |
-| Outlines | ❌ | |
+| OpenAI | ✅ | 若要在可通过 [`ModelResponse.native_tool_calls`][pydantic_ai.messages.ModelResponse.native_tool_calls] 访问的 [`NativeToolReturnPart`][pydantic_ai.messages.NativeToolReturnPart] 中包含 code execution output，请启用 [`OpenAIResponsesModelSettings.openai_include_code_execution_outputs`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_include_code_execution_outputs] [model setting](agent.md#model-run-settings)。如果 code execution 生成了图片（例如图表），它们会以 [`BinaryImage`][pydantic_ai.messages.BinaryImage] objects 形式出现在 [`ModelResponse.images`][pydantic_ai.messages.ModelResponse.images] 上。生成的图片也可以作为 agent run 的 [image output](output.md#image-output)。 |
+| Google | ✅ | 不支持同时使用 native tools 和 function tools（包括 [output tools](output.md#tool-output)）；若要使用 structured output，请改用 [`PromptedOutput`](output.md#prompted-output)。 |
+| Anthropic | ✅ | 可用于兼容的 Anthropic models。Pydantic AI 会自动选择兼容的 code execution tool version；如需覆盖，请参阅 [Anthropic code execution tool version](models/anthropic.md#code-execution-tool-version)。 |
+| xAI | ✅ | 完整功能支持。 |
+| Groq | ❌ | 不支持 |
+| Bedrock | ✅ | 仅适用于 Nova 2.0 models。 |
+| Mistral | ❌ | 不支持 |
+| Cohere | ❌ | 不支持 |
+| HuggingFace | ❌ | 不支持 |
+| Outlines | ❌ | 不支持 |
 
-### Usage
+### 用法 {#usage-2}
 
 ```py {title="code_execution_basic.py"}
 from pydantic_ai import Agent, CodeExecutionTool
@@ -293,9 +291,9 @@ print(result.response.native_tool_calls)
 """
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-In addition to text output, code execution with OpenAI can generate images as part of their response. Accessing this image via [`ModelResponse.images`][pydantic_ai.messages.ModelResponse.images] or [image output](output.md#image-output) requires the [`OpenAIResponsesModelSettings.openai_include_code_execution_outputs`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_include_code_execution_outputs] [model setting](agent.md#model-run-settings) to be enabled.
+除了文本输出之外，OpenAI 的 code execution 还可以在 response 中生成图片。若要通过 [`ModelResponse.images`][pydantic_ai.messages.ModelResponse.images] 或 [image output](output.md#image-output) 访问这张图片，需要启用 [`OpenAIResponsesModelSettings.openai_include_code_execution_outputs`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_include_code_execution_outputs] [model setting](agent.md#model-run-settings)。
 
 ```py {title="code_execution_openai.py"}
 from pydantic_ai import Agent, BinaryImage, CodeExecutionTool
@@ -313,32 +311,32 @@ result = agent.run_sync('Generate a chart of y=x^2 for x=-5 to 5.')
 assert isinstance(result.output, BinaryImage)
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-## Image Generation Tool
+## Image Generation Tool（图片生成工具） {#image-generation-tool}
 
 !!! tip
-    For a model-agnostic approach with automatic local fallback, see the [`ImageGeneration`][pydantic_ai.capabilities.ImageGeneration] [capability](capabilities.md#provider-adaptive-tools).
+    如需带自动本地 fallback 的 model-agnostic 方式，请参阅 [`ImageGeneration`][pydantic_ai.capabilities.ImageGeneration] [capability](capabilities.md#provider-adaptive-tools)。
 
-The [`ImageGenerationTool`][pydantic_ai.native_tools.ImageGenerationTool] enables your agent to generate images.
+[`ImageGenerationTool`][pydantic_ai.native_tools.ImageGenerationTool] 允许 agent 生成图片。
 
-### Provider Support
+### Provider 支持 {#provider-support-3}
 
-| Provider | Supported | Notes |
+| Provider | 支持 | Notes |
 |----------|-----------|-------|
-| OpenAI Responses | ✅ | Full feature support. Only supported by models newer than `gpt-5.2`. Metadata about the generated image, like the [`revised_prompt`](https://platform.openai.com/docs/guides/tools-image-generation#revised-prompt) sent to the underlying image model, is available on the [`NativeToolReturnPart`][pydantic_ai.messages.NativeToolReturnPart] that's available via [`ModelResponse.native_tool_calls`][pydantic_ai.messages.ModelResponse.native_tool_calls]. |
-| Google | ✅ | Limited parameter support. Only supported by [image generation models](https://ai.google.dev/gemini-api/docs/image-generation) like `gemini-3-pro-image-preview` and `gemini-3-pro-image-preview`. These models do not support [function tools](tools.md) and will always have the option of generating images, even if this native tool is not explicitly specified. |
-| Anthropic | ❌ | |
+| OpenAI Responses | ✅ | Full feature support。仅支持比 `gpt-5.2` 更新的 models。关于生成图片的 metadata，例如发送给底层 image model 的 [`revised_prompt`](https://platform.openai.com/docs/guides/tools-image-generation#revised-prompt)，可在通过 [`ModelResponse.native_tool_calls`][pydantic_ai.messages.ModelResponse.native_tool_calls] 访问的 [`NativeToolReturnPart`][pydantic_ai.messages.NativeToolReturnPart] 上获得。 |
+| Google | ✅ | Limited parameter support。仅支持 [image generation models](https://ai.google.dev/gemini-api/docs/image-generation)，例如 `gemini-3-pro-image-preview` 和 `gemini-3-pro-image-preview`。这些 models 不支持 [function tools](tools.md)，并且即使没有显式指定此原生工具，也始终可以生成图片。 |
+| Anthropic | ❌ | 不支持 |
 | xAI | ❌ | |
-| Groq | ❌ | |
-| Bedrock | ❌ | |
-| Mistral | ❌ | |
-| Cohere | ❌ | |
-| HuggingFace | ❌ | |
+| Groq | ❌ | 不支持 |
+| Bedrock | ❌ | 不支持 |
+| Mistral | ❌ | 不支持 |
+| Cohere | ❌ | 不支持 |
+| HuggingFace | ❌ | 不支持 |
 
-### Usage
+### 用法 {#usage-3}
 
-Generated images are available on [`ModelResponse.images`][pydantic_ai.messages.ModelResponse.images] as [`BinaryImage`][pydantic_ai.messages.BinaryImage] objects:
+生成的图片会作为 [`BinaryImage`][pydantic_ai.messages.BinaryImage] objects 出现在 [`ModelResponse.images`][pydantic_ai.messages.ModelResponse.images] 上：
 
 ```py {title="image_generation_openai.py"}
 from pydantic_ai import Agent, BinaryImage, ImageGenerationTool
@@ -355,9 +353,9 @@ Once upon a time, in a hidden underwater cave, lived a curious axolotl named Pip
 assert isinstance(result.response.images[0], BinaryImage)
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-Image generation with Google [image generation models](https://ai.google.dev/gemini-api/docs/image-generation) does not require the `ImageGenerationTool` native tool to be explicitly specified:
+使用 Google [image generation models](https://ai.google.dev/gemini-api/docs/image-generation) 进行 image generation 时，不需要显式指定 `ImageGenerationTool` 原生工具：
 
 ```py {title="image_generation_google.py"}
 from pydantic_ai import Agent, BinaryImage
@@ -373,9 +371,9 @@ Once upon a time, in a hidden underwater cave, lived a curious axolotl named Pip
 assert isinstance(result.response.images[0], BinaryImage)
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-The `ImageGenerationTool` can be used together with `output_type=BinaryImage` to get [image output](output.md#image-output). If the `ImageGenerationTool` native tool is not explicitly specified, it will be enabled automatically:
+`ImageGenerationTool` 可与 `output_type=BinaryImage` 一起使用，以获取 [image output](output.md#image-output)。如果没有显式指定 `ImageGenerationTool` 原生工具，它会被自动启用：
 
 ```py {title="image_generation_output.py"}
 from pydantic_ai import Agent, BinaryImage
@@ -386,11 +384,11 @@ result = agent.run_sync('Generate an image of an axolotl.')
 assert isinstance(result.output, BinaryImage)
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-### Configuration Options
+### 配置选项 {#configuration-options-2}
 
-The `ImageGenerationTool` supports several configuration parameters:
+`ImageGenerationTool` 支持几个配置参数：
 
 ```py {title="image_generation_configured.py"}
 from pydantic_ai import Agent, BinaryImage, ImageGenerationTool
@@ -421,18 +419,16 @@ result = agent.run_sync('Generate an image of an axolotl.')
 assert isinstance(result.output, BinaryImage)
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-OpenAI Responses models also respect the `aspect_ratio` parameter. Because the OpenAI API only exposes discrete image sizes,
-Pydantic AI maps `'1:1'` -> `1024x1024`, `'2:3'` -> `1024x1536`, and `'3:2'` -> `1536x1024`. Providing any other aspect ratio
-results in an error, and if you also set `size` it must match the computed value.
+OpenAI Responses models 也会遵守 `aspect_ratio` 参数。由于 OpenAI API 只暴露离散 image sizes，
+Pydantic AI 会将 `'1:1'` 映射为 `1024x1024`，`'2:3'` 映射为 `1024x1536`，并将 `'3:2'` 映射为 `1536x1024`。提供任何其他 aspect ratio
+都会导致错误；如果你同时设置了 `size`，它必须与计算出的值匹配。
 
-The OpenAI Responses image generation tool defaults to `action='auto'`, where the model decides whether to generate a new
-image or edit one already in context. Use `action='generate'` or `action='edit'` to force either behavior. You can also set
-`model` to select the underlying image generation model used by the tool, for example `model='gpt-image-2'`; this does not
-change the agent's conversational model.
+OpenAI Responses image generation tool 默认使用 `action='auto'`，由模型决定是生成新图片，还是编辑 context 中已有的图片。使用 `action='generate'` 或 `action='edit'` 可以强制其中一种行为。你也可以设置
+`model` 来选择该工具使用的底层 image generation model，例如 `model='gpt-image-2'`；这不会改变 agent 的 conversational model。
 
-To control the aspect ratio when using Gemini image models, include the `ImageGenerationTool` explicitly:
+使用 Gemini image models 时，如需控制 aspect ratio，请显式包含 `ImageGenerationTool`：
 
 ```py {title="image_generation_google_aspect_ratio.py"}
 from pydantic_ai import Agent, BinaryImage, ImageGenerationTool
@@ -448,9 +444,9 @@ result = agent.run_sync('Generate a wide illustration of an axolotl city skyline
 assert isinstance(result.output, BinaryImage)
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-To control the image resolution with Google image generation models (starting with Gemini 3 Pro Image), use the `size` parameter:
+若要使用 Google image generation models（从 Gemini 3 Pro Image 开始）控制 image resolution，请使用 `size` 参数：
 
 ```py {title="image_generation_google_resolution.py"}
 from pydantic_ai import Agent, BinaryImage, ImageGenerationTool
@@ -466,54 +462,53 @@ result = agent.run_sync('Generate a high-resolution wide landscape illustration 
 assert isinstance(result.output, BinaryImage)
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-For more details, check the [API documentation][pydantic_ai.native_tools.ImageGenerationTool].
+更多细节请查看 [API documentation][pydantic_ai.native_tools.ImageGenerationTool]。
 
-#### Provider Support
+#### Provider 支持 {#provider-support-4}
 
-| Parameter | OpenAI | Google |
+| 参数 | OpenAI | Google |
 |-----------|--------|--------|
-| `action` | ✅ (auto (default), generate, edit) | ❌ |
+| `action` | ✅ (auto（默认）、generate、edit) | ❌ |
 | `background` | ✅ | ❌ |
 | `input_fidelity` | ✅ | ❌ |
 | `moderation` | ✅ | ❌ |
-| `model` | ✅ (gpt-image-2, gpt-image-1.5, gpt-image-1, gpt-image-1-mini, or another OpenAI image model ID) | ❌ |
-| `output_compression` | ✅ (100 (default), jpeg or webp only) | ✅ (75 (default), jpeg only, Google Cloud only) |
-| `output_format` | ✅ | ✅ (Google Cloud only) |
+| `model` | ✅（gpt-image-2、gpt-image-1.5、gpt-image-1、gpt-image-1-mini，或另一个 OpenAI image model ID） | ❌ |
+| `output_compression` | ✅（100（默认），仅 jpeg 或 webp） | ✅（75（默认），仅 jpeg，仅 Google Cloud） |
+| `output_format` | ✅ | ✅（仅 Google Cloud） |
 | `partial_images` | ✅ | ❌ |
 | `quality` | ✅ | ❌ |
-| `size` | ✅ (auto (default), 1024x1024, 1024x1536, 1536x1024) | ✅ (512, 1K (default), 2K, 4K) |
+| `size` | ✅（auto（默认）、1024x1024、1024x1536、1536x1024） | ✅（512、1K（默认）、2K、4K） |
 | `aspect_ratio` | ✅ (1:1, 2:3, 3:2) | ✅ (1:1, 2:3, 3:2, 3:4, 4:3, 4:5, 5:4, 9:16, 16:9, 21:9) |
 
-!!! note "Notes"
-    - **OpenAI**: `auto` lets the model select the value.
-    - **Google Cloud**: Setting `output_compression` will default `output_format` to `jpeg` if not specified.
+!!! note "Notes（说明）"
+    - **OpenAI**：`auto` 允许模型选择值。
+    - **Google Cloud**：如果未指定 `output_format`，设置 `output_compression` 会使其默认变为 `jpeg`。
 
-## Web Fetch Tool
+## Web Fetch Tool（Web 获取工具） {#web-fetch-tool}
 
 !!! tip
-    For a model-agnostic approach with automatic local fallback, see the [`WebFetch`][pydantic_ai.capabilities.WebFetch] [capability](capabilities.md#provider-adaptive-tools).
+    如需带自动本地 fallback 的 model-agnostic 方式，请参阅 [`WebFetch`][pydantic_ai.capabilities.WebFetch] [capability](capabilities.md#provider-adaptive-tools)。
 
-The [`WebFetchTool`][pydantic_ai.native_tools.WebFetchTool] enables your agent to pull URL contents into its context,
-allowing it to pull up-to-date information from the web.
+[`WebFetchTool`][pydantic_ai.native_tools.WebFetchTool] 允许 agent 把 URL 内容拉入其 context，从 Web 获取最新信息。
 
-### Provider Support
+### Provider 支持 {#provider-support-5}
 
-| Provider | Supported | Notes |
+| Provider | 支持 | Notes |
 |----------|-----------|-------|
-| Anthropic | ✅ | Full feature support. Uses Anthropic's [Web Fetch Tool](https://docs.claude.com/en/docs/agents-and-tools/tool-use/web-fetch-tool) internally to retrieve URL contents. |
-| Google | ✅ | No parameter support. The limits are fixed at 20 URLs per request with a maximum of 34MB per URL. Using native tools and function tools (including [output tools](output.md#tool-output)) at the same time is not supported; to use structured output, use [`PromptedOutput`](output.md#prompted-output) instead. |
-| xAI | ❌ | Web browsing is implemented as part of [`WebSearchTool`](#web-search-tool) with xAI. |
-| OpenAI | ❌ | |
-| Groq | ❌ | |
-| Bedrock | ❌ | |
-| Mistral | ❌ | |
-| Cohere | ❌ | |
-| HuggingFace | ❌ | |
-| Outlines | ❌ | |
+| Anthropic | ✅ | Full feature support。内部使用 Anthropic 的 [Web Fetch Tool](https://docs.claude.com/en/docs/agents-and-tools/tool-use/web-fetch-tool) 获取 URL 内容。 |
+| Google | ✅ | 不支持参数。限制固定为每个请求 20 个 URLs，且每个 URL 最大 34MB。不支持同时使用 native tools 和 function tools（包括 [output tools](output.md#tool-output)）；若要使用 structured output，请改用 [`PromptedOutput`](output.md#prompted-output)。 |
+| xAI | ❌ | 在 xAI 中，web browsing 作为 [`WebSearchTool`](#web-search-tool) 的一部分实现。 |
+| OpenAI | ❌ | 不支持 |
+| Groq | ❌ | 不支持 |
+| Bedrock | ❌ | 不支持 |
+| Mistral | ❌ | 不支持 |
+| Cohere | ❌ | 不支持 |
+| HuggingFace | ❌ | 不支持 |
+| Outlines | ❌ | 不支持 |
 
-### Usage
+### 用法 {#usage-4}
 
 ```py {title="web_fetch_basic.py"}
 from pydantic_ai import Agent, WebFetchTool
@@ -526,11 +521,11 @@ print(result.output)
 #> A Python agent framework for building Generative AI applications.
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-### Configuration Options
+### 配置选项 {#configuration-options-3}
 
-The `WebFetchTool` supports several configuration parameters:
+`WebFetchTool` 支持几个配置参数：
 
 ```py {title="web_fetch_configured.py"}
 from pydantic_ai import Agent, WebFetchTool
@@ -559,11 +554,11 @@ Both sites provide comprehensive documentation for Pydantic projects. ai.pydanti
 """
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-#### Provider Support
+#### Provider 支持 {#provider-support-6}
 
-| Parameter | Anthropic | Google |
+| 参数 | Anthropic | Google |
 |-----------|-----------|--------|
 | `max_uses` | ✅ | ❌ |
 | `allowed_domains` | ✅ | ❌ |
@@ -571,31 +566,31 @@ _(This example is complete, it can be run "as is")_
 | `enable_citations` | ✅ | ❌ |
 | `max_content_tokens` | ✅ | ❌ |
 
-!!! note "Anthropic Domain Filtering"
-    With Anthropic, you can only use either `blocked_domains` or `allowed_domains`, not both.
+!!! note "Anthropic domain filtering（Anthropic 域名过滤）"
+    使用 Anthropic 时，只能使用 `blocked_domains` 或 `allowed_domains` 其中之一，不能同时使用。
 
-## Memory Tool
+## Memory Tool（记忆工具） {#memory-tool}
 
-The [`MemoryTool`][pydantic_ai.native_tools.MemoryTool] enables your agent to use memory.
+[`MemoryTool`][pydantic_ai.native_tools.MemoryTool] 允许 agent 使用 memory。
 
-### Provider Support
+### Provider 支持 {#provider-support-7}
 
-| Provider | Supported | Notes |
+| Provider | 支持 | Notes |
 |----------|-----------|-------|
-| Anthropic | ✅ | Requires a tool named `memory` to be defined that implements [specific sub-commands](https://docs.claude.com/en/docs/agents-and-tools/tool-use/memory-tool#tool-commands). You can use a subclass of [`anthropic.lib.tools.BetaAbstractMemoryTool`](https://github.com/anthropics/anthropic-sdk-python/blob/main/src/anthropic/lib/tools/_beta_builtin_memory_tool.py) as documented below. |
-| Google | ❌ | |
-| OpenAI | ❌ | |
-| Groq | ❌ | |
-| Bedrock | ❌ | |
-| Mistral | ❌ | |
-| Cohere | ❌ | |
-| HuggingFace | ❌ | |
+| Anthropic | ✅ | 需要定义一个名为 `memory` 的工具，并实现[特定 sub-commands](https://docs.claude.com/en/docs/agents-and-tools/tool-use/memory-tool#tool-commands)。你可以按下面文档所示，使用 [`anthropic.lib.tools.BetaAbstractMemoryTool`](https://github.com/anthropics/anthropic-sdk-python/blob/main/src/anthropic/lib/tools/_beta_builtin_memory_tool.py) 的 subclass。 |
+| Google | ❌ | 不支持 |
+| OpenAI | ❌ | 不支持 |
+| Groq | ❌ | 不支持 |
+| Bedrock | ❌ | 不支持 |
+| Mistral | ❌ | 不支持 |
+| Cohere | ❌ | 不支持 |
+| HuggingFace | ❌ | 不支持 |
 
-### Usage
+### 用法 {#usage-5}
 
-The Anthropic SDK provides an abstract [`BetaAbstractMemoryTool`](https://github.com/anthropics/anthropic-sdk-python/blob/main/src/anthropic/lib/tools/_beta_builtin_memory_tool.py) class that you can subclass to create your own memory storage solution (e.g., database, cloud storage, encrypted files, etc.). Their [`LocalFilesystemMemoryTool`](https://github.com/anthropics/anthropic-sdk-python/blob/main/examples/memory/basic.py) example can serve as a starting point.
+Anthropic SDK 提供了一个 abstract [`BetaAbstractMemoryTool`](https://github.com/anthropics/anthropic-sdk-python/blob/main/src/anthropic/lib/tools/_beta_builtin_memory_tool.py) class，你可以继承它来创建自己的 memory storage solution（例如 database、cloud storage、encrypted files 等）。其 [`LocalFilesystemMemoryTool`](https://github.com/anthropics/anthropic-sdk-python/blob/main/examples/memory/basic.py) 示例可以作为起点。
 
-The following example uses a subclass that hard-codes a specific memory. The bits specific to Pydantic AI are the `MemoryTool` native tool and the `memory` tool definition that forwards commands to the `call` method of the `BetaAbstractMemoryTool` subclass.
+以下示例使用一个 hard-code 特定 memory 的 subclass。与 Pydantic AI 相关的部分是 `MemoryTool` 原生工具，以及把 commands 转发给 `BetaAbstractMemoryTool` subclass 的 `call` method 的 `memory` 工具定义。
 
 ```py {title="anthropic_memory.py"}
 from typing import Any
@@ -657,34 +652,34 @@ print(result.output)
 #> You live in Mexico City.
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-## MCP Server Tool
+## MCP Server Tool（MCP Server 工具） {#mcp-server-tool}
 
 !!! tip
-    For a model-agnostic approach with automatic local fallback, see the [`MCP`][pydantic_ai.capabilities.MCP] [capability](capabilities.md#provider-adaptive-tools).
+    如需带自动本地 fallback 的 model-agnostic 方式，请参阅 [`MCP`][pydantic_ai.capabilities.MCP] [capability](capabilities.md#provider-adaptive-tools)。
 
-The [`MCPServerTool`][pydantic_ai.native_tools.MCPServerTool] allows your agent to use remote MCP servers with communication handled by the model provider.
+[`MCPServerTool`][pydantic_ai.native_tools.MCPServerTool] 允许 agent 使用远程 MCP servers，并由模型提供商处理通信。
 
-This requires the MCP server to live at a public URL the provider can reach and does not support many of the advanced features of Pydantic AI's agent-side [MCP support](mcp/client.md),
-but can result in optimized context use and caching, and faster performance due to the lack of a round-trip back to Pydantic AI.
+这要求 MCP server 位于 provider 可以访问的公开 URL，且不支持 Pydantic AI agent-side [MCP support](mcp/client.md) 的许多高级功能；
+但由于无需往返 Pydantic AI，它可以带来更优化的 context 使用和 caching，并提升性能。
 
-### Provider Support
+### Provider 支持 {#provider-support-8}
 
-| Provider | Supported | Notes                 |
+| Provider | 支持 | Notes                 |
 |----------|-----------|-----------------------|
-| OpenAI Responses | ✅ | Full feature support. [Connectors](https://platform.openai.com/docs/guides/tools-connectors-mcp#connectors) can be used by specifying a special `x-openai-connector:<connector_id>` URL.  |
-| Anthropic | ✅ | Full feature support |
-| xAI | ✅ | Full feature support |
-| Google  | ❌ | Not supported |
-| Groq  | ❌ | Not supported |
-| OpenAI Chat Completions | ❌ | Not supported |
-| Bedrock | ❌ | Not supported |
-| Mistral | ❌ | Not supported |
-| Cohere | ❌ | Not supported |
-| HuggingFace | ❌ | Not supported |
+| OpenAI Responses | ✅ | Full feature support。可以通过指定特殊的 `x-openai-connector:<connector_id>` URL 使用 [Connectors](https://platform.openai.com/docs/guides/tools-connectors-mcp#connectors)。 |
+| Anthropic | ✅ | 完整功能支持 |
+| xAI | ✅ | 完整功能支持 |
+| Google  | ❌ | 不支持 |
+| Groq  | ❌ | 不支持 |
+| OpenAI Chat Completions | ❌ | 不支持 |
+| Bedrock | ❌ | 不支持 |
+| Mistral | ❌ | 不支持 |
+| Cohere | ❌ | 不支持 |
+| HuggingFace | ❌ | 不支持 |
 
-### Usage
+### 用法 {#usage-6}
 
 ```py {title="mcp_server_anthropic.py"}
 from pydantic_ai import Agent, MCPServerTool
@@ -709,11 +704,11 @@ The pydantic/pydantic-ai repo is a Python agent framework for building Generativ
 """
 ```
 
-1. The [DeepWiki MCP server](https://docs.devin.ai/work-with-devin/deepwiki-mcp) does not require authorization.
+1. [DeepWiki MCP server](https://docs.devin.ai/work-with-devin/deepwiki-mcp) 不需要 authorization。
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-With OpenAI, you must use their Responses API to access the MCP server tool:
+使用 OpenAI 时，你必须通过 Responses API 访问 MCP server tool：
 
 ```py {title="mcp_server_openai.py"}
 from pydantic_ai import Agent, MCPServerTool
@@ -738,13 +733,13 @@ The pydantic/pydantic-ai repo is a Python agent framework for building Generativ
 """
 ```
 
-1. The [DeepWiki MCP server](https://docs.devin.ai/work-with-devin/deepwiki-mcp) does not require authorization.
+1. [DeepWiki MCP server](https://docs.devin.ai/work-with-devin/deepwiki-mcp) 不需要 authorization。
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-### Configuration Options
+### 配置选项 {#configuration-options-4}
 
-The `MCPServerTool` supports several configuration parameters for custom MCP servers:
+`MCPServerTool` 支持几个用于自定义 MCP servers 的配置参数：
 
 ```py {title="mcp_server_configured_url.py"}
 import os
@@ -775,11 +770,11 @@ The pydantic/pydantic-ai repo is a Python agent framework for building Generativ
 """
 ```
 
-1. The [GitHub MCP server](https://github.com/github/github-mcp-server) requires an authorization token.
+1. [GitHub MCP server](https://github.com/github/github-mcp-server) 需要 authorization token。
 
-For OpenAI Responses, you can use a [connector](https://platform.openai.com/docs/guides/tools-connectors-mcp#connectors) by specifying a special `x-openai-connector:` URL:
+对于 OpenAI Responses，你可以通过指定特殊的 `x-openai-connector:` URL 使用 [connector](https://platform.openai.com/docs/guides/tools-connectors-mcp#connectors)：
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
 ```py {title="mcp_server_configured_connector_id.py"}
 import os
@@ -805,45 +800,45 @@ print(result.output)
 #> You're going to spend all day playing with Pydantic AI.
 ```
 
-1. OpenAI's Google Calendar connector requires an [authorization token](https://platform.openai.com/docs/guides/tools-connectors-mcp#authorizing-a-connector).
+1. OpenAI 的 Google Calendar connector 需要 [authorization token](https://platform.openai.com/docs/guides/tools-connectors-mcp#authorizing-a-connector)。
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以"原样"运行）_
 
-#### Provider Support
+#### Provider 支持 {#provider-support-9}
 
-| Parameter             | OpenAI | Anthropic | xAI |
+| 参数                  | OpenAI | Anthropic | xAI |
 |-----------------------|--------|-----------|-----|
 | `authorization_token` | ✅ | ✅ | ✅ |
 | `allowed_tools`       | ✅ | ✅ | ✅ |
 | `description`         | ✅ | ❌ | ✅ |
 | `headers`             | ✅ | ❌ | ✅ |
 
-## File Search Tool
+## File Search Tool（文件搜索工具） {#file-search-tool}
 
-The [`FileSearchTool`][pydantic_ai.native_tools.FileSearchTool] enables your agent to search through uploaded files using vector search, providing a fully managed Retrieval-Augmented Generation (RAG) system. This tool handles file storage, chunking, embedding generation, and context injection into prompts.
+[`FileSearchTool`][pydantic_ai.native_tools.FileSearchTool] 允许 agent 使用 vector search 搜索已上传文件，并提供完全托管的 Retrieval-Augmented Generation（RAG）系统。该工具会处理 file storage、chunking、embedding generation，以及把 context 注入 prompts。
 
-### Provider Support
+### Provider 支持 {#provider-support-10}
 
-| Provider | Supported | Notes |
+| Provider | 支持 | Notes |
 |----------|-----------|-------|
-| OpenAI Responses | ✅ | Full feature support. Requires files to be uploaded to vector stores via the [OpenAI Files API](https://platform.openai.com/docs/api-reference/files). To include search results on the [`NativeToolReturnPart`][pydantic_ai.messages.NativeToolReturnPart] available via [`ModelResponse.native_tool_calls`][pydantic_ai.messages.ModelResponse.native_tool_calls], enable the [`OpenAIResponsesModelSettings.openai_include_file_search_results`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_include_file_search_results] [model setting](agent.md#model-run-settings). |
-| Google (Gemini) | ✅ | Requires files to be uploaded via the [Gemini Files API](https://ai.google.dev/gemini-api/docs/files). Files are automatically deleted after 48 hours. Supports up to 2 GB per file and 20 GB per project. Using native tools and function tools (including [output tools](output.md#tool-output)) at the same time is not supported; to use structured output, use [`PromptedOutput`](output.md#prompted-output) instead. |
-| xAI | ✅ | Mapped to xAI collections search. Requires collection IDs. To include search results on the [`NativeToolReturnPart`][pydantic_ai.messages.NativeToolReturnPart], enable the [`XaiModelSettings.xai_include_collections_search_output`][pydantic_ai.models.xai.XaiModelSettings.xai_include_collections_search_output] [model setting](agent.md#model-run-settings). |
-|| Google Cloud | ❌ | Not supported |
-| Anthropic | ❌ | Not supported |
-| Groq | ❌ | Not supported |
-| OpenAI Chat Completions | ❌ | Not supported |
-| Bedrock | ❌ | Not supported |
-| Mistral | ❌ | Not supported |
-| Cohere | ❌ | Not supported |
-| HuggingFace | ❌ | Not supported |
-| Outlines | ❌ | Not supported |
+| OpenAI Responses | ✅ | Full feature support。需要通过 [OpenAI Files API](https://platform.openai.com/docs/api-reference/files) 将文件上传到 vector stores。若要在可通过 [`ModelResponse.native_tool_calls`][pydantic_ai.messages.ModelResponse.native_tool_calls] 访问的 [`NativeToolReturnPart`][pydantic_ai.messages.NativeToolReturnPart] 中包含 search results，请启用 [`OpenAIResponsesModelSettings.openai_include_file_search_results`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_include_file_search_results] [model setting](agent.md#model-run-settings)。 |
+| Google (Gemini) | ✅ | 需要通过 [Gemini Files API](https://ai.google.dev/gemini-api/docs/files) 上传文件。文件会在 48 小时后自动删除。支持单文件最大 2 GB，每个项目最大 20 GB。不支持同时使用 native tools 和 function tools（包括 [output tools](output.md#tool-output)）；若要使用 structured output，请改用 [`PromptedOutput`](output.md#prompted-output)。 |
+| xAI | ✅ | 映射到 xAI collections search。需要 collection IDs。若要在 [`NativeToolReturnPart`][pydantic_ai.messages.NativeToolReturnPart] 上包含 search results，请启用 [`XaiModelSettings.xai_include_collections_search_output`][pydantic_ai.models.xai.XaiModelSettings.xai_include_collections_search_output] [model setting](agent.md#model-run-settings)。 |
+|| Google Cloud | ❌ | 不支持 |
+| Anthropic | ❌ | 不支持 |
+| Groq | ❌ | 不支持 |
+| OpenAI Chat Completions | ❌ | 不支持 |
+| Bedrock | ❌ | 不支持 |
+| Mistral | ❌ | 不支持 |
+| Cohere | ❌ | 不支持 |
+| HuggingFace | ❌ | 不支持 |
+| Outlines | ❌ | 不支持 |
 
-### Usage
+### 用法 {#usage-7}
 
 #### OpenAI Responses
 
-With OpenAI, you need to first [upload files to a vector store](https://platform.openai.com/docs/assistants/tools/file-search), then reference the vector store IDs when using the `FileSearchTool`.
+使用 OpenAI 时，你需要先[将文件上传到 vector store](https://platform.openai.com/docs/assistants/tools/file-search)，然后在使用 `FileSearchTool` 时引用 vector store IDs。
 
 ```py {title="file_search_openai_upload.py" test="skip"}
 import asyncio
@@ -879,7 +874,7 @@ asyncio.run(main())
 
 #### Google (Gemini)
 
-With Gemini, you need to first [create a file search store via the Files API](https://ai.google.dev/gemini-api/docs/files), then reference the file search store names.
+使用 Gemini 时，你需要先[通过 Files API 创建 file search store](https://ai.google.dev/gemini-api/docs/files)，然后引用 file search store names。
 
 ```py {title="file_search_google_upload.py" test="skip"}
 import asyncio
@@ -917,7 +912,7 @@ asyncio.run(main())
 
 #### xAI
 
-With xAI, `FileSearchTool` maps to the [collections search](https://docs.x.ai/developers/tools/collection-search) tool. Pass collection IDs as `file_store_ids`.
+使用 xAI 时，`FileSearchTool` 会映射到 [collections search](https://docs.x.ai/developers/tools/collection-search) tool。请将 collection IDs 作为 `file_store_ids` 传入。
 
 ```py {title="file_search_xai.py" test="skip"}
 import asyncio
@@ -939,6 +934,6 @@ async def main():
 asyncio.run(main())
 ```
 
-## API Reference
+## API 参考 {#api-reference}
 
-For complete API documentation, see the [API Reference](api/native_tools.md).
+完整 API 文档请参阅 [API Reference](api/native_tools.md)。
