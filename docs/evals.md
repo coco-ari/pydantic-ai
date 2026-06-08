@@ -4,78 +4,77 @@ title: Pydantic Evals
 
 # Pydantic Evals
 
-**Pydantic Evals** is a powerful evaluation framework for systematically testing and evaluating AI systems, from simple LLM calls to complex multi-agent applications.
+**Pydantic Evals** 是一个强大的评估框架，用于系统化测试和评估 AI 系统，范围从简单的 LLM 调用到复杂的多 agent 应用。
 
-## Design Philosophy
+## 设计理念 {#design-philosophy}
 
-!!! note "Code-First Approach"
-    Pydantic Evals follows a code-first philosophy where all evaluation components are defined in Python. This differs from platforms with web-based configuration. You write and run evals in code, and can write the results to disk or view them in your terminal or in [Pydantic Logfire](https://logfire.pydantic.dev/docs/guides/web-ui/evals/).
+!!! note "代码优先的方法"
+    Pydantic Evals 遵循代码优先的理念，所有评估组件都在 Python 中定义。这不同于基于 Web 配置的平台。你在代码中编写并运行 evals，并可以把结果写入磁盘，或在终端中、在 [Pydantic Logfire](https://logfire.pydantic.dev/docs/guides/web-ui/evals/) 中查看。
 
-!!! danger "Evals are an Emerging Practice"
-    Unlike unit tests, evals are an emerging art/science. Anyone who claims to know exactly how your evals should be defined can safely be ignored. We've designed Pydantic Evals to be flexible and useful without being too opinionated.
+!!! danger "Evals 仍是新兴实践"
+    与单元测试不同，evals 仍是一门新兴的技艺/科学。任何声称确切知道你的 evals 应该如何定义的人，都可以放心忽略。我们把 Pydantic Evals 设计得灵活且实用，同时避免过度武断。
 
 
-## Quick Navigation
+## 快速导航 {#quick-navigation}
 
-**Getting Started:**
+**入门：**
 
-- [Installation](#installation)
-- [Quick Start](evals/quick-start.md)
-- [Core Concepts](evals/core-concepts.md)
+- [安装](#installation)
+- [快速开始](evals/quick-start.md)
+- [核心概念](evals/core-concepts.md)
 
-**Evaluators:**
+**评估器：**
 
-- [Evaluators Overview](evals/evaluators/overview.md) - Compare evaluator types and learn when to use each approach
-- [Built-in Evaluators](evals/evaluators/built-in.md) - Complete reference for exact match, instance checks, and other ready-to-use evaluators
-- [LLM as a Judge](evals/evaluators/llm-judge.md) - Use LLMs to evaluate subjective qualities, complex criteria, and natural language outputs
-- [Custom Evaluators](evals/evaluators/custom.md) - Implement domain-specific scoring logic and custom evaluation metrics
-- [Span-Based Evaluation](evals/evaluators/span-based.md) - Evaluate internal agent behavior (tool calls, execution flow) using OpenTelemetry traces. Essential for complex agents where correctness depends on _how_ the answer was reached, not just the final output. Also ensures eval assertions align with production telemetry.
+- [评估器概览](evals/evaluators/overview.md) - 比较评估器类型，并了解何时使用每种方法
+- [内置评估器](evals/evaluators/built-in.md) - 精确匹配、实例检查和其他开箱即用评估器的完整参考
+- [LLM 作为裁判](evals/evaluators/llm-judge.md) - 使用 LLM 评估主观质量、复杂标准和自然语言输出
+- [自定义评估器](evals/evaluators/custom.md) - 实现 domain-specific 的评分逻辑和自定义评估指标
+- [基于 Span 的评估](evals/evaluators/span-based.md) - 使用 OpenTelemetry traces 评估内部 agent 行为（工具调用、执行流）。对于答案正确性取决于 _如何_ 得出，而不只是最终输出的复杂 agent，这非常重要。它还能确保 eval 断言与生产 telemetry 对齐。
 
-**How-To Guides:**
+**How-To 指南：**
 
-- [Logfire Integration](evals/how-to/logfire-integration.md) - Visualize results
-- [Dataset Management](evals/how-to/dataset-management.md) - Save, load, generate
-- [Concurrency & Performance](evals/how-to/concurrency.md) - Control parallel execution
-- [Retry Strategies](evals/how-to/retry-strategies.md) - Handle transient failures
-- [Metrics & Attributes](evals/how-to/metrics-attributes.md) - Track custom data
-- [Case Lifecycle Hooks](evals/how-to/lifecycle.md) - Per-case setup, teardown, and context enrichment
+- [Logfire 集成](evals/how-to/logfire-integration.md) - 可视化结果
+- [数据集管理](evals/how-to/dataset-management.md) - 保存、加载、生成
+- [并发与性能](evals/how-to/concurrency.md) - 控制并行执行
+- [重试策略](evals/how-to/retry-strategies.md) - 处理瞬时失败
+- [指标与属性](evals/how-to/metrics-attributes.md) - 跟踪自定义数据
+- [用例生命周期 hooks](evals/how-to/lifecycle.md) - 按用例设置、清理和上下文增强
 
-**Examples:**
+**示例：**
 
-- [Simple Validation](evals/examples/simple-validation.md) - Basic example
+- [简单验证](evals/examples/simple-validation.md) - 基础示例
 
-**Reference:**
+**参考：**
 
-- [API Documentation](api/pydantic_evals/dataset.md)
+- [API 文档](api/pydantic_evals/dataset.md)
 
-## Code-First Evaluation
+## 代码优先评估 {#code-first-evaluation}
 
-Pydantic Evals follows a **code-first approach** where you define all evaluation components (datasets, experiments, tasks, cases and evaluators) in Python code, or as serialized data loaded by Python code. This differs from platforms with fully web-based configuration.
+Pydantic Evals 采用**代码优先方法**：你可以在 Python 代码中定义所有评估组件（数据集、实验、任务、用例和评估器），也可以把它们定义为由 Python 代码加载的序列化数据。这不同于完全基于 Web 配置的平台。
 
-When you run an _Experiment_ you'll see a progress indicator and can print the results wherever you run your python code (IDE, terminal, etc). You also get a report object back that you can serialize and store or send to a notebook or other application for further visualization and analysis.
+运行一个 _Experiment_ 时，你会看到进度指示器，并可以在运行 Python 代码的任何地方（IDE、终端等）打印结果。你还会拿到一个 report 对象，可以将它序列化并存储，或发送到 notebook 或其他应用做进一步可视化和分析。
 
-If you are using [Pydantic Logfire](https://logfire.pydantic.dev/docs/guides/web-ui/evals/), your experiment results automatically appear in the Logfire web interface for visualization, comparison, and collaborative analysis. Logfire serves as a observability layer - you write and run evals in code, then view and analyze results in the web UI.
+如果你使用 [Pydantic Logfire](https://logfire.pydantic.dev/docs/guides/web-ui/evals/)，实验结果会自动出现在 Logfire Web 界面中，用于可视化、比较和协作分析。Logfire 作为 observability 层存在：你在代码中编写并运行 evals，然后在 Web UI 中查看和分析结果。
 
-## Installation
+## 安装 {#installation}
 
-To install the Pydantic Evals package, run:
+要安装 Pydantic Evals 包，请运行：
 
 ```bash
 pip/uv-add pydantic-evals
 ```
 
-`pydantic-evals` does not depend on `pydantic-ai`, but has an optional dependency on `logfire` if you'd like to
-use OpenTelemetry traces in your evals, or send evaluation results to [logfire](https://pydantic.dev/logfire).
+`pydantic-evals` 不依赖 `pydantic-ai`，但如果你想在 evals 中使用 OpenTelemetry traces，或把评估结果发送到 [logfire](https://pydantic.dev/logfire)，可以安装可选的 `logfire` 依赖。
 
 ```bash
 pip/uv-add 'pydantic-evals[logfire]'
 ```
 
-## Pydantic Evals Data Model
+## Pydantic Evals 数据模型 {#pydantic-evals-data-model}
 
-Pydantic Evals is built around a simple data model:
+Pydantic Evals 围绕一个简单数据模型构建：
 
-### Data Model Diagram
+### 数据模型图 {#data-model-diagram}
 
 ```
 Dataset (1) ──────────── (Many) Case
@@ -88,54 +87,42 @@ Dataset (1) ──────────── (Many) Case
      └─── (Many) Evaluator
 ```
 
-### Key Relationships
+### 关键关系 {#key-relationships}
 
-1. **Dataset → Cases**: One Dataset contains many Cases
-2. **Dataset → Experiments**: One Dataset can be used across many Experiments over time
-3. **Experiment → Case results**: One Experiment generates results by executing each Case
-4. **Experiment → Task**: One Experiment evaluates one defined Task
-5. **Experiment → Evaluators**: One Experiment uses multiple Evaluators. Dataset-wide Evaluators are run against all Cases, and Case-specific Evaluators against their respective Cases
+1. **Dataset → Cases**：一个 Dataset 包含多个 Cases
+2. **Dataset → Experiments**：一个 Dataset 可以随着时间用于多个 Experiments
+3. **Experiment → Case results**：一个 Experiment 通过执行每个 Case 生成结果
+4. **Experiment → Task**：一个 Experiment 评估一个已定义的 Task
+5. **Experiment → Evaluators**：一个 Experiment 使用多个 Evaluators。Dataset-wide Evaluators 会针对所有 Cases 运行，而 case-specific Evaluators 只针对各自的 Cases 运行
 
-### Data Flow
+### 数据流 {#data-flow}
 
-1. **Dataset creation**: Define cases and evaluators in YAML/JSON, or directly in Python
-2. **Experiment execution**: Run `dataset.evaluate_sync(task_function)`
-3. **Cases run**: Each Case is executed against the Task
-4. **Evaluation**: Evaluators score the Task outputs for each Case
-5. **Results**: All Case results are collected into a summary report
+1. **创建 Dataset**：在 YAML/JSON 中定义 cases 和 evaluators，或直接在 Python 中定义
+2. **执行 Experiment**：运行 `dataset.evaluate_sync(task_function)`
+3. **运行 Cases**：每个 Case 都会针对 Task 执行
+4. **Evaluation**：Evaluators 为每个 Case 的 Task 输出打分
+5. **Results**：所有 Case results 会被收集到一份摘要报告中
 
-!!! note "A metaphor"
+!!! note "一个类比"
 
-    A useful metaphor (although not perfect) is to think of evals like a **Unit Testing** framework:
+    一个有用（但并不完美）的类比，是把 evals 看作一个**单元测试**框架：
 
-    - **Cases + Evaluators** are your individual unit tests - each one
-    defines a specific scenario you want to test, complete with inputs
-    and expected outcomes. Just like a unit test, a case asks: _"Given
-    this input, does my system produce the right output?"_
+    - **Cases + Evaluators** 是你的单个单元测试：每个测试定义一个你想验证的具体场景，其中包含输入和预期结果。就像单元测试一样，一个 case 会问：_"给定这个输入，我的系统是否产生了正确输出？"_
 
-    -  **Datasets** are like test suites - they are the scaffolding that holds your unit
-    tests together. They group related cases and define shared
-    evaluation criteria that should apply across all tests in the suite.
+    - **Datasets** 类似测试套件：它们是把单元测试组织在一起的脚手架。它们把相关 cases 分组，并定义应当应用于套件中所有测试的共享评估标准。
 
-    - **Experiments** are like running your entire test suite and getting a
-    report. When you execute `dataset.evaluate_sync(my_ai_function)`,
-    you're running all your cases against your AI system and
-    collecting the results - just like running `pytest` and getting a
-    summary of passes, failures, and performance metrics.
+    - **Experiments** 类似运行整个测试套件并获得报告。当你执行 `dataset.evaluate_sync(my_ai_function)` 时，就是把所有 cases 跑到你的 AI 系统上，并收集结果，就像运行 `pytest` 并获得通过、失败和性能指标摘要一样。
 
-    The key difference from traditional unit testing is that AI systems are
-    probabilistic. If you're type checking you'll still get a simple pass/fail,
-    but scores for text outputs are likely qualitative and/or categorical,
-    and more open to interpretation.
+    与传统单元测试的关键区别在于，AI 系统是概率性的。如果你在做类型检查，仍然会得到简单的通过/失败；但文本输出的分数更可能是定性和/或分类的，也更开放于解释。
 
-For a deeper understanding, see [Core Concepts](evals/core-concepts.md).
+要更深入理解，请参阅[核心概念](evals/core-concepts.md)。
 
-## Datasets and Cases
+## Datasets 和 Cases {#datasets-and-cases}
 
-In Pydantic Evals, everything begins with [`Dataset`][pydantic_evals.dataset.Dataset]s and [`Case`][pydantic_evals.dataset.Case]s:
+在 Pydantic Evals 中，一切都从 [`Dataset`][pydantic_evals.dataset.Dataset] 和 [`Case`][pydantic_evals.dataset.Case] 开始：
 
-- **[`Dataset`][pydantic_evals.dataset.Dataset]**: A collection of test Cases designed for the evaluation of a specific task or function
-- **[`Case`][pydantic_evals.dataset.Case]**: A single test scenario corresponding to Task inputs, with optional expected outputs, metadata, and case-specific evaluators
+- **[`Dataset`][pydantic_evals.dataset.Dataset]**：为评估特定任务或函数而设计的一组测试 Cases
+- **[`Case`][pydantic_evals.dataset.Case]**：对应 Task 输入的单个测试场景，可带可选预期输出、metadata 和 case-specific evaluators
 
 ```python {title="simple_eval_dataset.py"}
 from pydantic_evals import Case, Dataset
@@ -150,19 +137,19 @@ case1 = Case(
 dataset = Dataset(name='capital_quiz', cases=[case1])
 ```
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以直接运行）_
 
-See [Dataset Management](evals/how-to/dataset-management.md) to learn about saving, loading, and generating datasets.
+参阅[数据集管理](evals/how-to/dataset-management.md)，了解如何保存、加载和生成 datasets。
 
-## Evaluators
+## Evaluators {#evaluators}
 
-[`Evaluator`][pydantic_evals.evaluators.Evaluator]s analyze and score the results of your Task when tested against a Case.
+[`Evaluator`][pydantic_evals.evaluators.Evaluator] 会在你的 Task 针对 Case 测试时分析并评分结果。
 
-These can be deterministic, code-based checks (such as testing model output format with a regex, or checking for the appearance of PII or sensitive data), or they can assess non-deterministic model outputs for qualities like accuracy, precision/recall, hallucinations, or instruction-following.
+它们可以是确定性的、基于代码的检查（例如用正则测试模型输出格式，或检查是否出现 PII 或敏感数据），也可以评估非确定性的模型输出质量，例如准确性、precision/recall、幻觉或指令遵循情况。
 
-While both kinds of testing are useful in LLM systems, classical code-based tests are cheaper and easier than tests which require either human or machine review of model outputs.
+在 LLM 系统中，两类测试都有用，但经典的基于代码的测试，比需要人类或机器审查模型输出的测试更便宜、更简单。
 
-Pydantic Evals includes several [built-in evaluators](evals/evaluators/built-in.md) and allows you to define [custom evaluators](evals/evaluators/custom.md):
+Pydantic Evals 包含几个[内置评估器](evals/evaluators/built-in.md)，也允许你定义[自定义评估器](evals/evaluators/custom.md)：
 
 ```python {title="simple_eval_evaluator.py" requires="simple_eval_dataset.py"}
 from dataclasses import dataclass
@@ -192,24 +179,24 @@ class MyEvaluator(Evaluator):
 dataset.add_evaluator(MyEvaluator())
 ```
 
-1. You can add built-in evaluators to a dataset using the [`add_evaluator`][pydantic_evals.dataset.Dataset.add_evaluator] method.
-2. This custom evaluator returns a simple score based on whether the output matches the expected output.
+1. 你可以用 [`add_evaluator`][pydantic_evals.dataset.Dataset.add_evaluator] 方法向 dataset 添加内置评估器。
+2. 这个自定义评估器会根据输出是否匹配预期输出返回一个简单分数。
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以直接运行）_
 
-Learn more:
+了解更多：
 
-- [Evaluators Overview](evals/evaluators/overview.md) - When to use different types
-- [Built-in Evaluators](evals/evaluators/built-in.md) - Complete reference
-- [LLM Judge](evals/evaluators/llm-judge.md) - Using LLMs as evaluators
-- [Custom Evaluators](evals/evaluators/custom.md) - Write your own logic
-- [Span-Based Evaluation](evals/evaluators/span-based.md) - Analyze execution traces
+- [评估器概览](evals/evaluators/overview.md) - 何时使用不同类型
+- [内置评估器](evals/evaluators/built-in.md) - 完整参考
+- [LLM Judge](evals/evaluators/llm-judge.md) - 使用 LLM 作为评估器
+- [自定义评估器](evals/evaluators/custom.md) - 编写你自己的逻辑
+- [基于 Span 的评估](evals/evaluators/span-based.md) - 分析执行 traces
 
-## Running Experiments
+## 运行 Experiments {#running-experiments}
 
-Performing evaluations involves running a task against all cases in a dataset, also known as running an "experiment".
+执行评估意味着针对数据集中的所有 cases 运行一个 task，也称为运行一次 "experiment"。
 
-Putting the above two examples together and using the more declarative `evaluators` kwarg to [`Dataset`][pydantic_evals.dataset.Dataset]:
+把上面两个示例合在一起，并使用更声明式的 [`Dataset`][pydantic_evals.dataset.Dataset] `evaluators` kwarg：
 
 ```python {title="simple_eval_complete.py"}
 from pydantic_evals import Case, Dataset
@@ -261,26 +248,26 @@ report.print(include_input=True, include_output=True, include_durations=False)  
 """
 ```
 
-1. Create a [test case][pydantic_evals.dataset.Case] as above
-2. Create a [`Dataset`][pydantic_evals.dataset.Dataset] with test cases and [`evaluators`][pydantic_evals.dataset.Dataset.evaluators]
-3. Our function to evaluate.
-4. Run the evaluation with [`evaluate_sync`][pydantic_evals.dataset.Dataset.evaluate_sync], which runs the function against all test cases in the dataset, and returns an [`EvaluationReport`][pydantic_evals.reporting.EvaluationReport] object.
-5. Print the report with [`print`][pydantic_evals.reporting.EvaluationReport.print], which shows the results of the evaluation. We have omitted duration here just to keep the printed output from changing from run to run.
+1. 像上面一样创建一个[测试用例][pydantic_evals.dataset.Case]
+2. 创建一个包含测试 cases 和 [`evaluators`][pydantic_evals.dataset.Dataset.evaluators] 的 [`Dataset`][pydantic_evals.dataset.Dataset]
+3. 这是我们要评估的函数。
+4. 用 [`evaluate_sync`][pydantic_evals.dataset.Dataset.evaluate_sync] 运行评估。它会针对数据集中的所有测试 cases 运行该函数，并返回一个 [`EvaluationReport`][pydantic_evals.reporting.EvaluationReport] 对象。
+5. 用 [`print`][pydantic_evals.reporting.EvaluationReport.print] 打印报告，展示评估结果。这里省略 duration，只是为了避免打印输出每次运行都发生变化。
 
-_(This example is complete, it can be run "as is")_
+_（这个示例是完整的，可以直接运行）_
 
-See [Quick Start](evals/quick-start.md) for more examples and [Concurrency & Performance](evals/how-to/concurrency.md) to learn about controlling parallel execution.
+更多示例见[快速开始](evals/quick-start.md)，控制并行执行请参阅[并发与性能](evals/how-to/concurrency.md)。
 
-## API Reference
+## API 参考 {#api-reference}
 
-For comprehensive coverage of all classes, methods, and configuration options, see the detailed [API Reference documentation](https://ai.pydantic.dev/api/pydantic_evals/dataset/).
+关于所有类、方法和配置选项的完整说明，请参阅详细的 [API 参考文档](https://ai.pydantic.dev/api/pydantic_evals/dataset/)。
 
-## Next Steps
+## 下一步 {#next-steps}
 
 <!-- TODO - this would be the perfect place for a full tutorial or case study  -->
-1. **Start with simple evaluations** using [Quick Start](evals/quick-start.md)
-2. **Understand the data model** with [Core Concepts](evals/core-concepts.md)
-3. **Explore built-in evaluators** in [Built-in Evaluators](evals/evaluators/built-in.md)
-4. **Integrate with Logfire** for visualization: [Logfire Integration](evals/how-to/logfire-integration.md)
-5. **Build comprehensive test suites** with [Dataset Management](evals/how-to/dataset-management.md)
-6. **Implement custom evaluators** for domain-specific metrics: [Custom Evaluators](evals/evaluators/custom.md)
+1. **从简单评估开始**：[快速开始](evals/quick-start.md)
+2. **理解数据模型**：[核心概念](evals/core-concepts.md)
+3. **探索内置评估器**：[内置评估器](evals/evaluators/built-in.md)
+4. **集成 Logfire** 进行可视化：[Logfire 集成](evals/how-to/logfire-integration.md)
+5. **构建全面测试套件**：[数据集管理](evals/how-to/dataset-management.md)
+6. **为 domain-specific 指标实现自定义评估器**：[自定义评估器](evals/evaluators/custom.md)

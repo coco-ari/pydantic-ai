@@ -1,21 +1,21 @@
-# Vercel AI Data Stream Protocol
+# Vercel AI Data Stream 协议 {#vercel-ai-data-stream-protocol}
 
-Pydantic AI natively supports the [Vercel AI Data Stream Protocol](https://ai-sdk.dev/docs/ai-sdk-ui/stream-protocol#data-stream-protocol) to receive agent run input from, and stream events to, a frontend using [AI SDK UI](https://ai-sdk.dev/docs/ai-sdk-ui/overview) hooks like [`useChat`](https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-chat). You can optionally use [AI Elements](https://ai-sdk.dev/elements) for pre-built UI components.
+Pydantic AI 原生支持 [Vercel AI Data Stream Protocol](https://ai-sdk.dev/docs/ai-sdk-ui/stream-protocol#data-stream-protocol)，可通过 [`useChat`](https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-chat) 这类 [AI SDK UI](https://ai-sdk.dev/docs/ai-sdk-ui/overview) hooks 从前端接收 agent 运行输入，并向前端流式发送事件。你也可以选择使用 [AI Elements](https://ai-sdk.dev/elements) 提供的预构建 UI 组件。
 
 !!! note
-    By default, the adapter targets AI SDK v5 for backwards compatibility. To use features introduced in AI SDK v6, set `sdk_version=6` on the adapter.
+    默认情况下，适配器为了向后兼容会面向 AI SDK v5。要使用 AI SDK v6 引入的功能，请在适配器上设置 `sdk_version=6`。
 
-## Usage
+## 用法 {#usage}
 
-The [`VercelAIAdapter`][pydantic_ai.ui.vercel_ai.VercelAIAdapter] class is responsible for transforming agent run input received from the frontend into arguments for [`Agent.run_stream_events()`](../agent.md#running-agents), running the agent, and then transforming Pydantic AI events into Vercel AI events. The event stream transformation is handled by the [`VercelAIEventStream`][pydantic_ai.ui.vercel_ai.VercelAIEventStream] class, but you typically won't use this directly.
+[`VercelAIAdapter`][pydantic_ai.ui.vercel_ai.VercelAIAdapter] 类负责把从前端收到的 agent 运行输入转换成 [`Agent.run_stream_events()`](../agent.md#running-agents) 的参数，运行 agent，然后再把 Pydantic AI 事件转换成 Vercel AI 事件。事件流转换由 [`VercelAIEventStream`][pydantic_ai.ui.vercel_ai.VercelAIEventStream] 类处理，但你通常不会直接使用它。
 
-If you're using a Starlette-based web framework like FastAPI, you can use the [`VercelAIAdapter.dispatch_request()`][pydantic_ai.ui.UIAdapter.dispatch_request] class method from an endpoint function to directly handle a request and return a streaming response of Vercel AI events. This is demonstrated in the next section.
+如果你使用的是基于 Starlette 的 Web 框架（例如 FastAPI），可以在端点函数中使用 [`VercelAIAdapter.dispatch_request()`][pydantic_ai.ui.UIAdapter.dispatch_request] 类方法直接处理请求，并返回 Vercel AI 事件的流式响应。下一节会演示这种用法。
 
-If you're using a web framework not based on Starlette (e.g. Django or Flask) or need fine-grained control over the input or output, you can create a `VercelAIAdapter` instance and directly use its methods. This is demonstrated in "Advanced Usage" section below.
+如果你使用的 Web 框架不是基于 Starlette（例如 Django 或 Flask），或者需要对输入或输出进行细粒度控制，可以创建一个 `VercelAIAdapter` 实例并直接使用它的方法。下面"高级用法"一节会演示这种方式。
 
-### Usage with Starlette/FastAPI
+### 与 Starlette/FastAPI 一起使用 {#usage-with-starlettefastapi}
 
-Besides the request, [`VercelAIAdapter.dispatch_request()`][pydantic_ai.ui.UIAdapter.dispatch_request] takes the agent, the same optional arguments as [`Agent.run_stream_events()`](../agent.md#running-agents), and an optional `on_complete` callback function that receives the completed [`AgentRunResult`][pydantic_ai.agent.AgentRunResult] and can optionally yield additional Vercel AI events.
+除了 request 之外，[`VercelAIAdapter.dispatch_request()`][pydantic_ai.ui.UIAdapter.dispatch_request] 还接收 agent、与 [`Agent.run_stream_events()`](../agent.md#running-agents) 相同的可选参数，以及一个可选的 `on_complete` 回调函数。该回调会收到完成后的 [`AgentRunResult`][pydantic_ai.agent.AgentRunResult]，并且可以选择继续 yield 额外的 Vercel AI 事件。
 
 ```py {title="dispatch_request.py"}
 from fastapi import FastAPI
@@ -34,19 +34,19 @@ async def chat(request: Request) -> Response:
     return await VercelAIAdapter.dispatch_request(request, agent=agent)
 ```
 
-### Advanced Usage
+### 高级用法 {#advanced-usage}
 
-If you're using a web framework not based on Starlette (e.g. Django or Flask) or need fine-grained control over the input or output, you can create a `VercelAIAdapter` instance and directly use its methods, which can be chained to accomplish the same thing as the `VercelAIAdapter.dispatch_request()` class method shown above:
+如果你使用的 Web 框架不是基于 Starlette（例如 Django 或 Flask），或者需要对输入或输出进行细粒度控制，可以创建一个 `VercelAIAdapter` 实例并直接使用它的方法。这些方法可以串起来，实现与上面展示的 `VercelAIAdapter.dispatch_request()` 类方法相同的效果：
 
-1. The [`VercelAIAdapter.build_run_input()`][pydantic_ai.ui.vercel_ai.VercelAIAdapter.build_run_input] class method takes the request body as bytes and returns a Vercel AI [`RequestData`][pydantic_ai.ui.vercel_ai.request_types.RequestData] run input object, which you can then pass to the [`VercelAIAdapter()`][pydantic_ai.ui.vercel_ai.VercelAIAdapter] constructor along with the agent.
-    - You can also use the [`VercelAIAdapter.from_request()`][pydantic_ai.ui.UIAdapter.from_request] class method to build an adapter directly from a Starlette/FastAPI request.
-2. The [`VercelAIAdapter.run_stream()`][pydantic_ai.ui.UIAdapter.run_stream] method runs the agent and returns a stream of Vercel AI events. It supports the same optional arguments as [`Agent.run_stream_events()`](../agent.md#running-agents) and an optional `on_complete` callback function that receives the completed [`AgentRunResult`][pydantic_ai.agent.AgentRunResult] and can optionally yield additional Vercel AI events.
-    - You can also use [`VercelAIAdapter.run_stream_native()`][pydantic_ai.ui.UIAdapter.run_stream_native] to run the agent and return a stream of Pydantic AI events instead, which can then be transformed into Vercel AI events using [`VercelAIAdapter.transform_stream()`][pydantic_ai.ui.UIAdapter.transform_stream].
-3. The [`VercelAIAdapter.encode_stream()`][pydantic_ai.ui.UIAdapter.encode_stream] method encodes the stream of Vercel AI events as SSE (HTTP Server-Sent Events) strings, which you can then return as a streaming response.
-    - You can also use [`VercelAIAdapter.streaming_response()`][pydantic_ai.ui.UIAdapter.streaming_response] to generate a Starlette/FastAPI streaming response directly from the Vercel AI event stream returned by `run_stream()`.
+1. [`VercelAIAdapter.build_run_input()`][pydantic_ai.ui.vercel_ai.VercelAIAdapter.build_run_input] 类方法接收字节形式的请求体，并返回一个 Vercel AI [`RequestData`][pydantic_ai.ui.vercel_ai.request_types.RequestData] 运行输入对象。随后你可以把它与 agent 一起传给 [`VercelAIAdapter()`][pydantic_ai.ui.vercel_ai.VercelAIAdapter] 构造函数。
+    - 也可以使用 [`VercelAIAdapter.from_request()`][pydantic_ai.ui.UIAdapter.from_request] 类方法，直接从 Starlette/FastAPI request 构建适配器。
+2. [`VercelAIAdapter.run_stream()`][pydantic_ai.ui.UIAdapter.run_stream] 方法运行 agent 并返回 Vercel AI 事件流。它支持与 [`Agent.run_stream_events()`](../agent.md#running-agents) 相同的可选参数，以及一个可选的 `on_complete` 回调函数。该回调会收到完成后的 [`AgentRunResult`][pydantic_ai.agent.AgentRunResult]，并且可以选择继续 yield 额外的 Vercel AI 事件。
+    - 也可以使用 [`VercelAIAdapter.run_stream_native()`][pydantic_ai.ui.UIAdapter.run_stream_native] 运行 agent 并返回 Pydantic AI 事件流，然后再用 [`VercelAIAdapter.transform_stream()`][pydantic_ai.ui.UIAdapter.transform_stream] 将其转换为 Vercel AI 事件。
+3. [`VercelAIAdapter.encode_stream()`][pydantic_ai.ui.UIAdapter.encode_stream] 方法把 Vercel AI 事件流编码成 SSE（HTTP Server-Sent Events）字符串，然后你可以把它作为流式响应返回。
+    - 也可以使用 [`VercelAIAdapter.streaming_response()`][pydantic_ai.ui.UIAdapter.streaming_response]，直接基于 `run_stream()` 返回的 Vercel AI 事件流生成 Starlette/FastAPI 流式响应。
 
 !!! note
-    This example uses FastAPI, but can be modified to work with any web framework.
+    这个示例使用 FastAPI，但可以改造成适用于任何 Web 框架。
 
 ```py {title="run_stream.py"}
 import json
@@ -85,16 +85,11 @@ async def chat(request: Request) -> Response:
     return StreamingResponse(sse_event_stream, media_type=accept)
 ```
 
-### Data Chunks
+### 数据 chunk {#data-chunks}
 
-Pydantic AI tools can send [Vercel AI data stream chunks](https://ai-sdk.dev/docs/ai-sdk-ui/stream-protocol#data-stream-protocol) by returning a
-[`ToolReturn`](../tools-advanced.md#advanced-tool-returns) object with a data-carrying chunk
-(or a list of chunks) as `metadata`.
-The supported chunk types are [`DataChunk`][pydantic_ai.ui.vercel_ai.response_types.DataChunk],
-[`SourceUrlChunk`][pydantic_ai.ui.vercel_ai.response_types.SourceUrlChunk],
-[`SourceDocumentChunk`][pydantic_ai.ui.vercel_ai.response_types.SourceDocumentChunk],
-and [`FileChunk`][pydantic_ai.ui.vercel_ai.response_types.FileChunk].
-This is useful for attaching structured data to the frontend alongside the tool result, such as source URLs or custom data payloads.
+Pydantic AI 工具可以通过返回 [`ToolReturn`](../tools-advanced.md#advanced-tool-returns) 对象，并在 `metadata` 中携带一个数据 chunk（或 chunk 列表），来发送 [Vercel AI data stream chunks](https://ai-sdk.dev/docs/ai-sdk-ui/stream-protocol#data-stream-protocol)。
+支持的 chunk 类型包括 [`DataChunk`][pydantic_ai.ui.vercel_ai.response_types.DataChunk]、[`SourceUrlChunk`][pydantic_ai.ui.vercel_ai.response_types.SourceUrlChunk]、[`SourceDocumentChunk`][pydantic_ai.ui.vercel_ai.response_types.SourceDocumentChunk] 和 [`FileChunk`][pydantic_ai.ui.vercel_ai.response_types.FileChunk]。
+这适合在工具结果旁边给前端附加结构化数据，例如来源 URL 或自定义数据载荷。
 
 ```python {title="vercel_ai_tool_chunks.py"}
 from pydantic_ai import Agent, ToolReturn
@@ -122,28 +117,28 @@ async def search_docs(query: str) -> ToolReturn:
 ```
 
 !!! note
-    Protocol-control chunks such as `StartChunk`, `FinishChunk`, `StartStepChunk`, or `FinishStepChunk` are automatically filtered out — only the four data-carrying chunk types listed above are forwarded to the stream and preserved in `dump_messages`.
+    `StartChunk`、`FinishChunk`、`StartStepChunk` 或 `FinishStepChunk` 这类协议控制 chunk 会被自动过滤掉。只有上面列出的四种携带数据的 chunk 类型会被转发到流中，并在 `dump_messages` 中保留。
 
-## Message metadata
+## 消息元数据 {#message-metadata}
 
-[`VercelAIAdapter.dump_messages`][pydantic_ai.ui.vercel_ai.VercelAIAdapter.dump_messages] writes [`ModelRequest.metadata`][pydantic_ai.messages.ModelRequest.metadata] and [`ModelResponse.metadata`][pydantic_ai.messages.ModelResponse.metadata] into Vercel AI [`UIMessage.metadata`](https://ai-sdk.dev/docs/ai-sdk-ui/message-metadata), and stores the message `timestamp` under a reserved `pydantic_ai` key so it survives the round-trip. [`VercelAIAdapter.load_messages`][pydantic_ai.ui.vercel_ai.VercelAIAdapter.load_messages] restores it on the way back.
+[`VercelAIAdapter.dump_messages`][pydantic_ai.ui.vercel_ai.VercelAIAdapter.dump_messages] 会把 [`ModelRequest.metadata`][pydantic_ai.messages.ModelRequest.metadata] 和 [`ModelResponse.metadata`][pydantic_ai.messages.ModelResponse.metadata] 写入 Vercel AI [`UIMessage.metadata`](https://ai-sdk.dev/docs/ai-sdk-ui/message-metadata)，并把消息 `timestamp` 存储在保留的 `pydantic_ai` key 下，这样它就能在往返转换中保留下来。[`VercelAIAdapter.load_messages`][pydantic_ai.ui.vercel_ai.VercelAIAdapter.load_messages] 会在返回路径上恢复它。
 
-When streaming, the timestamp is also emitted as a Vercel AI `message-metadata` chunk after the final step, so frontends using AI SDK UI can persist it with the assistant message. Request-side messages have no analogous chunk — frontends rebuilding history purely from streamed chunks see timestamps only on assistant responses, whereas `dump_messages` populates both sides.
+流式传输时，timestamp 也会在最后一个 step 之后作为 Vercel AI `message-metadata` chunk 发出，因此使用 AI SDK UI 的前端可以把它和 assistant 消息一起持久化。请求侧消息没有类似 chunk：如果前端只从流式 chunk 重建历史，就只能在 assistant 响应上看到 timestamp，而 `dump_messages` 会填充双方消息。
 
-`UIMessage.metadata` is fully client-controlled, so only `timestamp` is round-tripped: server-side fields such as `usage`, `model_name`, and `provider_*` are deliberately excluded — dumping them could leak infrastructure details, and restoring them would trust client-submitted history for values the server owns. Broadening the round-trip behind an explicit user-controlled opt-in is tracked in [issue #5174](https://github.com/pydantic/pydantic-ai/issues/5174).
+`UIMessage.metadata` 完全由客户端控制，因此只有 `timestamp` 会往返传递：`usage`、`model_name` 和 `provider_*` 等服务端字段会被刻意排除。导出这些字段可能泄露基础设施细节，而恢复它们则意味着信任客户端提交的历史中本应由服务端拥有的值。通过显式、用户可控的 opt-in 扩展往返传递范围，已在 [issue #5174](https://github.com/pydantic/pydantic-ai/issues/5174) 中跟踪。
 
-## Trust model
+## 信任模型 {#trust-model}
 
-Vercel AI's request `messages` array is fully client-controlled, and the protocol round-trips approval responses and tool results through the message history. The [`VercelAIAdapter`][pydantic_ai.ui.vercel_ai.VercelAIAdapter] applies defaults to strip untrusted parts before the agent runs — see [Trust model for client-submitted messages](./overview.md#trust-model-for-client-submitted-messages) in the UI adapter overview.
+Vercel AI 请求中的 `messages` 数组完全由客户端控制，并且协议会通过消息历史往返传递审批响应和工具结果。[`VercelAIAdapter`][pydantic_ai.ui.vercel_ai.VercelAIAdapter] 会应用默认设置，在 agent 运行前剥离不可信部分。详见 UI 适配器概览中的[客户端提交消息的信任模型](./overview.md#trust-model-for-client-submitted-messages)。
 
-## Tool Approval
+## 工具审批 {#tool-approval}
 
 !!! note
-    Tool approval requires AI SDK UI v6 or later on the frontend.
+    工具审批要求前端使用 AI SDK UI v6 或更高版本。
 
-Pydantic AI supports human-in-the-loop tool approval workflows with AI SDK UI, allowing users to approve or deny tool executions before they run. See the [deferred tool calls documentation](../deferred-tools.md#human-in-the-loop-tool-approval) for details on setting up tools that require approval.
+Pydantic AI 支持与 AI SDK UI 配合的人在环路工具审批工作流，允许用户在工具执行前批准或拒绝。关于如何设置需要审批的工具，详见[延迟工具调用文档](../deferred-tools.md#human-in-the-loop-tool-approval)。
 
-To enable tool approval streaming, pass `sdk_version=6` to `dispatch_request`:
+要启用工具审批流式传输，请向 `dispatch_request` 传入 `sdk_version=6`：
 
 ```py {test="skip" lint="skip"}
 @app.post('/chat')
@@ -151,32 +146,32 @@ async def chat(request: Request) -> Response:
     return await VercelAIAdapter.dispatch_request(request, agent=agent, sdk_version=6)
 ```
 
-When `sdk_version=6`, the adapter will:
+当 `sdk_version=6` 时，适配器会：
 
-1. Emit `tool-approval-request` chunks when tools with `requires_approval=True` are called
-2. Automatically extract approval responses from follow-up requests
-3. Emit `tool-output-denied` chunks for rejected tools
+1. 在调用带有 `requires_approval=True` 的工具时发出 `tool-approval-request` chunk
+2. 自动从后续请求中提取审批响应
+3. 为被拒绝的工具发出 `tool-output-denied` chunk
 
-On the frontend, AI SDK UI's [`useChat`](https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-chat) hook handles the approval flow. You can use the [`Confirmation`](https://ai-sdk.dev/elements/components/confirmation) component from AI Elements for a pre-built approval UI, or build your own using the hook's `addToolApprovalResponse` function.
+在前端，AI SDK UI 的 [`useChat`](https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-chat) hook 会处理审批流程。你可以使用 AI Elements 中的 [`Confirmation`](https://ai-sdk.dev/elements/components/confirmation) 组件作为预构建审批 UI，也可以用 hook 的 `addToolApprovalResponse` 函数构建自己的 UI。
 
-Tool approval responses are trusted from the request by design, matching the protocol's round-trip through `useChat`'s `addToolApprovalResponse` and the reference Next.js backend. If your application needs the approval decision tied to server-side state rather than the request, intercept [`DeferredToolRequests`][pydantic_ai.DeferredToolRequests], persist the approval IDs server-side, and pass explicit `deferred_tool_results` when resuming.
+按照协议通过 `useChat` 的 `addToolApprovalResponse` 和参考 Next.js 后端进行往返传递的设计，来自请求的工具审批响应会被信任。如果你的应用需要把审批决策绑定到服务端状态，而不是绑定到请求，请拦截 [`DeferredToolRequests`][pydantic_ai.DeferredToolRequests]，在服务端持久化审批 ID，并在恢复时传入显式的 `deferred_tool_results`。
 
-## Tool input validation
+## 工具输入验证 {#tool-input-validation}
 
-`tool-input-available` is emitted **after** the agent has validated the call against the tool's schema and any custom [`args_validator`](../tools-advanced.md#args-validator), so the chunk only fires once the args are known to be acceptable. The chunk's `input` field carries the raw arguments the model emitted.
+`tool-input-available` 会在 agent 已根据工具 schema 和任何自定义 [`args_validator`](../tools-advanced.md#args-validator) 验证调用之后才发出，因此只有当 args 已知可接受时，该 chunk 才会触发。chunk 的 `input` 字段会携带模型发出的原始参数。
 
-When validation fails, the adapter emits `tool-input-error` instead of `tool-input-available`. The chunk carries the same `tool_call_id`, `tool_name`, and `input` (the raw arguments) plus an `error_text` field rendered from the retry prompt that will be sent back to the model. The agent will retry the call (subject to the tool's `retries` setting) and emit a new `tool-input-(available|error)` for each attempt.
+验证失败时，适配器会发出 `tool-input-error`，而不是 `tool-input-available`。该 chunk 携带相同的 `tool_call_id`、`tool_name` 和 `input`（原始参数），外加一个 `error_text` 字段；该字段由将要发回模型的重试提示渲染而来。agent 会重试该调用（受工具 `retries` 设置约束），并为每次尝试发出新的 `tool-input-(available|error)`。
 
-## System prompts and instructions
+## System prompts 和 instructions {#system-prompts-and-instructions}
 
-Pydantic AI supports two ways to provide guidance to the model: [`system_prompt`](../agent.md#system-prompts) (stored in the message history as [`SystemPromptPart`][pydantic_ai.messages.SystemPromptPart]s) and [`instructions`](../agent.md#instructions) (injected fresh on every request, never persisted). When you control the server side, `instructions` is the recommended default.
+Pydantic AI 支持两种向模型提供指导的方式：[`system_prompt`](../agent.md#system-prompts)（作为 [`SystemPromptPart`][pydantic_ai.messages.SystemPromptPart] 存储在消息历史中）和 [`instructions`](../agent.md#instructions)（每次请求都会重新注入，从不持久化）。当你控制服务端时，`instructions` 是推荐默认值。
 
-The rest of this section only matters if you use `system_prompt`. If you only use `instructions`, there's nothing to configure — they're always applied regardless of the frontend message history.
+本节剩余内容只有在你使用 `system_prompt` 时才重要。如果你只使用 `instructions`，则无需配置任何内容；无论前端消息历史如何，它们都会始终应用。
 
-For `system_prompt`, you choose who owns it with the `manage_system_prompt` parameter on [`VercelAIAdapter`][pydantic_ai.ui.vercel_ai.VercelAIAdapter]:
+对于 `system_prompt`，你可以通过 [`VercelAIAdapter`][pydantic_ai.ui.vercel_ai.VercelAIAdapter] 上的 `manage_system_prompt` 参数选择所有权归属：
 
-- `'server'` (default): the agent's configured `system_prompt` is authoritative. Any system message sent by the frontend is stripped with a warning (a malicious client could otherwise inject arbitrary instructions via crafted API requests), and the agent's own system prompt is reinjected at the head of the first request via the [`ReinjectSystemPrompt`][pydantic_ai.capabilities.ReinjectSystemPrompt] capability.
-- `'client'`: the frontend owns the system prompt. Frontend system messages are preserved as-is, and the agent's configured `system_prompt` is not injected — the caller is fully responsible for sending it on every turn if desired. To opt into fallback-to-configured behavior, add the [`ReinjectSystemPrompt`][pydantic_ai.capabilities.ReinjectSystemPrompt] capability to your agent.
+- `'server'`（默认）：agent 配置的 `system_prompt` 具有权威性。前端发送的任何 system message 都会被剥离并给出警告（否则恶意客户端可以通过构造的 API 请求注入任意指令），agent 自己的 system prompt 会通过 [`ReinjectSystemPrompt`][pydantic_ai.capabilities.ReinjectSystemPrompt] capability 重新注入到第一个请求的开头。
+- `'client'`：前端拥有 system prompt。前端 system message 会原样保留，而 agent 配置的 `system_prompt` 不会被注入；如果需要，调用方需要完全负责在每一轮发送它。要选择启用回退到已配置内容的行为，请把 [`ReinjectSystemPrompt`][pydantic_ai.capabilities.ReinjectSystemPrompt] capability 添加到你的 agent。
 
 ```python {title="vercel_ai_client_managed_system_prompt.py"}
 from fastapi import FastAPI

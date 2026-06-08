@@ -1,18 +1,18 @@
-# Durable Execution with Prefect
+# 使用 Prefect 进行持久化执行 {#durable-execution-with-prefect}
 
-[Prefect](https://www.prefect.io/) is a workflow orchestration framework for building resilient data pipelines in Python, natively integrated with Pydantic AI.
+[Prefect](https://www.prefect.io/) 是一个工作流编排框架，用于在 Python 中构建有韧性的数据管道，并与 Pydantic AI 原生集成。
 
-## Durable Execution
+## 持久化执行 {#durable-execution}
 
-Prefect 3.0 brings [transactional semantics](https://www.prefect.io/blog/transactional-ml-pipelines-with-prefect-3-0) to your Python workflows, allowing you to group tasks into atomic units and define failure modes. If any part of a transaction fails, the entire transaction can be rolled back to a clean state.
+Prefect 3.0 为你的 Python 工作流带来了[事务语义](https://www.prefect.io/blog/transactional-ml-pipelines-with-prefect-3-0)，允许你把任务组合成原子单元并定义失败模式。如果事务中的任何部分失败，整个事务都可以回滚到干净状态。
 
-* **Flows** are the top-level entry points for your workflow. They can contain tasks and other flows.
-* **Tasks** are individual units of work that can be retried, cached, and monitored independently.
+* **Flows** 是工作流的顶层入口点。它们可以包含 tasks 和其他 flows。
+* **Tasks** 是单独的工作单元，可以独立重试、缓存和监控。
 
-Prefect 3.0's approach to transactional orchestration makes your workflows automatically **idempotent**: rerunnable without duplication or inconsistency across any environment. Every task is executed within a transaction that governs when and where the task's result record is persisted. If the task runs again under an identical context, it will not re-execute but instead load its previous result.
+Prefect 3.0 的事务编排方法让你的工作流天然具备**幂等性**：可以在任何环境中重新运行，而不会产生重复或不一致。每个 task 都在一个 transaction 中执行，该 transaction 管理 task 的结果记录何时以及在哪里持久化。如果 task 在相同上下文下再次运行，它不会重新执行，而是加载之前的结果。
 
-The diagram below shows the overall architecture of an agentic application with Prefect.
-Prefect uses client-side task orchestration by default, with optional server connectivity for advanced features like scheduling and monitoring.
+下面的图展示了一个使用 Prefect 的 agentic 应用的整体架构。
+Prefect 默认使用客户端侧 task 编排，并可选择连接服务端以获得调度、监控等高级功能。
 
 ```text
             +---------------------+
@@ -50,28 +50,28 @@ Prefect uses client-side task orchestration by default, with optional server con
       [External APIs, services, databases, etc.]
 ```
 
-See the [Prefect documentation](https://docs.prefect.io/) for more information.
+更多信息请参阅 [Prefect 文档](https://docs.prefect.io/)。
 
-## Durable Agent
+## 持久化 Agent {#durable-agent}
 
-Any agent can be wrapped in a [`PrefectAgent`][pydantic_ai.durable_exec.prefect.PrefectAgent] to get durable execution. `PrefectAgent` automatically:
+任何 agent 都可以包装在 [`PrefectAgent`][pydantic_ai.durable_exec.prefect.PrefectAgent] 中以获得持久化执行能力。`PrefectAgent` 会自动：
 
-* Wraps [`Agent.run`][pydantic_ai.agent.Agent.run] and [`Agent.run_sync`][pydantic_ai.agent.Agent.run_sync] as Prefect flows.
-* Wraps [model requests](../models/overview.md) as Prefect tasks.
-* Wraps [tool calls](../tools.md) as Prefect tasks (configurable per-tool).
-* Wraps [MCP communication](../mcp/client.md) as Prefect tasks.
+* 将 [`Agent.run`][pydantic_ai.agent.Agent.run] 和 [`Agent.run_sync`][pydantic_ai.agent.Agent.run_sync] 包装为 Prefect flows。
+* 将[模型请求](../models/overview.md)包装为 Prefect tasks。
+* 将[工具调用](../tools.md)包装为 Prefect tasks（可按工具配置）。
+* 将 [MCP 通信](../mcp/client.md)包装为 Prefect tasks。
 
-Event stream handlers are **automatically wrapped** by Prefect when running inside a Prefect flow. Each event from the stream is processed in a separate Prefect task for durability. You can customize the task behavior using the `event_stream_handler_task_config` parameter when creating the `PrefectAgent`. Do **not** manually decorate event stream handlers with `@task`. For examples, see the [streaming docs](../agent.md#streaming-all-events)
+在 Prefect flow 内运行时，事件流处理器会被 Prefect **自动包装**。流中的每个事件都会在单独的 Prefect task 中处理，以实现持久化。创建 `PrefectAgent` 时，你可以使用 `event_stream_handler_task_config` 参数自定义 task 行为。**不要**手动用 `@task` 装饰事件流处理器。示例见[流式文档](../agent.md#streaming-all-events)。
 
-The original agent, model, and MCP server can still be used as normal outside the Prefect flow.
+原始 agent、model 和 MCP server 在 Prefect flow 之外仍然可以正常使用。
 
-Here is a simple but complete example of wrapping an agent for durable execution. All it requires is to install Pydantic AI with Prefect:
+下面是一个简单但完整的示例，展示如何包装 agent 以获得持久化执行。它只需要安装带 Prefect 的 Pydantic AI：
 
 ```bash
 pip/uv-add pydantic-ai[prefect]
 ```
 
-Or if you're using the slim package, you can install it with the `prefect` optional group:
+或者，如果你使用 slim 包，可以安装 `prefect` 可选依赖组：
 
 ```bash
 pip/uv-add pydantic-ai-slim[prefect]
@@ -95,31 +95,31 @@ async def main():
     #> Mexico City (Ciudad de México, CDMX)
 ```
 
-1. The agent's `name` is used to uniquely identify its flows and tasks.
-2. Wrapping the agent with `PrefectAgent` enables durable execution for all agent runs.
-3. [`PrefectAgent.run()`][pydantic_ai.durable_exec.prefect.PrefectAgent.run] works like [`Agent.run()`][pydantic_ai.agent.Agent.run], but runs as a Prefect flow and executes model requests, decorated tool calls, and MCP communication as Prefect tasks.
+1. agent 的 `name` 用于唯一标识它的 flows 和 tasks。
+2. 用 `PrefectAgent` 包装 agent 后，所有 agent 运行都会启用持久化执行。
+3. [`PrefectAgent.run()`][pydantic_ai.durable_exec.prefect.PrefectAgent.run] 的工作方式类似 [`Agent.run()`][pydantic_ai.agent.Agent.run]，但会作为 Prefect flow 运行，并将模型请求、被装饰的工具调用和 MCP 通信作为 Prefect tasks 执行。
 
-_(This example is complete, it can be run "as is" — you'll need to add `asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以直接运行；你需要添加 `asyncio.run(main())` 来运行 `main`）_
 
-For more information on how to use Prefect in Python applications, see their [Python documentation](https://docs.prefect.io/v3/how-to-guides/workflows/write-and-run).
+关于如何在 Python 应用中使用 Prefect，更多信息见其 [Python 文档](https://docs.prefect.io/v3/how-to-guides/workflows/write-and-run)。
 
-## Prefect Integration Considerations
+## Prefect 集成注意事项 {#prefect-integration-considerations}
 
-When using Prefect with Pydantic AI agents, there are a few important considerations to ensure workflows behave correctly.
+将 Prefect 与 Pydantic AI agents 一起使用时，有几个重要注意事项可以确保工作流行为正确。
 
-### Agent Requirements
+### Agent 要求 {#agent-requirements}
 
-Each agent instance must have a unique `name` so Prefect can correctly identify and track its flows and tasks.
+每个 agent 实例都必须有唯一的 `name`，这样 Prefect 才能正确识别和跟踪它的 flows 与 tasks。
 
-### Tool Wrapping
+### 工具包装 {#tool-wrapping}
 
-Agent tools are automatically wrapped as Prefect tasks, which means they benefit from:
+Agent tools 会自动包装为 Prefect tasks，这意味着它们可以受益于：
 
-* **Retry logic**: Failed tool calls can be retried automatically
-* **Caching**: Tool results are cached based on their inputs
-* **Observability**: Tool execution is tracked in the Prefect UI
+* **重试逻辑**：失败的工具调用可以自动重试
+* **缓存**：工具结果会根据其输入缓存
+* **可观测性**：工具执行会在 Prefect UI 中跟踪
 
-You can customize tool task behavior using `tool_task_config` (applies to all tools) or `tool_task_config_by_name` (per-tool configuration):
+你可以用 `tool_task_config`（应用于所有工具）或 `tool_task_config_by_name`（按工具配置）自定义工具 task 行为：
 
 ```python {title="prefect_agent_config.py" test="skip"}
 from pydantic_ai import Agent
@@ -142,41 +142,41 @@ prefect_agent = PrefectAgent(
 )
 ```
 
-Set a tool's config to `None` in `tool_task_config_by_name` to disable task wrapping for that specific tool.
+在 `tool_task_config_by_name` 中把某个工具的 config 设置为 `None`，即可禁用该特定工具的 task 包装。
 
-### Streaming
+### 流式传输 {#streaming}
 
-When running inside a Prefect flow, [`Agent.run_stream()`][pydantic_ai.agent.Agent.run_stream] works but doesn't provide real-time streaming because Prefect tasks consume their entire execution before returning results. The method will execute fully and return the complete result at once.
+在 Prefect flow 内运行时，[`Agent.run_stream()`][pydantic_ai.agent.Agent.run_stream] 可以工作，但不会提供实时流式传输，因为 Prefect tasks 会在返回结果前消费完整执行。该方法会完整执行，并一次性返回完整结果。
 
-For real-time streaming behavior inside Prefect flows, you can set an [`event_stream_handler`][pydantic_ai.agent.EventStreamHandler] on the `Agent` or `PrefectAgent` instance and use [`PrefectAgent.run()`][pydantic_ai.durable_exec.prefect.PrefectAgent.run].
+如果想在 Prefect flows 内获得实时流式行为，可以在 `Agent` 或 `PrefectAgent` 实例上设置 [`event_stream_handler`][pydantic_ai.agent.EventStreamHandler]，并使用 [`PrefectAgent.run()`][pydantic_ai.durable_exec.prefect.PrefectAgent.run]。
 
-**Note**: Event stream handlers behave differently when running inside a Prefect flow versus outside:
-- **Outside a flow**: The handler receives events as they stream from the model
-- **Inside a flow**: Each event is wrapped as a Prefect task for durability, which may affect timing but ensures reliability
+**注意**：事件流处理器在 Prefect flow 内外行为不同：
+- **flow 外部**：处理器会随着模型流式返回而接收事件
+- **flow 内部**：每个事件都会被包装为 Prefect task 以获得持久化，这可能影响时序，但能保证可靠性
 
-The event stream handler function will receive the agent [run context][pydantic_ai.tools.RunContext] and an async iterable of events from the model's streaming response and the agent's execution of tools. For examples, see the [streaming docs](../agent.md#streaming-all-events).
+事件流处理器函数会接收 agent [run context][pydantic_ai.tools.RunContext]，以及来自模型流式响应和 agent 工具执行的异步事件迭代器。示例见[流式文档](../agent.md#streaming-all-events)。
 
-## Task Configuration
+## Task 配置 {#task-configuration}
 
-You can customize Prefect task behavior, such as retries and timeouts, by passing [`TaskConfig`][pydantic_ai.durable_exec.prefect.TaskConfig] objects to the `PrefectAgent` constructor:
+你可以通过向 `PrefectAgent` 构造函数传入 [`TaskConfig`][pydantic_ai.durable_exec.prefect.TaskConfig] 对象，自定义 Prefect task 行为，例如重试和超时：
 
-- `mcp_task_config`: Configuration for MCP server communication tasks
-- `model_task_config`: Configuration for model request tasks
-- `tool_task_config`: Default configuration for all tool calls
-- `tool_task_config_by_name`: Per-tool task configuration (overrides `tool_task_config`)
-- `event_stream_handler_task_config`: Configuration for event stream handler tasks (applies when running inside a Prefect flow)
+- `mcp_task_config`：MCP server 通信 tasks 的配置
+- `model_task_config`：模型请求 tasks 的配置
+- `tool_task_config`：所有工具调用的默认配置
+- `tool_task_config_by_name`：按工具配置 task（覆盖 `tool_task_config`）
+- `event_stream_handler_task_config`：事件流处理器 tasks 的配置（在 Prefect flow 内运行时应用）
 
-Available `TaskConfig` options:
+可用的 `TaskConfig` 选项：
 
-- `retries`: Maximum number of retries for the task (default: `0`)
-- `retry_delay_seconds`: Delay between retries in seconds (can be a single value or list for exponential backoff, default: `1.0`)
-- `timeout_seconds`: Maximum time in seconds for the task to complete
-- `cache_policy`: Custom Prefect cache policy for the task
-- `persist_result`: Whether to persist the task result
-- `result_storage`: Prefect result storage for the task (e.g., `'s3-bucket/my-storage'` or a `WritableFileSystem` block)
-- `log_prints`: Whether to log print statements from the task (default: `False`)
+- `retries`：task 的最大重试次数（默认：`0`）
+- `retry_delay_seconds`：重试之间的秒数延迟（可以是单个值，也可以是指数退避列表；默认：`1.0`）
+- `timeout_seconds`：task 完成允许的最大秒数
+- `cache_policy`：task 的自定义 Prefect 缓存策略
+- `persist_result`：是否持久化 task 结果
+- `result_storage`：task 的 Prefect 结果存储（例如 `'s3-bucket/my-storage'` 或 `WritableFileSystem` block）
+- `log_prints`：是否记录 task 中的 print 语句（默认：`False`）
 
-Example:
+示例：
 
 ```python {title="prefect_agent_config.py" test="skip"}
 from pydantic_ai import Agent
@@ -203,51 +203,51 @@ async def main():
     #> Paris
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以直接运行；你需要添加 `asyncio.run(main())` 来运行 `main`）_
 
-### Retry Considerations
+### 重试注意事项 {#retry-considerations}
 
-Pydantic AI and provider API clients have their own retry logic. When using Prefect, you may want to:
+Pydantic AI 和 provider API clients 拥有自己的重试逻辑。使用 Prefect 时，你可能希望：
 
-* Disable [HTTP Request Retries](../retries.md) in Pydantic AI
-* Turn off your provider API client's retry logic (e.g., `max_retries=0` on a [custom OpenAI client](../models/openai.md#custom-openai-client))
-* Rely on Prefect's task-level retry configuration for consistency
+* 在 Pydantic AI 中禁用 [HTTP 请求重试](../retries.md)
+* 关闭 provider API client 的重试逻辑（例如在[自定义 OpenAI client](../models/openai.md#custom-openai-client) 上设置 `max_retries=0`）
+* 依赖 Prefect 的 task-level 重试配置以保持一致性
 
-This prevents requests from being retried multiple times at different layers.
+这可以避免请求在不同层被重复重试。
 
-## Caching and Idempotency
+## 缓存和幂等性 {#caching-and-idempotency}
 
-Prefect 3.0 provides built-in caching and transactional semantics. Tasks with identical inputs will not re-execute if their results are already cached, making workflows naturally idempotent and resilient to failures.
+Prefect 3.0 提供内置缓存和事务语义。输入相同的 tasks 如果已有缓存结果，就不会重新执行，这让工作流天然具备幂等性，并能从失败中恢复。
 
-* **Task inputs**: Messages, settings, parameters, tool arguments, and serializable dependencies
+* **Task 输入**：Messages、settings、parameters、tool arguments 和可序列化依赖
 
-**Note**: For user dependencies to be included in cache keys, they must be serializable (e.g., Pydantic models or basic Python types). Non-serializable dependencies are automatically excluded from cache computation.
+**注意**：如果要把用户依赖纳入缓存键，它们必须是可序列化的（例如 Pydantic models 或基础 Python 类型）。不可序列化依赖会自动从缓存计算中排除。
 
-## Observability with Prefect and Logfire
+## 使用 Prefect 和 Logfire 进行可观测性 {#observability-with-prefect-and-logfire}
 
-Prefect provides a built-in UI for monitoring flow runs, task executions, and failures. You can:
+Prefect 提供内置 UI，用于监控 flow runs、task executions 和 failures。你可以：
 
-* View real-time flow run status
-* Debug failures with full stack traces
-* Set up alerts and notifications
+* 查看实时 flow run 状态
+* 用完整 stack traces 调试失败
+* 设置 alerts 和 notifications
 
-To access the Prefect UI, you can either:
+要访问 Prefect UI，可以：
 
-1. Use [Prefect Cloud](https://www.prefect.io/cloud) (managed service)
-2. Run a local [Prefect server](https://docs.prefect.io/v3/how-to-guides/self-hosted/server-cli) with `prefect server start`
+1. 使用 [Prefect Cloud](https://www.prefect.io/cloud)（托管服务）
+2. 用 `prefect server start` 运行本地 [Prefect server](https://docs.prefect.io/v3/how-to-guides/self-hosted/server-cli)
 
-You can also use [Pydantic Logfire](../logfire.md) for detailed observability. When using both Prefect and Logfire, you'll get complementary views:
+你也可以使用 [Pydantic Logfire](../logfire.md) 获得详细可观测性。同时使用 Prefect 和 Logfire 时，你会得到互补视图：
 
-* **Prefect**: Workflow-level orchestration, task status, and retry history
-* **Logfire**: Fine-grained tracing of agent runs, model requests, and tool invocations
+* **Prefect**：workflow-level 编排、task 状态和重试历史
+* **Logfire**：agent runs、模型请求和工具调用的细粒度 tracing
 
-When using Logfire with Prefect, you can enable distributed tracing to see spans for your Prefect runs included with your agent runs, model requests, and tool invocations.
+将 Logfire 与 Prefect 一起使用时，可以启用 distributed tracing，在 agent runs、模型请求和工具调用中看到包含 Prefect runs 的 spans。
 
-For more information about Prefect monitoring, see the [Prefect documentation](https://docs.prefect.io/).
+关于 Prefect 监控的更多信息，请参阅 [Prefect 文档](https://docs.prefect.io/)。
 
-## Deployments and Scheduling
+## 部署和调度 {#deployments-and-scheduling}
 
-To deploy and schedule a `PrefectAgent`, wrap it in a Prefect flow and use the flow's [`serve()`](https://docs.prefect.io/v3/how-to-guides/deployments/create-deployments#create-a-deployment-with-serve) or [`deploy()`](https://docs.prefect.io/v3/how-to-guides/deployments/deploy-via-python) methods:
+要部署和调度 `PrefectAgent`，请把它包装在 Prefect flow 中，并使用 flow 的 [`serve()`](https://docs.prefect.io/v3/how-to-guides/deployments/create-deployments#create-a-deployment-with-serve) 或 [`deploy()`](https://docs.prefect.io/v3/how-to-guides/deployments/deploy-via-python) 方法：
 
 ```python {title="serve_agent.py" test="skip"}
 from prefect import flow
@@ -282,12 +282,12 @@ if __name__ == '__main__':
     )
 ```
 
-1. Each flow run executes in an isolated process, and all inputs and dependencies must be serializable. Because Agent instances cannot be serialized, instantiate the agent inside the flow rather than at the module level.
+1. 每次 flow run 都在隔离进程中执行，所有输入和依赖都必须可序列化。由于 Agent 实例无法序列化，请在 flow 内实例化 agent，而不是在模块级实例化。
 
-The `serve()` method accepts scheduling options:
+`serve()` 方法接受调度选项：
 
-- **`cron`**: Cron schedule string (e.g., `'0 9 * * *'` for daily at 9am)
-- **`interval`**: Schedule interval in seconds or as a timedelta
-- **`rrule`**: iCalendar RRule schedule string
+- **`cron`**：Cron 调度字符串（例如 `'0 9 * * *'` 表示每天上午 9 点运行）
+- **`interval`**：以秒数或 timedelta 表示的调度间隔
+- **`rrule`**：iCalendar RRule 调度字符串
 
-For production deployments with Docker, Kubernetes, or other infrastructure, use the flow's [`deploy()`](https://docs.prefect.io/v3/how-to-guides/deployments/deploy-via-python) method. See the [Prefect deployment documentation](https://docs.prefect.io/v3/how-to-guides/deployments/create-deploymentsy) for more information.
+对于使用 Docker、Kubernetes 或其他基础设施的生产部署，请使用 flow 的 [`deploy()`](https://docs.prefect.io/v3/how-to-guides/deployments/deploy-via-python) 方法。更多信息请参阅 [Prefect 部署文档](https://docs.prefect.io/v3/how-to-guides/deployments/create-deploymentsy)。

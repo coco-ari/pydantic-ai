@@ -1,22 +1,22 @@
 # Bedrock
 
-## Install
+## 安装 {#install}
 
-To use `BedrockConverseModel`, you need to either install `pydantic-ai`, or install `pydantic-ai-slim` with the `bedrock` optional group:
+要使用 `BedrockConverseModel`，你需要安装 `pydantic-ai`，或安装带 `bedrock` 可选依赖组的 `pydantic-ai-slim`：
 
 ```bash
 pip/uv-add "pydantic-ai-slim[bedrock]"
 ```
 
-## Configuration
+## 配置 {#configuration}
 
-To use [AWS Bedrock](https://aws.amazon.com/bedrock/), you'll need an AWS account with Bedrock enabled and appropriate credentials. You can use either AWS credentials directly or a pre-configured boto3 client.
+要使用 [AWS Bedrock](https://aws.amazon.com/bedrock/)，你需要一个已启用 Bedrock 且具备适当凭据的 AWS 账号。你可以直接使用 AWS 凭据，也可以使用预配置的 boto3 client。
 
-`BedrockModelName` contains a list of available Bedrock models, including models from Anthropic, Amazon, Cohere, Meta, and Mistral.
+`BedrockModelName` 包含可用 Bedrock 模型列表，包括来自 Anthropic、Amazon、Cohere、Meta 和 Mistral 的模型。
 
-## Environment variables
+## 环境变量 {#environment-variables}
 
-You can set your AWS credentials as environment variables ([among other options](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html#using-environment-variables)):
+你可以把 AWS 凭据设置为环境变量（也可以使用[其他选项](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html#using-environment-variables)）：
 
 ```bash
 export AWS_BEARER_TOKEN_BEDROCK='your-api-key'
@@ -26,7 +26,7 @@ export AWS_SECRET_ACCESS_KEY='your-secret-key'
 export AWS_DEFAULT_REGION='us-east-1'  # or your preferred region
 ```
 
-You can then use `BedrockConverseModel` by name:
+然后可以按名称使用 `BedrockConverseModel`：
 
 ```python
 from pydantic_ai import Agent
@@ -35,7 +35,7 @@ agent = Agent('bedrock:anthropic.claude-sonnet-4-5-20250929-v1:0')
 ...
 ```
 
-Or initialize the model directly with just the model name:
+或者只用模型名称直接初始化模型：
 
 ```python
 from pydantic_ai import Agent
@@ -46,11 +46,9 @@ agent = Agent(model)
 ...
 ```
 
-## Customizing Bedrock Runtime API
+## 自定义 Bedrock Runtime API {#customizing-bedrock-runtime-api}
 
-You can customize the Bedrock Runtime API calls by adding additional parameters, such as [guardrail
-configurations](https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html) and [performance settings](https://docs.aws.amazon.com/bedrock/latest/userguide/latency-optimized-inference.html). For a complete list of configurable parameters, refer to the
-documentation for [`BedrockModelSettings`][pydantic_ai.models.bedrock.BedrockModelSettings].
+你可以通过添加额外参数来自定义 Bedrock Runtime API 调用，例如 [guardrail 配置](https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html)和[性能设置](https://docs.aws.amazon.com/bedrock/latest/userguide/latency-optimized-inference.html)。完整的可配置参数列表请参考 [`BedrockModelSettings`][pydantic_ai.models.bedrock.BedrockModelSettings] 文档。
 
 ```python {title="customize_bedrock_model_settings.py"}
 from pydantic_ai import Agent
@@ -74,35 +72,35 @@ model = BedrockConverseModel(model_name='us.amazon.nova-pro-v1:0')
 agent = Agent(model=model, model_settings=bedrock_model_settings)
 ```
 
-## Service tier
+## 服务层级 {#service-tier}
 
-Bedrock supports controlling the [service tier](https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles.html) to manage throughput and cost.
-You can use the unified [`service_tier`][pydantic_ai.settings.ModelSettings.service_tier] field or the provider-specific [`bedrock_service_tier`][pydantic_ai.models.bedrock.BedrockModelSettings.bedrock_service_tier] field. `bedrock_service_tier` takes precedence over the unified field when both are set.
+Bedrock 支持控制[服务层级](https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles.html)，用于管理吞吐量和成本。
+你可以使用统一的 [`service_tier`][pydantic_ai.settings.ModelSettings.service_tier] 字段，也可以使用 provider-specific 的 [`bedrock_service_tier`][pydantic_ai.models.bedrock.BedrockModelSettings.bedrock_service_tier] 字段。两者同时设置时，`bedrock_service_tier` 优先于统一字段。
 
-The unified field maps as follows for Bedrock:
+Bedrock 对统一字段的映射如下：
 
-- `'auto'`: the `serviceTier` field is omitted from the request, so AWS applies its server-side default (Standard tier).
-- `'default'`: explicitly sent as `{'type': 'default'}` — opts out of any future server-side auto-promotion to premium tiers.
-- `'flex'`: sent as `{'type': 'flex'}`.
-- `'priority'`: sent as `{'type': 'priority'}`.
+- `'auto'`：请求中省略 `serviceTier` 字段，因此 AWS 会应用其服务端默认值（Standard tier）。
+- `'default'`：显式发送为 `{'type': 'default'}`，表示退出任何未来可能的服务端自动晋升到高级层级行为。
+- `'flex'`：发送为 `{'type': 'flex'}`。
+- `'priority'`：发送为 `{'type': 'priority'}`。
 
-To request Bedrock's `'reserved'` tier (which requires a pre-purchased capacity reservation), set [`bedrock_service_tier`][pydantic_ai.models.bedrock.BedrockModelSettings.bedrock_service_tier] directly — it isn't reachable through the unified field.
+要请求 Bedrock 的 `'reserved'` tier（需要预先购买的容量预留），请直接设置 [`bedrock_service_tier`][pydantic_ai.models.bedrock.BedrockModelSettings.bedrock_service_tier]；它无法通过统一字段访问。
 
-## Prompt Caching
+## Prompt 缓存 {#prompt-caching}
 
-Bedrock supports [prompt caching](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html) on Anthropic models so you can reuse expensive context across requests. Pydantic AI provides four ways to use prompt caching:
+Bedrock 在 Anthropic 模型上支持 [prompt caching](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html)，让你可以跨请求复用昂贵的上下文。Pydantic AI 提供四种使用 prompt caching 的方式：
 
-1. **Cache User Messages with [`CachePoint`][pydantic_ai.messages.CachePoint]**: Insert a `CachePoint` marker to cache everything before it in the current user message. Pass `CachePoint(ttl='1h')` to opt into the extended cache duration.
-2. **Cache System Instructions**: Set [`BedrockModelSettings.bedrock_cache_instructions`][pydantic_ai.models.bedrock.BedrockModelSettings.bedrock_cache_instructions] to `True` (uses 5m TTL by default) or specify `'5m'` / `'1h'` directly. When you have both static and dynamic [instructions](../agent.md#instructions), the cache point is placed after the last static instruction, so dynamic instructions can change without invalidating the static cache.
-3. **Cache Tool Definitions**: Set [`BedrockModelSettings.bedrock_cache_tool_definitions`][pydantic_ai.models.bedrock.BedrockModelSettings.bedrock_cache_tool_definitions] to `True` (uses 5m TTL by default) or specify `'5m'` / `'1h'` directly.
-4. **Cache All Messages**: Set [`BedrockModelSettings.bedrock_cache_messages`][pydantic_ai.models.bedrock.BedrockModelSettings.bedrock_cache_messages] to `True` (uses 5m TTL by default) or specify `'5m'` / `'1h'` directly to automatically cache the last user message.
+1. **使用 [`CachePoint`][pydantic_ai.messages.CachePoint] 缓存用户消息**：插入 `CachePoint` 标记，以缓存当前用户消息中它之前的所有内容。传入 `CachePoint(ttl='1h')` 可以启用扩展缓存时长。
+2. **缓存系统 instructions**：将 [`BedrockModelSettings.bedrock_cache_instructions`][pydantic_ai.models.bedrock.BedrockModelSettings.bedrock_cache_instructions] 设置为 `True`（默认使用 5m TTL），或直接指定 `'5m'` / `'1h'`。当你同时拥有静态和动态 [instructions](../agent.md#instructions) 时，缓存点会放在最后一个静态 instruction 之后，因此动态 instructions 可以变化而不会使静态缓存失效。
+3. **缓存工具定义**：将 [`BedrockModelSettings.bedrock_cache_tool_definitions`][pydantic_ai.models.bedrock.BedrockModelSettings.bedrock_cache_tool_definitions] 设置为 `True`（默认使用 5m TTL），或直接指定 `'5m'` / `'1h'`。
+4. **缓存所有消息**：将 [`BedrockModelSettings.bedrock_cache_messages`][pydantic_ai.models.bedrock.BedrockModelSettings.bedrock_cache_messages] 设置为 `True`（默认使用 5m TTL），或直接指定 `'5m'` / `'1h'`，以自动缓存最后一条用户消息。
 
-!!! note "Minimum Token Threshold"
-    AWS only serves cached content once a segment crosses the provider-specific minimum token thresholds (see the [Bedrock prompt caching docs](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html)). Short prompts or tool definitions below those limits will bypass the cache, so don't expect savings for tiny payloads.
+!!! note "最小 token 阈值"
+    AWS 只有在某个片段超过 provider-specific 的最小 token 阈值后才会提供缓存内容（见 [Bedrock prompt caching 文档](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html)）。低于这些限制的短 prompt 或工具定义会绕过缓存，因此不要期待小载荷能节省成本。
 
-### Example 1: Automatic Message Caching
+### 示例 1：自动消息缓存 {#example-1-automatic-message-caching}
 
-Use `bedrock_cache_messages` to automatically cache the last user message:
+使用 `bedrock_cache_messages` 自动缓存最后一条用户消息：
 
 ```python {test="skip"}
 from pydantic_ai import Agent
@@ -125,9 +123,9 @@ print(f'Cache write: {result1.usage.cache_write_tokens}')
 print(f'Cache read: {result2.usage.cache_read_tokens}')
 ```
 
-### Example 2: Comprehensive Caching Strategy
+### 示例 2：全面缓存策略 {#example-2-comprehensive-caching-strategy}
 
-Combine multiple cache settings for maximum savings:
+组合多个缓存设置以最大化节省：
 
 ```python {test="skip"}
 from pydantic_ai import Agent, RunContext
@@ -155,9 +153,9 @@ result = agent.run_sync('Search for Python best practices')
 print(result.output)
 ```
 
-### Example 3: Fine-Grained Control with CachePoint
+### 示例 3：使用 CachePoint 进行细粒度控制 {#example-3-fine-grained-control-with-cachepoint}
 
-Use manual `CachePoint` markers to control cache locations precisely:
+使用手动 `CachePoint` 标记精确控制缓存位置：
 
 ```python {test="skip"}
 from pydantic_ai import Agent, CachePoint
@@ -176,9 +174,9 @@ result = agent.run_sync([
 print(result.output)
 ```
 
-### Accessing Cache Usage Statistics
+### 访问缓存用量统计 {#accessing-cache-usage-statistics}
 
-Access cache usage statistics via [`RequestUsage`][pydantic_ai.usage.RequestUsage]:
+通过 [`RequestUsage`][pydantic_ai.usage.RequestUsage] 访问缓存用量统计：
 
 ```python {test="skip"}
 from pydantic_ai import Agent, CachePoint
@@ -199,23 +197,23 @@ async def main():
     print(f'Cache reads: {usage.cache_read_tokens}')
 ```
 
-### Cache Point Limits
+### 缓存点限制 {#cache-point-limits}
 
-Bedrock enforces a maximum of 4 cache points per request. Pydantic AI automatically manages this limit to ensure your requests always comply without errors.
+Bedrock 每个请求最多允许 4 个缓存点。Pydantic AI 会自动管理这个限制，确保你的请求始终合规且不会出错。
 
-#### How Cache Points Are Allocated
+#### 缓存点如何分配 {#how-cache-points-are-allocated}
 
-Cache points can be placed in three locations:
+缓存点可以放在三个位置：
 
-1. **System Prompt**: Via `bedrock_cache_instructions` setting (adds cache point to last system prompt block)
-2. **Tool Definitions**: Via `bedrock_cache_tool_definitions` setting (adds cache point to last tool definition)
-3. **Messages**: Via `CachePoint` markers or `bedrock_cache_messages` setting (adds cache points to message content)
+1. **System Prompt**：通过 `bedrock_cache_instructions` 设置（向最后一个 system prompt block 添加缓存点）
+2. **工具定义**：通过 `bedrock_cache_tool_definitions` 设置（向最后一个工具定义添加缓存点）
+3. **消息**：通过 `CachePoint` 标记或 `bedrock_cache_messages` 设置（向消息内容添加缓存点）
 
-Each setting uses **at most 1 cache point**, but you can combine them.
+每个设置**最多使用 1 个缓存点**，但你可以组合它们。
 
-#### Automatic Cache Point Limiting
+#### 自动限制缓存点 {#automatic-cache-point-limiting}
 
-When cache points from all sources (settings + `CachePoint` markers) exceed 4, Pydantic AI automatically removes excess cache points from **older message content** (keeping the most recent ones).
+当所有来源（设置 + `CachePoint` 标记）的缓存点超过 4 个时，Pydantic AI 会自动从**较旧的消息内容**中移除多余缓存点（保留最近的缓存点）。
 
 ```python {test="skip"}
 from pydantic_ai import Agent, CachePoint
@@ -247,16 +245,16 @@ result = agent.run_sync([
 print(result.output)
 ```
 
-**Key Points**:
+**要点**：
 
-- System and tool cache points are **always preserved**
-- The cache point created by `bedrock_cache_messages` is **always preserved** (as it's the newest message cache point)
-- Additional `CachePoint` markers in messages are removed from oldest to newest when the limit is exceeded
-- This ensures critical caching (instructions/tools) is maintained while still benefiting from message-level caching
+- System 和工具缓存点会**始终保留**
+- `bedrock_cache_messages` 创建的缓存点会**始终保留**（因为它是最新的消息缓存点）
+- 当超过限制时，消息中的额外 `CachePoint` 标记会从旧到新移除
+- 这会确保关键缓存（instructions/tools）得到保留，同时仍然能从消息级缓存获益
 
-## `provider` argument
+## `provider` 参数 {#provider-argument}
 
-You can provide a custom `BedrockProvider` via the `provider` argument. This is useful when you want to specify credentials directly or use a custom boto3 client:
+你可以通过 `provider` 参数提供自定义 `BedrockProvider`。当你想直接指定凭据或使用自定义 boto3 client 时，这很有用：
 
 ```python
 from pydantic_ai import Agent
@@ -276,7 +274,7 @@ agent = Agent(model)
 ...
 ```
 
-You can also pass a pre-configured boto3 client:
+也可以传入预配置的 boto3 client：
 
 ```python
 import boto3
@@ -295,9 +293,9 @@ agent = Agent(model)
 ...
 ```
 
-## Using AWS Application Inference Profiles
+## 使用 AWS Application Inference Profiles {#using-aws-application-inference-profiles}
 
-AWS Bedrock supports [custom application inference profiles](https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-create.html) for cost tracking and resource management. Set [`bedrock_inference_profile`][pydantic_ai.models.bedrock.BedrockModelSettings.bedrock_inference_profile] to route requests through an inference profile while keeping the base model name for detecting model capabilities:
+AWS Bedrock 支持用于成本跟踪和资源管理的[自定义 application inference profiles](https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles-create.html)。设置 [`bedrock_inference_profile`][pydantic_ai.models.bedrock.BedrockModelSettings.bedrock_inference_profile] 可通过 inference profile 路由请求，同时保留基础模型名称用于检测模型能力：
 
 ```python
 from pydantic_ai import Agent
@@ -317,9 +315,9 @@ model = BedrockConverseModel(
 agent = Agent(model)
 ```
 
-## Configuring Retries
+## 配置重试 {#configuring-retries}
 
-Bedrock uses boto3's built-in retry mechanisms. You can configure retry behavior by passing a custom boto3 client with retry settings:
+Bedrock 使用 boto3 内置的重试机制。你可以通过传入带重试设置的自定义 boto3 client 来配置重试行为：
 
 ```python
 import boto3
@@ -350,13 +348,13 @@ model = BedrockConverseModel(
 agent = Agent(model)
 ```
 
-### Retry Modes
+### 重试模式 {#retry-modes}
 
-- `'legacy'` (default): 5 attempts, basic retry behavior
-- `'standard'`: 3 attempts, more comprehensive error coverage
-- `'adaptive'`: 3 attempts with client-side rate limiting (recommended for handling `ThrottlingException`)
+- `'legacy'`（默认）：5 次尝试，基础重试行为
+- `'standard'`：3 次尝试，覆盖更全面的错误
+- `'adaptive'`：3 次尝试，并带客户端侧限流（推荐用于处理 `ThrottlingException`）
 
-For more details on boto3 retry configuration, see the [AWS boto3 documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/retries.html).
+关于 boto3 重试配置的更多细节，请参阅 [AWS boto3 文档](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/retries.html)。
 
 !!! note
-    Unlike other providers that use httpx for HTTP requests, Bedrock uses boto3's native retry mechanisms. The retry strategies described in [HTTP Request Retries](../retries.md) do not apply to Bedrock.
+    与其他使用 httpx 进行 HTTP 请求的 providers 不同，Bedrock 使用 boto3 的原生重试机制。[HTTP 请求重试](../retries.md)中描述的重试策略不适用于 Bedrock。

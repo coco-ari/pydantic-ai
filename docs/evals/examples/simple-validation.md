@@ -1,17 +1,17 @@
-# Example: Simple Validation
+# 示例：简单验证 {#example-simple-validation}
 
-A proof of concept example of evaluating a simple text transformation function with deterministic checks.
+这是一个概念验证示例，用确定性检查评估一个简单的文本转换函数。
 
-## Scenario
+## 场景 {#scenario}
 
-We're testing a function that converts text to title case. We want to verify:
+我们要测试一个把文本转换为标题大小写的函数。我们希望验证：
 
-- Output is always a string
-- Output matches expected format
-- Function handles edge cases correctly
-- Performance meets requirements
+- 输出始终是字符串
+- 输出匹配预期格式
+- 函数能正确处理边界情况
+- 性能满足要求
 
-## Complete Example
+## 完整示例 {#complete-example}
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -134,7 +134,7 @@ else:
     """
 ```
 
-## Expected Output
+## 预期输出 {#expected-output}
 
 ```
                         Evaluation Summary: to_title_case
@@ -163,11 +163,11 @@ else:
 ✅ All tests passed!
 ```
 
-Note: The `empty_string` case has one failed assertion (`has_capitals`) because an empty string contains no capital letters.
+注意：`empty_string` 用例有一个失败断言（`has_capitals`），因为空字符串不包含大写字母。
 
-## Saving and Loading
+## 保存与加载 {#saving-and-loading}
 
-Save the dataset for future use:
+保存数据集以便将来使用：
 
 ```python {test="skip"}
 from typing import Any
@@ -197,9 +197,9 @@ dataset = Dataset.from_file('title_case_tests.yaml')
 report = dataset.evaluate_sync(to_title_case)
 ```
 
-## Adding More Cases
+## 添加更多用例 {#adding-more-cases}
 
-As you find bugs or edge cases, add them to the dataset:
+当你发现 bug 或边界情况时，把它们加入数据集：
 
 ```python {test="skip"}
 from pydantic_evals import Dataset
@@ -232,9 +232,9 @@ dataset.add_case(
 dataset.to_file('title_case_tests.yaml')
 ```
 
-## Using with pytest
+## 与 pytest 一起使用 {#using-with-pytest}
 
-Integrate with pytest for CI/CD:
+与 pytest 集成，用于 CI/CD：
 
 ```python
 import pytest
@@ -272,9 +272,9 @@ def test_title_case_performance(title_case_dataset):
         assert case.task_duration < 0.001, f'{case.name} took {case.task_duration}s'
 ```
 
-## Next Steps
+## 下一步 {#next-steps}
 
-- **[Native Evaluators](../evaluators/built-in.md)** - Explore all available evaluators
-- **[Custom Evaluators](../evaluators/custom.md)** - Write your own evaluation logic
-- **[Dataset Management](../how-to/dataset-management.md)** - Save, load, and manage datasets
-- **[Concurrency & Performance](../how-to/concurrency.md)** - Optimize evaluation performance
+- **[原生评估器](../evaluators/built-in.md)** - 浏览所有可用评估器
+- **[自定义评估器](../evaluators/custom.md)** - 编写你自己的评估逻辑
+- **[数据集管理](../how-to/dataset-management.md)** - 保存、加载和管理数据集
+- **[并发与性能](../how-to/concurrency.md)** - 优化评估性能

@@ -1,12 +1,12 @@
-# Native Evaluators
+# 原生评估器 {#native-evaluators}
 
-Pydantic Evals provides several built-in evaluators for common evaluation tasks.
+Pydantic Evals 为常见评估任务提供了几个内置评估器。
 
-## Comparison Evaluators
+## 比较评估器 {#comparison-evaluators}
 
 ### EqualsExpected
 
-Check if the output exactly equals the expected output from the case.
+检查输出是否与用例中的预期输出完全相等。
 
 ```python
 from pydantic_evals.evaluators import EqualsExpected
@@ -14,11 +14,11 @@ from pydantic_evals.evaluators import EqualsExpected
 EqualsExpected()
 ```
 
-**Parameters:** None
+**参数：** 无
 
-**Returns:** `bool` - `True` if `ctx.output == ctx.expected_output`
+**返回：** `bool` - 如果 `ctx.output == ctx.expected_output` 则为 `True`
 
-**Example:**
+**示例：**
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -37,17 +37,17 @@ dataset = Dataset(
 )
 ```
 
-**Notes:**
+**说明：**
 
-- Skips evaluation if `expected_output` is `None` (returns empty dict `{}`)
-- Uses Python's `==` operator, so works with any comparable types
-- For structured data, considers nested equality
+- 如果 `expected_output` 为 `None`，会跳过评估（返回空字典 `{}`）
+- 使用 Python 的 `==` 运算符，因此适用于任何可比较类型
+- 对于结构化数据，会比较嵌套结构是否相等
 
 ---
 
 ### Equals
 
-Check if the output equals a specific value.
+检查输出是否等于指定值。
 
 ```python
 from pydantic_evals.evaluators import Equals
@@ -55,14 +55,14 @@ from pydantic_evals.evaluators import Equals
 Equals(value='expected_result')
 ```
 
-**Parameters:**
+**参数：**
 
-- `value` (Any): The value to compare against
-- `evaluation_name` (str | None): Custom name for this evaluation in reports
+- `value` (Any)：要与输出比较的值
+- `evaluation_name` (str | None)：报告中此评估的自定义名称
 
-**Returns:** `bool` - `True` if `ctx.output == value`
+**返回：** `bool` - 如果 `ctx.output == value` 则为 `True`
 
-**Example:**
+**示例：**
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -78,17 +78,17 @@ dataset = Dataset(
 )
 ```
 
-**Use Cases:**
+**使用场景：**
 
-- Checking for sentinel values
-- Validating consistent outputs
-- Testing classification into specific categories
+- 检查哨兵值
+- 验证输出是否保持一致
+- 测试是否分类到特定类别
 
 ---
 
 ### Contains
 
-Check if the output contains a specific value or substring.
+检查输出是否包含指定值或子字符串。
 
 ```python
 from pydantic_evals.evaluators import Contains
@@ -100,36 +100,36 @@ Contains(
 )
 ```
 
-**Parameters:**
+**参数：**
 
-- `value` (Any): The value to search for
-- `case_sensitive` (bool): Case-sensitive comparison for strings (default: `True`)
-- `as_strings` (bool): Convert both values to strings before checking (default: `False`)
-- `evaluation_name` (str | None): Custom name for this evaluation in reports
+- `value` (Any)：要搜索的值
+- `case_sensitive` (bool)：字符串比较是否区分大小写（默认：`True`）
+- `as_strings` (bool)：检查前是否将两个值都转换为字符串（默认：`False`）
+- `evaluation_name` (str | None)：报告中此评估的自定义名称
 
-**Returns:** [`EvaluationReason`][pydantic_evals.evaluators.EvaluationReason] - Pass/fail with explanation
+**返回：** [`EvaluationReason`][pydantic_evals.evaluators.EvaluationReason] - 带解释的通过/失败结果
 
-**Behavior:**
+**行为：**
 
-For **strings**: checks substring containment
+对于**字符串**：检查是否包含子字符串
 
 - `Contains(value='hello', case_sensitive=False)`
-  - Matches: "Hello World", "say hello", "HELLO"
-  - Doesn't match: "hi there"
+  - 匹配："Hello World"、"say hello"、"HELLO"
+  - 不匹配："hi there"
 
-For **lists/tuples**: checks membership
+对于**列表/元组**：检查成员关系
 
 - `Contains(value='apple')`
-  - Matches: `['apple', 'banana']`, `('apple',)`
-  - Doesn't match: `['apples', 'orange']`
+  - 匹配：`['apple', 'banana']`、`('apple',)`
+  - 不匹配：`['apples', 'orange']`
 
-For **dicts**: checks key-value pairs
+对于**字典**：检查键值对
 
 - `Contains(value={'name': 'Alice'})`
-  - Matches: `{'name': 'Alice', 'age': 30}`
-  - Doesn't match: `{'name': 'Bob'}`
+  - 匹配：`{'name': 'Alice', 'age': 30}`
+  - 不匹配：`{'name': 'Bob'}`
 
-**Example:**
+**示例：**
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -147,20 +147,20 @@ dataset = Dataset(
 )
 ```
 
-**Use Cases:**
+**使用场景：**
 
-- Required content verification
-- Keyword detection
-- PII/sensitive data detection
-- Multi-value validation
+- 必需内容校验
+- 关键词检测
+- PII/敏感数据检测
+- 多值验证
 
 ---
 
-## Type Validation
+## 类型验证 {#type-validation}
 
 ### IsInstance
 
-Check if the output is an instance of a type with the given name.
+检查输出是否为给定名称对应类型的实例。
 
 ```python
 from pydantic_evals.evaluators import IsInstance
@@ -168,14 +168,14 @@ from pydantic_evals.evaluators import IsInstance
 IsInstance(type_name='str')
 ```
 
-**Parameters:**
+**参数：**
 
-- `type_name` (str): The type name to check (uses `__name__` or `__qualname__`)
-- `evaluation_name` (str | None): Custom name for this evaluation in reports
+- `type_name` (str)：要检查的类型名称（使用 `__name__` 或 `__qualname__`）
+- `evaluation_name` (str | None)：报告中此评估的自定义名称
 
-**Returns:** [`EvaluationReason`][pydantic_evals.evaluators.EvaluationReason] - Pass/fail with type information
+**返回：** [`EvaluationReason`][pydantic_evals.evaluators.EvaluationReason] - 带类型信息的通过/失败结果
 
-**Example:**
+**示例：**
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -195,26 +195,26 @@ dataset = Dataset(
 )
 ```
 
-**Notes:**
+**说明：**
 
-- Matches against both `__name__` and `__qualname__` of the type
-- Works with built-in types (`str`, `int`, `dict`, `list`, etc.)
-- Works with custom classes and Pydantic models
-- Checks the entire MRO (Method Resolution Order) for inheritance
+- 同时匹配类型的 `__name__` 和 `__qualname__`
+- 适用于内置类型（`str`、`int`、`dict`、`list` 等）
+- 适用于自定义类和 Pydantic 模型
+- 会检查完整的 MRO（Method Resolution Order）以支持继承
 
-**Use Cases:**
+**使用场景：**
 
-- Format validation
-- Structured output verification
-- Type consistency checks
+- 格式验证
+- 结构化输出校验
+- 类型一致性检查
 
 ---
 
-## Performance Evaluation
+## 性能评估 {#performance-evaluation}
 
 ### MaxDuration
 
-Check if task execution time is under a maximum threshold.
+检查任务执行时间是否低于最大阈值。
 
 ```python
 from datetime import timedelta
@@ -226,13 +226,13 @@ MaxDuration(seconds=2.0)
 MaxDuration(seconds=timedelta(seconds=2))
 ```
 
-**Parameters:**
+**参数：**
 
-- `seconds` (float | timedelta): Maximum allowed duration
+- `seconds` (float | timedelta)：允许的最大耗时
 
-**Returns:** `bool` - `True` if `ctx.duration <= seconds`
+**返回：** `bool` - 如果 `ctx.duration <= seconds` 则为 `True`
 
-**Example:**
+**示例：**
 
 ```python
 from datetime import timedelta
@@ -252,22 +252,22 @@ dataset = Dataset(
 )
 ```
 
-**Use Cases:**
+**使用场景：**
 
-- SLA compliance
-- Performance regression testing
-- Latency requirements
-- Timeout validation
+- SLA 合规性
+- 性能回归测试
+- 延迟要求
+- 超时验证
 
-**See Also:** [Concurrency & Performance](../how-to/concurrency.md)
+**另见：** [并发与性能](../how-to/concurrency.md)
 
 ---
 
-## LLM-as-a-Judge
+## LLM 作为裁判 {#llm-as-a-judge}
 
 ### LLMJudge
 
-Use an LLM to evaluate subjective qualities based on a rubric.
+使用 LLM 按照评分规则评估主观质量。
 
 ```python
 from pydantic_evals.evaluators import LLMJudge
@@ -283,41 +283,41 @@ LLMJudge(
 )
 ```
 
-**Parameters:**
+**参数：**
 
-- `rubric` (str): The evaluation criteria (required)
-- `model` (Model | KnownModelName | None): Model to use (default: `'openai:gpt-5.2'`)
-- `include_input` (bool): Include task inputs in the prompt (default: `False`)
-- `include_expected_output` (bool): Include expected output in the prompt (default: `False`)
-- `model_settings` (ModelSettings | None): Custom model settings
-- `score` (OutputConfig | False): Configure score output (default: `False`)
-- `assertion` (OutputConfig | False): Configure assertion output (default: includes reason)
+- `rubric` (str)：评估标准（必填）
+- `model` (Model | KnownModelName | None)：要使用的模型（默认：`'openai:gpt-5.2'`）
+- `include_input` (bool)：是否在提示中包含任务输入（默认：`False`）
+- `include_expected_output` (bool)：是否在提示中包含预期输出（默认：`False`）
+- `model_settings` (ModelSettings | None)：自定义模型设置
+- `score` (OutputConfig | False)：配置分数输出（默认：`False`）
+- `assertion` (OutputConfig | False)：配置断言输出（默认：包含原因）
 
-**Returns:** Depends on `score` and `assertion` parameters (see below)
+**返回：** 取决于 `score` 和 `assertion` 参数（见下文）
 
-**Output Modes:**
+**输出模式：**
 
-By default, returns a **boolean assertion** with reason:
+默认返回带原因的**布尔断言**：
 
 - `LLMJudge(rubric='Response is polite')`
-  - Returns: `{'LLMJudge_pass': EvaluationReason(value=True, reason='...')}`
+  - 返回：`{'LLMJudge_pass': EvaluationReason(value=True, reason='...')}`
 
-Return a **score** (0.0 to 1.0) instead:
+改为返回**分数**（0.0 到 1.0）：
 
 - `LLMJudge(rubric='Response quality', score={'include_reason': True}, assertion=False)`
-  - Returns: `{'LLMJudge_score': EvaluationReason(value=0.85, reason='...')}`
+  - 返回：`{'LLMJudge_score': EvaluationReason(value=0.85, reason='...')}`
 
-Return **both** score and assertion:
+同时返回**分数**和**断言**：
 
 - `LLMJudge(rubric='Response quality', score={'include_reason': True}, assertion={'include_reason': True})`
-  - Returns: `{'LLMJudge_score': EvaluationReason(value=0.85, reason='...'), 'LLMJudge_pass': EvaluationReason(value=True, reason='...')}`
+  - 返回：`{'LLMJudge_score': EvaluationReason(value=0.85, reason='...'), 'LLMJudge_pass': EvaluationReason(value=True, reason='...')}`
 
-**Customize evaluation names:**
+**自定义评估名称：**
 
 - `LLMJudge(rubric='Response is factually accurate', assertion={'evaluation_name': 'accuracy', 'include_reason': True})`
-  - Returns: `{'accuracy': EvaluationReason(value=True, reason='...')}`
+  - 返回：`{'accuracy': EvaluationReason(value=True, reason='...')}`
 
-**Example:**
+**示例：**
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -349,15 +349,15 @@ dataset = Dataset(
 )
 ```
 
-**See Also:** [LLM Judge Deep Dive](llm-judge.md)
+**另见：** [LLM Judge 深入说明](llm-judge.md)
 
 ---
 
-## Span-Based Evaluation
+## 基于 Span 的评估 {#span-based-evaluation}
 
 ### HasMatchingSpan
 
-Check if OpenTelemetry spans match a query (requires Logfire configuration).
+检查 OpenTelemetry span 是否匹配查询（需要配置 Logfire）。
 
 ```python
 from pydantic_evals.evaluators import HasMatchingSpan
@@ -368,14 +368,14 @@ HasMatchingSpan(
 )
 ```
 
-**Parameters:**
+**参数：**
 
-- `query` ([`SpanQuery`][pydantic_evals.otel.SpanQuery]): Query to match against spans
-- `evaluation_name` (str | None): Custom name for this evaluation in reports
+- `query` ([`SpanQuery`][pydantic_evals.otel.SpanQuery])：用于匹配 span 的查询
+- `evaluation_name` (str | None)：报告中此评估的自定义名称
 
-**Returns:** `bool` - `True` if any span matches the query
+**返回：** `bool` - 如果任意 span 匹配该查询则为 `True`
 
-**Example:**
+**示例：**
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -407,49 +407,49 @@ dataset = Dataset(
 )
 ```
 
-**See Also:** [Span-Based Evaluation](span-based.md)
+**另见：** [基于 Span 的评估](span-based.md)
 
 ---
 
-## Native Report Evaluators
+## 原生报告评估器 {#native-report-evaluators}
 
-In addition to the case-level evaluators above, Pydantic Evals provides report evaluators that
-analyze entire experiment results. These are passed via the `report_evaluators` parameter on `Dataset`.
+除了上面的用例级评估器，Pydantic Evals 还提供了可分析整个实验结果的报告评估器。
+这些评估器通过 `Dataset` 上的 `report_evaluators` 参数传入。
 
-| Report Evaluator | Purpose | Output |
+| 报告评估器 | 用途 | 输出 |
 |------------------|---------|--------|
-| [`ConfusionMatrixEvaluator`][pydantic_evals.evaluators.ConfusionMatrixEvaluator] | Classification confusion matrix | `ConfusionMatrix` |
-| [`PrecisionRecallEvaluator`][pydantic_evals.evaluators.PrecisionRecallEvaluator] | PR curve with AUC | `PrecisionRecall` |
+| [`ConfusionMatrixEvaluator`][pydantic_evals.evaluators.ConfusionMatrixEvaluator] | 分类混淆矩阵 | `ConfusionMatrix` |
+| [`PrecisionRecallEvaluator`][pydantic_evals.evaluators.PrecisionRecallEvaluator] | 带 AUC 的 PR 曲线 | `PrecisionRecall` |
 
-**See:** [Report Evaluators](report-evaluators.md) for full documentation, parameters, and examples,
-including how to write custom report evaluators that produce `ScalarResult` and `TableResult` analyses.
+**另见：** [报告评估器](report-evaluators.md)，其中包含完整文档、参数和示例，
+也包括如何编写会生成 `ScalarResult` 和 `TableResult` 分析的自定义报告评估器。
 
 ---
 
-## Quick Reference Table
+## 快速参考表 {#quick-reference-table}
 
-### Case-Level Evaluators
+### 用例级评估器 {#case-level-evaluators}
 
-| Evaluator | Purpose | Return Type | Cost | Speed |
+| 评估器 | 用途 | 返回类型 | 成本 | 速度 |
 |-----------|---------|-------------|------|-------|
-| [`EqualsExpected`][pydantic_evals.evaluators.EqualsExpected] | Exact match with expected | `bool` | Free | Instant |
-| [`Equals`][pydantic_evals.evaluators.Equals] | Equals specific value | `bool` | Free | Instant |
-| [`Contains`][pydantic_evals.evaluators.Contains] | Contains value/substring | `bool` + reason | Free | Instant |
-| [`IsInstance`][pydantic_evals.evaluators.IsInstance] | Type validation | `bool` + reason | Free | Instant |
-| [`MaxDuration`][pydantic_evals.evaluators.MaxDuration] | Performance threshold | `bool` | Free | Instant |
-| [`LLMJudge`][pydantic_evals.evaluators.LLMJudge] | Subjective quality | `bool` and/or `float` | $$ | Slow |
-| [`HasMatchingSpan`][pydantic_evals.evaluators.HasMatchingSpan] | Behavioral check | `bool` | Free | Fast |
+| [`EqualsExpected`][pydantic_evals.evaluators.EqualsExpected] | 与预期输出精确匹配 | `bool` | 免费 | 即时 |
+| [`Equals`][pydantic_evals.evaluators.Equals] | 等于指定值 | `bool` | 免费 | 即时 |
+| [`Contains`][pydantic_evals.evaluators.Contains] | 包含值/子字符串 | `bool` + 原因 | 免费 | 即时 |
+| [`IsInstance`][pydantic_evals.evaluators.IsInstance] | 类型验证 | `bool` + 原因 | 免费 | 即时 |
+| [`MaxDuration`][pydantic_evals.evaluators.MaxDuration] | 性能阈值 | `bool` | 免费 | 即时 |
+| [`LLMJudge`][pydantic_evals.evaluators.LLMJudge] | 主观质量 | `bool` 和/或 `float` | $$ | 慢 |
+| [`HasMatchingSpan`][pydantic_evals.evaluators.HasMatchingSpan] | 行为检查 | `bool` | 免费 | 快 |
 
-### Report-Level Evaluators
+### 报告级评估器 {#report-level-evaluators}
 
-| Evaluator | Purpose | Output Type | Cost | Speed |
+| 评估器 | 用途 | 输出类型 | 成本 | 速度 |
 |-----------|---------|-------------|------|-------|
-| [`ConfusionMatrixEvaluator`][pydantic_evals.evaluators.ConfusionMatrixEvaluator] | Classification matrix | `ConfusionMatrix` | Free | Instant |
-| [`PrecisionRecallEvaluator`][pydantic_evals.evaluators.PrecisionRecallEvaluator] | PR curve with AUC | `PrecisionRecall` | Free | Instant |
+| [`ConfusionMatrixEvaluator`][pydantic_evals.evaluators.ConfusionMatrixEvaluator] | 分类矩阵 | `ConfusionMatrix` | 免费 | 即时 |
+| [`PrecisionRecallEvaluator`][pydantic_evals.evaluators.PrecisionRecallEvaluator] | 带 AUC 的 PR 曲线 | `PrecisionRecall` | 免费 | 即时 |
 
-## Combining Evaluators
+## 组合评估器 {#combining-evaluators}
 
-Best practice is to combine fast deterministic checks with slower LLM evaluations:
+最佳实践是组合快速的确定性检查和较慢的 LLM 评估：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -474,16 +474,16 @@ dataset = Dataset(
 )
 ```
 
-This approach:
+这种方式：
 
-1. Catches format/structure issues immediately
-2. Validates required content quickly
-3. Only runs expensive LLM evaluation if basic checks pass
-4. Provides comprehensive quality assessment
+1. 立即捕获格式/结构问题
+2. 快速验证必需内容
+3. 只有在基础检查通过后才运行昂贵的 LLM 评估
+4. 提供全面的质量评估
 
-## Next Steps
+## 下一步 {#next-steps}
 
-- **[LLM Judge](llm-judge.md)** - Deep dive on LLM-as-a-Judge evaluation
-- **[Custom Evaluators](custom.md)** - Write your own evaluation logic
-- **[Report Evaluators](report-evaluators.md)** - Experiment-wide analyses (confusion matrices, PR curves, etc.)
-- **[Span-Based Evaluation](span-based.md)** - Using OpenTelemetry spans for behavioral checks
+- **[LLM Judge](llm-judge.md)** - 深入了解 LLM 作为裁判的评估
+- **[自定义评估器](custom.md)** - 编写你自己的评估逻辑
+- **[报告评估器](report-evaluators.md)** - 实验范围分析（混淆矩阵、PR 曲线等）
+- **[基于 Span 的评估](span-based.md)** - 使用 OpenTelemetry span 进行行为检查
