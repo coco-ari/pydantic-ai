@@ -1,66 +1,66 @@
-# Graphs
+# 图
 
-!!! danger "Don't use a nail gun unless you need a nail gun"
-    If Pydantic AI [agents](agent.md) are a hammer, and [multi-agent workflows](multi-agent-applications.md) are a sledgehammer, then graphs are a nail gun:
+!!! danger "除非真的需要射钉枪，否则不要用射钉枪"
+    如果 Pydantic AI [agents](agent.md) 是锤子，[多智能体工作流](multi-agent-applications.md)是大锤，那么 graphs 就是射钉枪：
 
-    * sure, nail guns look cooler than hammers
-    * but nail guns take a lot more setup than hammers
-    * and nail guns don't make you a better builder, they make you a builder with a nail gun
-    * Lastly, (and at the risk of torturing this metaphor), if you're a fan of medieval tools like mallets and untyped Python, you probably won't like nail guns or our approach to graphs. (But then again, if you're not a fan of type hints in Python, you've probably already bounced off Pydantic AI to use one of the toy agent frameworks — good luck, and feel free to borrow my sledgehammer when you realize you need it)
+    * 没错，射钉枪看起来比锤子酷
+    * 但射钉枪需要比锤子多得多的准备工作
+    * 射钉枪不会让你成为更好的建造者，只会让你成为一个拿着射钉枪的建造者
+    * 最后（哪怕这个比喻已经被折磨得差不多了），如果你喜欢木槌和无类型 Python 这类中世纪工具，你大概不会喜欢射钉枪，也不会喜欢我们处理 graphs 的方式。（不过话说回来，如果你不喜欢 Python 类型提示，你可能早就离开 Pydantic AI，去用某个玩具 agent 框架了。祝好运；等你意识到自己需要大锤时，欢迎借我的。）
 
-    In short, graphs are a powerful tool, but they're not the right tool for every job. Please consider other [multi-agent approaches](multi-agent-applications.md) before proceeding.
+    简而言之，graphs 是强大的工具，但并不适合所有工作。继续之前，请先考虑其他[多智能体方案](multi-agent-applications.md)。
 
-    If you're not confident a graph-based approach is a good idea, it might be unnecessary.
+    如果你不确定基于 graph 的方法是个好主意，它可能就是不必要的。
 
-Graphs and finite state machines (FSMs) are a powerful abstraction to model, execute, control and visualize complex workflows.
+Graphs 和有限状态机（FSMs）是用于建模、执行、控制和可视化复杂工作流的强大抽象。
 
-Alongside Pydantic AI, we've developed `pydantic-graph` — an async graph and state machine library for Python where nodes and edges are defined using type hints.
+在 Pydantic AI 之外，我们还开发了 `pydantic-graph`，这是一个面向 Python 的异步 graph 和状态机库，节点和边都使用类型提示定义。
 
-While this library is developed as part of Pydantic AI; it has no dependency on `pydantic-ai` and can be considered as a pure graph-based state machine library. You may find it useful whether or not you're using Pydantic AI or even building with GenAI.
+虽然这个库是作为 Pydantic AI 的一部分开发的，但它不依赖 `pydantic-ai`，可以视为一个纯 graph-based 状态机库。无论你是否使用 Pydantic AI，甚至是否在构建 GenAI，它都可能有用。
 
-`pydantic-graph` is designed for advanced users and makes heavy use of Python generics and type hints. It is not designed to be as beginner-friendly as Pydantic AI.
+`pydantic-graph` 面向高级用户设计，大量使用 Python generics 和类型提示。它并不打算像 Pydantic AI 一样对初学者友好。
 
-## Installation
+## 安装 {#installation}
 
-`pydantic-graph` is a required dependency of `pydantic-ai`, and an optional dependency of `pydantic-ai-slim`, see [installation instructions](install.md#slim-install) for more information. You can also install it directly:
+`pydantic-graph` 是 `pydantic-ai` 的必需依赖，也是 `pydantic-ai-slim` 的可选依赖；更多信息请参阅[安装说明](install.md#slim-install)。你也可以直接安装：
 
 ```bash
 pip/uv-add pydantic-graph
 ```
 
-## Graph Types
+## Graph 类型 {#graph-types}
 
-`pydantic-graph` is made up of a few key components:
+`pydantic-graph` 由几个关键组件组成：
 
 ### GraphRunContext
 
-[`GraphRunContext`][pydantic_graph.basenode.GraphRunContext] — The context for the graph run, similar to Pydantic AI's [`RunContext`][pydantic_ai.tools.RunContext]. This holds the state of the graph and dependencies and is passed to nodes when they're run.
+[`GraphRunContext`][pydantic_graph.basenode.GraphRunContext] 是 graph run 的上下文，类似于 Pydantic AI 的 [`RunContext`][pydantic_ai.tools.RunContext]。它保存 graph 的 state 和 dependencies，并在节点运行时传给节点。
 
-`GraphRunContext` is generic in the state type of the graph it's used in, [`StateT`][pydantic_graph.basenode.StateT].
+`GraphRunContext` 对它所在 graph 的 state 类型 [`StateT`][pydantic_graph.basenode.StateT] 是泛型的。
 
 ### End
 
-[`End`][pydantic_graph.basenode.End] — return value to indicate the graph run should end.
+[`End`][pydantic_graph.basenode.End] 是一个返回值，用于表示 graph run 应该结束。
 
-`End` is generic in the graph return type of the graph it's used in, [`RunEndT`][pydantic_graph.basenode.RunEndT].
+`End` 对它所在 graph 的返回类型 [`RunEndT`][pydantic_graph.basenode.RunEndT] 是泛型的。
 
 ### Nodes
 
-Subclasses of [`BaseNode`][pydantic_graph.basenode.BaseNode] define nodes for execution in the graph.
+[`BaseNode`][pydantic_graph.basenode.BaseNode] 的子类定义 graph 中要执行的节点。
 
-Nodes, which are generally [`dataclass`es][dataclasses.dataclass], generally consist of:
+节点通常是 [`dataclass`es][dataclasses.dataclass]，一般包含：
 
-- fields containing any parameters required/optional when calling the node
-- the business logic to execute the node, in the [`run`][pydantic_graph.basenode.BaseNode.run] method
-- return annotations of the [`run`][pydantic_graph.basenode.BaseNode.run] method, which are read by `pydantic-graph` to determine the outgoing edges of the node
+- 调用节点时需要/可选的参数字段
+- 在 [`run`][pydantic_graph.basenode.BaseNode.run] 方法中执行的业务逻辑
+- [`run`][pydantic_graph.basenode.BaseNode.run] 方法的返回注解，`pydantic-graph` 会读取它们来确定该节点的出边
 
-Nodes are generic in:
+节点在这些维度上是泛型的：
 
-- **state**, which must have the same type as the state of graphs they're included in, [`StateT`][pydantic_graph.basenode.StateT] has a default of `None`, so if you're not using state you can omit this generic parameter, see [stateful graphs](#stateful-graphs) for more information
-- **deps**, which must have the same type as the deps of the graph they're included in, [`DepsT`][pydantic_graph.basenode.DepsT] has a default of `None`, so if you're not using deps you can omit this generic parameter, see [dependency injection](#dependency-injection) for more information
-- **graph return type** — this only applies if the node returns [`End`][pydantic_graph.basenode.End]. [`RunEndT`][pydantic_graph.basenode.RunEndT] has a default of [Never][typing.Never] so this generic parameter can be omitted if the node doesn't return `End`, but must be included if it does.
+- **state**，必须与包含它们的 graphs 的 state 类型相同；[`StateT`][pydantic_graph.basenode.StateT] 默认是 `None`，所以如果你不使用 state，可以省略这个泛型参数；更多信息见 [stateful graphs](#stateful-graphs)
+- **deps**，必须与包含它们的 graph 的 deps 类型相同；[`DepsT`][pydantic_graph.basenode.DepsT] 默认是 `None`，所以如果你不使用 deps，可以省略这个泛型参数；更多信息见 [dependency injection](#dependency-injection)
+- **graph 返回类型**，只在节点返回 [`End`][pydantic_graph.basenode.End] 时适用。[`RunEndT`][pydantic_graph.basenode.RunEndT] 默认是 [Never][typing.Never]，所以如果节点不返回 `End`，可以省略这个泛型参数；如果返回 `End`，则必须包含它。
 
-Here's an example of a start or intermediate node in a graph — it can't end the run as it doesn't return [`End`][pydantic_graph.basenode.End]:
+下面是 graph 中一个起始或中间节点的示例；它不能结束运行，因为它不返回 [`End`][pydantic_graph.basenode.End]：
 
 ```py {title="intermediate_node.py" noqa="F821" test="skip"}
 from dataclasses import dataclass
@@ -80,12 +80,12 @@ class MyNode(BaseNode[MyState]):  # (1)!
         return AnotherNode()
 ```
 
-1. State in this example is `MyState` (not shown), hence `BaseNode` is parameterized with `MyState`. This node can't end the run, so the `RunEndT` generic parameter is omitted and defaults to `Never`.
-2. `MyNode` is a dataclass and has a single field `foo`, an `int`.
-3. The `run` method takes a `GraphRunContext` parameter, again parameterized with state `MyState`.
-4. The return type of the `run` method is `AnotherNode` (not shown), this is used to determine the outgoing edges of the node.
+1. 此示例中的 state 是 `MyState`（未展示），因此 `BaseNode` 使用 `MyState` 作为参数。这个节点不能结束运行，所以省略 `RunEndT` 泛型参数，它会默认为 `Never`。
+2. `MyNode` 是一个 dataclass，只有一个 `int` 字段 `foo`。
+3. `run` 方法接收一个 `GraphRunContext` 参数，同样以 state `MyState` 参数化。
+4. `run` 方法的返回类型是 `AnotherNode`（未展示），这会用于确定该节点的出边。
 
-We could extend `MyNode` to optionally end the run if `foo` is divisible by 5:
+我们可以扩展 `MyNode`，让它在 `foo` 能被 5 整除时可选地结束运行：
 
 ```py {title="intermediate_or_end_node.py" hl_lines="7 13 15" noqa="F821" test="skip"}
 from dataclasses import dataclass
@@ -107,21 +107,21 @@ class MyNode(BaseNode[MyState, None, int]):  # (1)!
             return AnotherNode()
 ```
 
-1. We parameterize the node with the return type (`int` in this case) as well as state. Because generic parameters are positional-only, we have to include `None` as the second parameter representing deps.
-2. The return type of the `run` method is now a union of `AnotherNode` and `End[int]`, this allows the node to end the run if `foo` is divisible by 5.
+1. 我们除了 state 之外，还用返回类型（这里是 `int`）参数化节点。因为泛型参数只能按位置传入，所以必须把 `None` 作为第二个参数来表示 deps。
+2. `run` 方法的返回类型现在是 `AnotherNode` 和 `End[int]` 的 union，这允许节点在 `foo` 能被 5 整除时结束运行。
 
 ### Graph
 
-[`Graph`][pydantic_graph.graph_builder.Graph] — the executable graph produced by a [`GraphBuilder`][pydantic_graph.graph_builder.GraphBuilder]. The builder is the entry point for assembling a graph from [step functions](graph/builder/steps.md), [`BaseNode`](#nodes) classes, and the edges connecting them.
+[`Graph`][pydantic_graph.graph_builder.Graph] 是由 [`GraphBuilder`][pydantic_graph.graph_builder.GraphBuilder] 产生的可执行 graph。builder 是从 [step functions](graph/builder/steps.md)、[`BaseNode`](#nodes) 类和连接它们的边组装 graph 的入口点。
 
-[`GraphBuilder`][pydantic_graph.graph_builder.GraphBuilder] is generic in:
+[`GraphBuilder`][pydantic_graph.graph_builder.GraphBuilder] 在这些维度上是泛型的：
 
-- **state** the state type of the graph, [`StateT`][pydantic_graph.basenode.StateT]
-- **deps** the deps type of the graph, [`DepsT`][pydantic_graph.basenode.DepsT]
-- **input** the type of the initial input passed to the graph, `InputT`
-- **output** the type of the final output produced by the graph, `OutputT`
+- **state**，graph 的 state 类型 [`StateT`][pydantic_graph.basenode.StateT]
+- **deps**，graph 的 deps 类型 [`DepsT`][pydantic_graph.basenode.DepsT]
+- **input**，传给 graph 的初始输入类型 `InputT`
+- **output**，graph 产生的最终输出类型 `OutputT`
 
-Here's an example of a simple graph built from two `BaseNode` subclasses:
+下面是一个由两个 `BaseNode` 子类构建的简单 graph 示例：
 
 ```py {title="graph_example.py"}
 from __future__ import annotations
@@ -176,18 +176,18 @@ async def main():
     #> 5
 ```
 
-1. The `DivisibleBy5` node is parameterized with `None` for the state param and `None` for the deps param as this graph doesn't use state or deps, and `int` as it can end the run.
-2. The `Increment` node doesn't return `End`, so the `RunEndT` generic parameter is omitted, state can also be omitted as the graph doesn't use state.
-3. Create a [`GraphBuilder`][pydantic_graph.graph_builder.GraphBuilder] declaring the input and output types of the graph.
-4. Define a [step](graph/builder/steps.md) that wraps the initial input as the first `BaseNode`. The builder calls this when execution leaves [`g.start_node`][pydantic_graph.graph_builder.GraphBuilder.start_node].
-5. Register each `BaseNode` subclass with [`g.node()`][pydantic_graph.graph_builder.GraphBuilder.node] so the builder knows about it; outgoing edges are inferred from each node's `run` return type.
-6. Wire the start node into the entry step.
-7. [`g.build()`][pydantic_graph.graph_builder.GraphBuilder.build] returns a [`Graph`][pydantic_graph.graph_builder.Graph] ready to execute.
-8. [`graph.run()`][pydantic_graph.graph_builder.Graph.run] is async and returns the raw output value (the `int` returned by the `End` node).
+1. `DivisibleBy5` 节点的 state 参数和 deps 参数都是 `None`，因为这个 graph 不使用 state 或 deps；它用 `int` 参数化，因为它可以结束运行。
+2. `Increment` 节点不返回 `End`，所以省略了 `RunEndT` 泛型参数；由于 graph 不使用 state，也可以省略 state。
+3. 创建 [`GraphBuilder`][pydantic_graph.graph_builder.GraphBuilder]，声明 graph 的 input 和 output 类型。
+4. 定义一个 [step](graph/builder/steps.md)，把初始输入包装为第一个 `BaseNode`。当执行离开 [`g.start_node`][pydantic_graph.graph_builder.GraphBuilder.start_node] 时，builder 会调用它。
+5. 使用 [`g.node()`][pydantic_graph.graph_builder.GraphBuilder.node] 注册每个 `BaseNode` 子类，让 builder 知道它们；出边会从每个节点的 `run` 返回类型推断。
+6. 将 start node 连接到入口 step。
+7. [`g.build()`][pydantic_graph.graph_builder.GraphBuilder.build] 返回一个可以执行的 [`Graph`][pydantic_graph.graph_builder.Graph]。
+8. [`graph.run()`][pydantic_graph.graph_builder.Graph.run] 是异步的，并返回原始输出值（`End` 节点返回的 `int`）。
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以"按原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-A [mermaid diagram](#mermaid-diagrams) for this graph can be generated with `print(fives_graph)`, or by calling [`fives_graph.render()`][pydantic_graph.graph_builder.Graph.render]:
+这个 graph 的 [mermaid 图](#mermaid-diagrams)可以通过 `print(fives_graph)` 生成，也可以调用 [`fives_graph.render()`][pydantic_graph.graph_builder.Graph.render]：
 
 ```mermaid
 stateDiagram-v2
@@ -204,11 +204,11 @@ stateDiagram-v2
   Increment --> DivisibleBy5
 ```
 
-## Stateful Graphs
+## Stateful Graphs {#stateful-graphs}
 
-The "state" concept in `pydantic-graph` provides an optional way to access and mutate an object (often a `dataclass` or Pydantic model) as nodes run in a graph. If you think of Graphs as a production line, then your state is the engine being passed along the line and built up by each node as the graph is run.
+`pydantic-graph` 中的 "state" 概念提供了一种可选方式，让节点在 graph 中运行时可以访问并修改某个对象（通常是 `dataclass` 或 Pydantic model）。如果把 Graphs 想成生产线，那么 state 就是沿生产线传递并由每个节点在 graph 运行时逐步构建的引擎。
 
-Here's an example of a graph which represents a vending machine where the user may insert coins and select a product to purchase.
+下面是一个表示自动售货机的 graph 示例，用户可以投币并选择要购买的商品。
 
 ```python {title="vending_machine.py"}
 from __future__ import annotations
@@ -308,28 +308,28 @@ async def main():
     #> purchase successful item=crisps change=0.25
 ```
 
-1. The state of the vending machine is defined as a dataclass with the user's balance and the product they've selected, if any.
-2. A dictionary of products mapped to prices.
-3. The `InsertCoin` node, [`BaseNode`][pydantic_graph.basenode.BaseNode] is parameterized with `MachineState` as that's the state used in this graph.
-4. The `InsertCoin` node prompts the user to insert coins. We keep things simple by just entering a monetary amount as a float.
-5. The `CoinsInserted` node; again this is a [`dataclass`][dataclasses.dataclass] with one field `amount`.
-6. Update the user's balance with the amount inserted.
-7. If the user has already selected a product, go to `Purchase`, otherwise go to `SelectProduct`.
-8. In the `Purchase` node, look up the price of the product if the user entered a valid product.
-9. If the user did enter a valid product, set the product in the state so we don't revisit `SelectProduct`.
-10. If the balance is enough to purchase the product, adjust the balance to reflect the purchase and return [`End`][pydantic_graph.basenode.End] to end the graph. We're not using the run return type, so we call `End` with `None`.
-11. If the balance is insufficient, go to `InsertCoin` to prompt the user to insert more coins.
-12. If the product is invalid, go to `SelectProduct` to prompt the user to select a product again.
-13. Build the graph with [`GraphBuilder`][pydantic_graph.graph_builder.GraphBuilder], declaring the `MachineState` type. Each `BaseNode` subclass is registered with [`g.node()`][pydantic_graph.graph_builder.GraphBuilder.node]; outgoing edges are inferred from the `run` return types. The `start` step constructs the first node.
-14. The return type of the node's [`run`][pydantic_graph.basenode.BaseNode.run] method is important as it is used to determine the outgoing edges of the node. This information in turn is used to render [mermaid diagrams](#mermaid-diagrams) and is enforced at runtime to detect misbehavior as soon as possible.
-15. The return type of `CoinsInserted`'s [`run`][pydantic_graph.basenode.BaseNode.run] method is a union, meaning multiple outgoing edges are possible.
-16. Unlike other nodes, `Purchase` can end the run, so the [`RunEndT`][pydantic_graph.basenode.RunEndT] generic parameter must be set. In this case it's `None` since the graph run return type is `None`.
-17. Initialize the state. This will be passed to the graph run and mutated as the graph runs.
-18. Run the graph with the initial state. The first node to execute is determined by the `start` step we wired into [`g.start_node`][pydantic_graph.graph_builder.GraphBuilder.start_node].
+1. 自动售货机的 state 被定义为 dataclass，包含用户余额以及他们选择的商品（如果有）。
+2. 一个从商品映射到价格的字典。
+3. `InsertCoin` 节点，[`BaseNode`][pydantic_graph.basenode.BaseNode] 使用 `MachineState` 参数化，因为这是该 graph 使用的 state。
+4. `InsertCoin` 节点提示用户投币。为保持简单，这里只输入一个 float 金额。
+5. `CoinsInserted` 节点同样是一个 [`dataclass`][dataclasses.dataclass]，有一个字段 `amount`。
+6. 用投入金额更新用户余额。
+7. 如果用户已经选择了商品，则进入 `Purchase`，否则进入 `SelectProduct`。
+8. 在 `Purchase` 节点中，如果用户输入了有效商品，就查找商品价格。
+9. 如果用户确实输入了有效商品，把商品设置到 state 中，这样就不会再次访问 `SelectProduct`。
+10. 如果余额足以购买商品，调整余额以反映购买，并返回 [`End`][pydantic_graph.basenode.End] 结束 graph。这里不使用 run 返回类型，所以用 `None` 调用 `End`。
+11. 如果余额不足，进入 `InsertCoin`，提示用户继续投币。
+12. 如果商品无效，进入 `SelectProduct`，提示用户重新选择商品。
+13. 使用 [`GraphBuilder`][pydantic_graph.graph_builder.GraphBuilder] 构建 graph，并声明 `MachineState` 类型。每个 `BaseNode` 子类都用 [`g.node()`][pydantic_graph.graph_builder.GraphBuilder.node] 注册；出边从 `run` 返回类型推断。`start` step 构造第一个节点。
+14. 节点 [`run`][pydantic_graph.basenode.BaseNode.run] 方法的返回类型很重要，因为它用于确定该节点的出边。这些信息也用于渲染 [mermaid diagrams](#mermaid-diagrams)，并在运行时强制检查，以尽早发现错误行为。
+15. `CoinsInserted` 的 [`run`][pydantic_graph.basenode.BaseNode.run] 方法返回类型是 union，表示可能有多条出边。
+16. 与其他节点不同，`Purchase` 可以结束运行，所以必须设置 [`RunEndT`][pydantic_graph.basenode.RunEndT] 泛型参数。这里是 `None`，因为 graph run 返回类型是 `None`。
+17. 初始化 state。它会传给 graph run，并在 graph 运行时被修改。
+18. 使用初始 state 运行 graph。第一个要执行的节点由我们连接到 [`g.start_node`][pydantic_graph.graph_builder.GraphBuilder.start_node] 的 `start` step 决定。
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以"按原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-A [mermaid diagram](#mermaid-diagrams) for this graph can be generated with `print(vending_machine_graph)`:
+这个 graph 的 [mermaid 图](#mermaid-diagrams)可以通过 `print(vending_machine_graph)` 生成：
 
 ```mermaid
 stateDiagram-v2
@@ -354,15 +354,15 @@ stateDiagram-v2
   decision_2 --> [*]
 ```
 
-See [below](#mermaid-diagrams) for more information on generating diagrams.
+有关生成图表的更多信息，请参见[下文](#mermaid-diagrams)。
 
-## GenAI Example
+## GenAI 示例 {#genai-example}
 
-So far we haven't shown an example of a Graph that actually uses Pydantic AI or GenAI at all.
+到目前为止，我们还没有展示一个真正使用 Pydantic AI 或 GenAI 的 Graph 示例。
 
-In this example, one agent generates a welcome email to a user and the other agent provides feedback on the email.
+在这个示例中，一个 agent 为用户生成欢迎邮件，另一个 agent 对邮件提供反馈。
 
-This graph has a very simple structure:
+这个 graph 的结构非常简单：
 
 ```mermaid
 ---
@@ -504,17 +504,17 @@ async def main():
     """
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以"按原样"运行；你需要添加 `asyncio.run(main())` 来运行 `main`）_
 
-## Iterating Over a Graph
+## 迭代 Graph {#iterating-over-a-graph}
 
-For step-by-step execution — inspecting each task as it runs, overriding the next step, or driving the loop manually — use [`graph.iter()`][pydantic_graph.graph_builder.Graph.iter] instead of [`graph.run()`][pydantic_graph.graph_builder.Graph.run]. See [Advanced Execution Control](graph/builder/index.md#advanced-execution-control) in the graph builder docs for the iteration model and examples.
+如果要逐步执行、检查每个任务运行情况、覆盖下一步，或手动驱动循环，请使用 [`graph.iter()`][pydantic_graph.graph_builder.Graph.iter]，而不是 [`graph.run()`][pydantic_graph.graph_builder.Graph.run]。迭代模型和示例请参阅 graph builder 文档中的[高级执行控制](graph/builder/index.md#advanced-execution-control)。
 
-## Dependency Injection
+## 依赖注入 {#dependency-injection}
 
-As with Pydantic AI, `pydantic-graph` supports dependency injection. Pass a `deps_type` to [`GraphBuilder`][pydantic_graph.graph_builder.GraphBuilder], parameterize each [`BaseNode`][pydantic_graph.basenode.BaseNode] subclass with the deps type, and read it via [`GraphRunContext.deps`][pydantic_graph.basenode.GraphRunContext.deps] inside `run()` (or [`StepContext.deps`][pydantic_graph.step.StepContext] inside step functions).
+与 Pydantic AI 一样，`pydantic-graph` 支持依赖注入。向 [`GraphBuilder`][pydantic_graph.graph_builder.GraphBuilder] 传入 `deps_type`，用 deps 类型参数化每个 [`BaseNode`][pydantic_graph.basenode.BaseNode] 子类，并在 `run()` 内通过 [`GraphRunContext.deps`][pydantic_graph.basenode.GraphRunContext.deps] 读取它（或在 step functions 内通过 [`StepContext.deps`][pydantic_graph.step.StepContext] 读取）。
 
-As an example, let's modify the `DivisibleBy5` example [above](#graph) to use a [`ProcessPoolExecutor`][concurrent.futures.ProcessPoolExecutor] to run the compute load in a separate process (this is a contrived example, `ProcessPoolExecutor` wouldn't actually improve performance in this example):
+举例来说，我们修改[上面](#graph)的 `DivisibleBy5` 示例，使用 [`ProcessPoolExecutor`][concurrent.futures.ProcessPoolExecutor] 在单独进程中运行计算负载（这是一个刻意设计的示例，`ProcessPoolExecutor` 在这个例子里其实不会提升性能）：
 
 ```py {title="deps_example.py" test="skip" hl_lines="4 8 14-16 39-44 49 56-58"}
 from __future__ import annotations
@@ -586,8 +586,8 @@ async def main():
     #> 5
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `asyncio.run(main())` to run `main`)_
+_（这个示例是完整的，可以"按原样"运行；你需要添加 `asyncio.run(main())` 来运行 `main`）_
 
-## Mermaid Diagrams
+## Mermaid 图 {#mermaid-diagrams}
 
-Pydantic Graph can render [mermaid](https://mermaid.js.org/) [`stateDiagram-v2`](https://mermaid.js.org/syntax/stateDiagram.html) diagrams for any built graph. Call [`graph.render()`][pydantic_graph.graph_builder.Graph.render] (or just `print(graph)`) to get the mermaid source — pass `direction` (`'TB'`, `'LR'`, `'RL'`, or `'BT'`) to control layout. See the [graph builder mermaid section](graph/builder/index.md#mermaid-diagrams) for the full set of rendering options.
+Pydantic Graph 可以为任何已构建的 graph 渲染 [mermaid](https://mermaid.js.org/) [`stateDiagram-v2`](https://mermaid.js.org/syntax/stateDiagram.html) 图。调用 [`graph.render()`][pydantic_graph.graph_builder.Graph.render]（或直接 `print(graph)`）即可获得 mermaid source；传入 `direction`（`'TB'`、`'LR'`、`'RL'` 或 `'BT'`）可以控制布局。完整渲染选项请参阅 [graph builder mermaid section](graph/builder/index.md#mermaid-diagrams)。
