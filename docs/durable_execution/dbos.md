@@ -1,20 +1,19 @@
-# Durable Execution with DBOS
+# 使用 DBOS 进行持久化执行 {#durable-execution-with-dbos}
 
-[DBOS](https://www.dbos.dev/) is a lightweight [durable execution](https://docs.dbos.dev/architecture) library natively integrated with Pydantic AI.
+[DBOS](https://www.dbos.dev/) 是一个轻量级[持久化执行](https://docs.dbos.dev/architecture)库，与 Pydantic AI 原生集成。
 
-## Durable Execution
+## 持久化执行 {#durable-execution}
 
-DBOS workflows make your program **durable** by checkpointing its state in a database. If your program ever fails, when it restarts all your workflows will automatically resume from the last completed step.
+DBOS workflows 会通过在数据库中 checkpoint 程序状态，让程序变得**持久化**。如果程序失败，重启时所有 workflows 都会自动从最后完成的 step 恢复。
 
-* **Workflows** must be deterministic and generally cannot include I/O.
-* **Steps** may perform I/O (network, disk, API calls). If a step fails, it restarts from the beginning.
+* **Workflows** 必须是确定性的，通常不能包含 I/O。
+* **Steps** 可以执行 I/O（网络、磁盘、API 调用）。如果 step 失败，它会从头重启。
 
-Every workflow input and step output is durably stored in the system database. When workflow execution fails, whether from crashes, network issues, or server restarts, DBOS leverages these checkpoints to recover workflows from their last completed step.
+每个 workflow input 和 step output 都会持久化存储在系统数据库中。当 workflow execution 因崩溃、网络问题或 server 重启而失败时，DBOS 会利用这些 checkpoints 从最后完成的 step 恢复 workflows。
 
-DBOS **queues** provide durable, database-backed alternatives to systems like Celery or BullMQ, supporting features such as concurrency limits, rate limits, timeouts, and prioritization. See the [DBOS docs](https://docs.dbos.dev/architecture) for details.
+DBOS **queues** 为 Celery 或 BullMQ 等系统提供了持久化、数据库支撑的替代方案，支持并发限制、速率限制、超时和优先级等功能。详情请参见 [DBOS docs](https://docs.dbos.dev/architecture)。
 
-The diagram below shows the overall architecture of an agentic application in DBOS.
-DBOS runs fully in-process as a library. Functions remain normal Python functions but are checkpointed into a database (Postgres or SQLite).
+下图展示了 DBOS 中 agentic application 的整体架构。DBOS 完全作为库在进程内运行。函数仍然是普通 Python 函数，但会 checkpoint 到数据库（Postgres 或 SQLite）中。
 
 ```text
                     Clients
@@ -41,27 +40,26 @@ DBOS runs fully in-process as a library. Functions remain normal Python function
 +------------------------------------------------------+
 ```
 
-See the [DBOS documentation](https://docs.dbos.dev/architecture) for more information.
+更多信息请参见 [DBOS documentation](https://docs.dbos.dev/architecture)。
 
-## Durable Agent
+## 持久化 Agent {#durable-agent}
 
-Any agent can be wrapped in a [`DBOSAgent`][pydantic_ai.durable_exec.dbos.DBOSAgent] to get durable execution. `DBOSAgent` automatically:,
+任何 agent 都可以包装为 [`DBOSAgent`][pydantic_ai.durable_exec.dbos.DBOSAgent] 以获得持久化执行。`DBOSAgent` 会自动：
 
-* Wraps `Agent.run` and `Agent.run_sync` as DBOS workflows.
-* Wraps [model requests](../models/overview.md) and [MCP communication](../mcp/client.md) as DBOS steps.
+* 将 `Agent.run` 和 `Agent.run_sync` 包装为 DBOS workflows。
+* 将 [model requests](../models/overview.md) 和 [MCP communication](../mcp/client.md) 包装为 DBOS steps。
 
-Custom tool functions and event stream handlers are **not automatically wrapped** by DBOS.
-If they involve non-deterministic behavior or perform I/O, you should explicitly decorate them with `@DBOS.step`.
+自定义 tool functions 和 event stream handlers **不会被 DBOS 自动包装**。如果它们涉及非确定性行为或执行 I/O，应显式用 `@DBOS.step` 装饰它们。
 
-The original agent, model, and MCP server can still be used as normal outside the DBOS workflow.
+原始 agent、model 和 MCP server 仍可在 DBOS workflow 外正常使用。
 
-Here is a simple but complete example of wrapping an agent for durable execution. All it requires is to install Pydantic AI with the DBOS [open-source library](https://github.com/dbos-inc/dbos-transact-py):
+下面是一个简单但完整的示例，展示如何包装 agent 以进行持久化执行。它只需要安装带 DBOS [open-source library](https://github.com/dbos-inc/dbos-transact-py) 的 Pydantic AI：
 
 ```bash
 pip/uv-add pydantic-ai[dbos]
 ```
 
-Or if you're using the slim package, you can install it with the `dbos` optional group:
+或者，如果你使用 slim 包，可以安装带 `dbos` 可选组的版本：
 
 ```bash
 pip/uv-add pydantic-ai-slim[dbos]
@@ -94,73 +92,71 @@ async def main():
     #> Mexico City (Ciudad de México, CDMX)
 ```
 
-1. Workflows and `DBOSAgent` must be defined before `DBOS.launch()` so that recovery can correctly find all workflows.
-2. [`DBOSAgent.run()`][pydantic_ai.durable_exec.dbos.DBOSAgent.run] works like [`Agent.run()`][pydantic_ai.agent.Agent.run], but runs as a DBOS workflow and executes model requests, decorated tool calls, and MCP communication as DBOS steps.
-3. This example uses SQLite. Postgres is recommended for production.
-4. The agent's `name` is used to uniquely identify its workflows.
+1. Workflows 和 `DBOSAgent` 必须在 `DBOS.launch()` 前定义，这样 recovery 才能正确找到所有 workflows。
+2. [`DBOSAgent.run()`][pydantic_ai.durable_exec.dbos.DBOSAgent.run] 的工作方式类似 [`Agent.run()`][pydantic_ai.agent.Agent.run]，但会作为 DBOS workflow 运行，并将 model requests、已装饰 tool calls 和 MCP communication 作为 DBOS steps 执行。
+3. 此示例使用 SQLite。生产环境推荐使用 Postgres。
+4. agent 的 `name` 用于唯一标识其 workflows。
 
-_(This example is complete, it can be run "as is" — you'll need to add `asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `asyncio.run(main())` 来运行 `main`）_
 
-Because DBOS workflows need to be defined before calling `DBOS.launch()` and the `DBOSAgent` instance automatically registers `run` and `run_sync` as workflows, it needs to be defined before calling `DBOS.launch()` as well.
+由于 DBOS workflows 需要在调用 `DBOS.launch()` 前定义，而 `DBOSAgent` 实例会自动将 `run` 和 `run_sync` 注册为 workflows，因此它也需要在调用 `DBOS.launch()` 前定义。
 
-For more information on how to use DBOS in Python applications, see their [Python SDK guide](https://docs.dbos.dev/python/programming-guide).
+关于如何在 Python applications 中使用 DBOS，更多信息请参见其 [Python SDK guide](https://docs.dbos.dev/python/programming-guide)。
 
-## DBOS Integration Considerations
+## DBOS 集成注意事项 {#dbos-integration-considerations}
 
-When using DBOS with Pydantic AI agents, there are a few important considerations to ensure workflows and toolsets behave correctly.
+将 DBOS 与 Pydantic AI agents 一起使用时，需要注意几个重要事项，以确保 workflows 和 toolsets 行为正确。
 
-### Agent and Toolset Requirements
+### Agent 和 Toolset 要求 {#agent-and-toolset-requirements}
 
-Each agent instance must have a unique `name` so DBOS can correctly resume workflows after a failure or restart.
+每个 agent 实例都必须有唯一的 `name`，这样 DBOS 才能在失败或重启后正确恢复 workflows。
 
-Tools and event stream handlers are not automatically wrapped by DBOS. You can decide how to integrate them:
+Tools 和 event stream handlers 不会被 DBOS 自动包装。你可以决定如何集成它们：
 
-* Decorate with `@DBOS.step` if the function involves non-determinism or I/O.
-* Skip the decorator if durability isn't needed, so you avoid the extra DB checkpoint write.
-* If the function needs to enqueue tasks or invoke other DBOS workflows, run it inside the agent's main workflow (not as a step).
+* 如果函数涉及非确定性或 I/O，请用 `@DBOS.step` 装饰。
+* 如果不需要 durability，可以跳过装饰器，以避免额外的 DB checkpoint 写入。
+* 如果函数需要 enqueue tasks 或调用其他 DBOS workflows，请在 agent 的主 workflow 内运行它（不要作为 step）。
 
-Other than that, any agent and toolset will just work!
+除此之外，任何 agent 和 toolset 都可以直接工作。
 
-### Agent Run Context and Dependencies
+### Agent Run Context 和依赖 {#agent-run-context-and-dependencies}
 
-DBOS checkpoints workflow inputs/outputs and step outputs into a database using [`pickle`](https://docs.python.org/3/library/pickle.html). This means you need to make sure [dependencies](../dependencies.md) object provided to [`DBOSAgent.run()`][pydantic_ai.durable_exec.dbos.DBOSAgent.run] or [`DBOSAgent.run_sync()`][pydantic_ai.durable_exec.dbos.DBOSAgent.run_sync], and tool outputs can be serialized using pickle. You may also want to keep the inputs and outputs small (under \~2 MB). PostgreSQL and SQLite support up to 1 GB per field, but large objects may impact performance.
+DBOS 使用 [`pickle`](https://docs.python.org/3/library/pickle.html) 将 workflow inputs/outputs 和 step outputs checkpoint 到数据库中。这意味着你需要确保提供给 [`DBOSAgent.run()`][pydantic_ai.durable_exec.dbos.DBOSAgent.run] 或 [`DBOSAgent.run_sync()`][pydantic_ai.durable_exec.dbos.DBOSAgent.run_sync] 的[依赖](../dependencies.md)对象，以及 tool outputs 都可以用 pickle 序列化。你也可能需要让 inputs 和 outputs 保持较小（小于约 2 MB）。PostgreSQL 和 SQLite 每个字段最多支持 1 GB，但大对象可能影响性能。
 
-### Streaming
+### Streaming {#streaming}
 
-Because DBOS cannot stream output directly to the workflow or step call site, [`Agent.run_stream()`][pydantic_ai.agent.Agent.run_stream] and [`Agent.run_stream_events()`][pydantic_ai.agent.Agent.run_stream_events] are not supported when running inside of a DBOS workflow.
+由于 DBOS 无法直接将 output stream 到 workflow 或 step 调用位置，因此在 DBOS workflow 内运行时不支持 [`Agent.run_stream()`][pydantic_ai.agent.Agent.run_stream] 和 [`Agent.run_stream_events()`][pydantic_ai.agent.Agent.run_stream_events]。
 
-Instead, you can implement streaming by setting an [`event_stream_handler`][pydantic_ai.agent.EventStreamHandler] on the `Agent` or `DBOSAgent` instance and using [`DBOSAgent.run()`][pydantic_ai.durable_exec.dbos.DBOSAgent.run].
-The event stream handler function will receive the agent [run context][pydantic_ai.tools.RunContext] and an async iterable of events from the model's streaming response and the agent's execution of tools. For examples, see the [streaming docs](../agent.md#streaming-all-events).
-
-
-### Parallel Tool Execution
-
-When using `DBOSAgent`, tools are executed in parallel by default to minimize latency. To guarantee deterministic replay and reliable recovery, DBOS waits for all parallel tool calls to complete before emitting events **in order**.
-It's equivalent to the behavior of [`with agent.parallel_tool_call_execution_mode('parallel_ordered_events')`][pydantic_ai.agent.AbstractAgent.parallel_tool_call_execution_mode].
-
-If you prefer strict ordering, you can configure the agent to run tools sequentially by setting [`parallel_execution_mode='sequential'`][pydantic_ai.durable_exec.dbos.DBOSAgent] when initializing the `DBOSAgent`.
+你可以改为在 `Agent` 或 `DBOSAgent` 实例上设置 [`event_stream_handler`][pydantic_ai.agent.EventStreamHandler]，并使用 [`DBOSAgent.run()`][pydantic_ai.durable_exec.dbos.DBOSAgent.run] 来实现 streaming。event stream handler 函数会接收 agent [run context][pydantic_ai.tools.RunContext]，以及来自 model streaming response 和 agent 工具执行的 events 的 async iterable。示例请参见 [streaming docs](../agent.md#streaming-all-events)。
 
 
-## Step Configuration
+### 并行工具执行 {#parallel-tool-execution}
 
-You can customize DBOS step behavior, such as retries, by passing [`StepConfig`][pydantic_ai.durable_exec.dbos.StepConfig] objects to the `DBOSAgent` constructor:
+使用 `DBOSAgent` 时，tools 默认并行执行，以最小化延迟。为了保证确定性 replay 和可靠 recovery，DBOS 会等待所有并行 tool calls 完成，然后**按顺序**发出 events。这等价于 [`with agent.parallel_tool_call_execution_mode('parallel_ordered_events')`][pydantic_ai.agent.AbstractAgent.parallel_tool_call_execution_mode] 的行为。
 
-- `mcp_step_config`: The DBOS step config to use for MCP server communication. No retries if omitted.
-- `model_step_config`: The DBOS step config to use for model request steps. No retries if omitted.
-
-For custom tools, you can annotate them directly with [`@DBOS.step`](https://docs.dbos.dev/python/reference/decorators#step) or [`@DBOS.workflow`](https://docs.dbos.dev/python/reference/decorators#workflow) decorators as needed. These decorators have no effect outside DBOS workflows, so tools remain usable in non-DBOS agents.
+如果你更偏好严格顺序，可以在初始化 `DBOSAgent` 时设置 [`parallel_execution_mode='sequential'`][pydantic_ai.durable_exec.dbos.DBOSAgent]，让 agent 顺序运行 tools。
 
 
-## Step Retries
+## Step 配置 {#step-configuration}
 
-On top of the automatic retries for request failures that DBOS will perform, Pydantic AI and various provider API clients also have their own request retry logic. Enabling these at the same time may cause the request to be retried more often than expected, with improper `Retry-After` handling.
+你可以向 `DBOSAgent` 构造函数传入 [`StepConfig`][pydantic_ai.durable_exec.dbos.StepConfig] 对象，自定义 DBOS step 行为，例如 retries：
 
-When using DBOS, it's recommended to not use [HTTP Request Retries](../retries.md) and to turn off your provider API client's own retry logic, for example by setting `max_retries=0` on a [custom `OpenAIProvider` API client](../models/openai.md#custom-openai-client).
+- `mcp_step_config`：用于 MCP server communication 的 DBOS step config。省略时不重试。
+- `model_step_config`：用于 model request steps 的 DBOS step config。省略时不重试。
 
-You can customize DBOS's retry policy using [step configuration](#step-configuration).
+对于 custom tools，可以根据需要直接用 [`@DBOS.step`](https://docs.dbos.dev/python/reference/decorators#step) 或 [`@DBOS.workflow`](https://docs.dbos.dev/python/reference/decorators#workflow) decorators 标注它们。这些 decorators 在 DBOS workflows 外没有效果，因此 tools 在非 DBOS agents 中仍可使用。
 
-## Observability with Logfire
 
-DBOS can be configured to generate OpenTelemetry spans for each workflow and step execution, and Pydantic AI emits spans for each agent run, model request, and tool invocation. You can send these spans to [Pydantic Logfire](../logfire.md) to get a full, end-to-end view of what's happening in your application.
+## Step 重试 {#step-retries}
 
-For more information about DBOS logging and tracing, please see the [DBOS docs](https://docs.dbos.dev/python/tutorials/logging-and-tracing) for details.
+除了 DBOS 会对 request failures 执行自动 retries 之外，Pydantic AI 和各类 provider API clients 也有自己的 request retry 逻辑。同时启用这些机制可能导致 request 重试次数超过预期，并带来不当的 `Retry-After` 处理。
+
+使用 DBOS 时，推荐不要使用 [HTTP Request Retries](../retries.md)，并关闭 provider API client 自身的 retry 逻辑，例如在[自定义 `OpenAIProvider` API client](../models/openai.md#custom-openai-client) 上设置 `max_retries=0`。
+
+你可以使用 [step configuration](#step-configuration) 自定义 DBOS 的 retry policy。
+
+## 使用 Logfire 进行可观测性分析 {#observability-with-logfire}
+
+可以配置 DBOS 为每次 workflow 和 step execution 生成 OpenTelemetry spans，而 Pydantic AI 会为每次 agent run、model request 和 tool invocation 发出 spans。你可以将这些 spans 发送到 [Pydantic Logfire](../logfire.md)，以获得应用中正在发生事情的完整端到端视图。
+
+关于 DBOS logging 和 tracing 的更多信息，请参见 [DBOS docs](https://docs.dbos.dev/python/tutorials/logging-and-tracing)。

@@ -1,24 +1,22 @@
-# Common Tools
+# 常用工具 {#common-tools}
 
-Pydantic AI ships with native tools that can be used to enhance your agent's capabilities.
+Pydantic AI 提供了一些 native tools，可用于增强 agent 的能力。
 
-## DuckDuckGo Search Tool
+## DuckDuckGo Search Tool {#duckduckgo-search-tool}
 
-The DuckDuckGo search tool allows you to search the web for information. It is built on top of the
-[DuckDuckGo API](https://github.com/deedy5/ddgs).
+DuckDuckGo search tool 允许你在 web 上搜索信息。它构建在 [DuckDuckGo API](https://github.com/deedy5/ddgs) 之上。
 
-### Installation
+### 安装 {#installation}
 
-To use [`duckduckgo_search_tool`][pydantic_ai.common_tools.duckduckgo.duckduckgo_search_tool], you need to install
-[`pydantic-ai-slim`](install.md#slim-install) with the `duckduckgo` optional group:
+要使用 [`duckduckgo_search_tool`][pydantic_ai.common_tools.duckduckgo.duckduckgo_search_tool]，你需要安装带有 `duckduckgo` 可选组的 [`pydantic-ai-slim`](install.md#slim-install)：
 
 ```bash
 pip/uv-add "pydantic-ai-slim[duckduckgo]"
 ```
 
-### Usage
+### 用法 {#usage}
 
-Here's an example of how you can use the DuckDuckGo search tool with an agent:
+下面展示如何在 agent 中使用 DuckDuckGo search tool：
 
 ```py {title="duckduckgo_search.py" test="skip"}
 from pydantic_ai import Agent
@@ -81,23 +79,21 @@ Would you like help finding a current source or additional details on where to l
 """
 ```
 
-## Web Fetch Tool
+## Web Fetch Tool {#web-fetch-tool}
 
-The web fetch tool allows your agent to fetch the content of web pages and convert them to markdown.
-It uses [SSRF protection](https://owasp.org/www-community/attacks/Server_Side_Request_Forgery) to prevent server-side request forgery attacks.
+web fetch tool 允许你的 agent 获取网页内容并将其转换为 markdown。它使用 [SSRF protection](https://owasp.org/www-community/attacks/Server_Side_Request_Forgery) 来防止服务器端请求伪造攻击。
 
-### Installation
+### 安装 {#installation}
 
-To use [`web_fetch_tool`][pydantic_ai.common_tools.web_fetch.web_fetch_tool], you need to install
-[`pydantic-ai-slim`](install.md#slim-install) with the `web-fetch` optional group:
+要使用 [`web_fetch_tool`][pydantic_ai.common_tools.web_fetch.web_fetch_tool]，你需要安装带有 `web-fetch` 可选组的 [`pydantic-ai-slim`](install.md#slim-install)：
 
 ```bash
 pip/uv-add "pydantic-ai-slim[web-fetch]"
 ```
 
-### Usage
+### 用法 {#usage}
 
-Here's an example of how you can use the web fetch tool with an agent:
+下面展示如何在 agent 中使用 web fetch tool：
 
 ```py {title="web_fetch.py" test="skip"}
 from pydantic_ai import Agent
@@ -113,32 +109,29 @@ result = agent.run_sync('What is on https://ai.pydantic.dev?')
 print(result.output)
 ```
 
-!!! tip "Automatic fallback via WebFetch capability"
-    You don't need to use [`web_fetch_tool`][pydantic_ai.common_tools.web_fetch.web_fetch_tool] directly — the
-    [`WebFetch`][pydantic_ai.capabilities.WebFetch] capability automatically uses it
-    as a local fallback when the model doesn't support native URL fetching.
+!!! tip "通过 WebFetch capability 自动 fallback"
+    你不需要直接使用 [`web_fetch_tool`][pydantic_ai.common_tools.web_fetch.web_fetch_tool]；当模型不支持 native URL fetching 时，[`WebFetch`][pydantic_ai.capabilities.WebFetch] capability 会自动将它用作本地 fallback。
 
-## Tavily Search Tool
+## Tavily Search Tool {#tavily-search-tool}
 
 !!! info
-    Tavily is a paid service, but they have free credits to explore their product.
+    Tavily 是付费服务，但他们提供免费额度用于试用产品。
 
-    You need to [sign up for an account](https://app.tavily.com/home) and get an API key to use the Tavily search tool.
+    你需要[注册账号](https://app.tavily.com/home)并获取 API key，才能使用 Tavily search tool。
 
-The Tavily search tool allows you to search the web for information. It is built on top of the [Tavily API](https://tavily.com/).
+Tavily search tool 允许你在 web 上搜索信息。它构建在 [Tavily API](https://tavily.com/) 之上。
 
-### Installation
+### 安装 {#installation}
 
-To use [`tavily_search_tool`][pydantic_ai.common_tools.tavily.tavily_search_tool], you need to install
-[`pydantic-ai-slim`](install.md#slim-install) with the `tavily` optional group:
+要使用 [`tavily_search_tool`][pydantic_ai.common_tools.tavily.tavily_search_tool]，你需要安装带有 `tavily` 可选组的 [`pydantic-ai-slim`](install.md#slim-install)：
 
 ```bash
 pip/uv-add "pydantic-ai-slim[tavily]"
 ```
 
-### Usage
+### 用法 {#usage}
 
-Here's an example of how you can use the Tavily search tool with an agent:
+下面展示如何在 agent 中使用 Tavily search tool：
 
 ```py {title="tavily_search.py" test="skip"}
 import os
@@ -176,11 +169,11 @@ Feel free to click on the links to dive deeper into each story!
 """
 ```
 
-### Configuring Parameters
+### 配置参数 {#configuring-parameters}
 
-The `tavily_search_tool` factory accepts optional parameters that control search behavior. `max_results` is always developer-controlled and never appears in the LLM tool schema. Other parameters, when provided, are fixed for all searches and hidden from the LLM's tool schema. Parameters left unset remain available for the LLM to set per-call.
+`tavily_search_tool` factory 接受用于控制搜索行为的可选参数。`max_results` 始终由开发者控制，永远不会出现在 LLM tool schema 中。其他参数在提供时会固定用于所有搜索，并从 LLM 的 tool schema 中隐藏。未设置的参数仍可由 LLM 在每次调用时设置。
 
-For example, you can lock in `max_results` and `include_domains` at tool creation time while still letting the LLM control `exclude_domains`:
+例如，你可以在创建工具时锁定 `max_results` 和 `include_domains`，同时仍允许 LLM 控制 `exclude_domains`：
 
 ```py {title="tavily_domain_filtering.py"}
 import os
@@ -209,34 +202,33 @@ Here are some recent papers about transformer architectures from arxiv.org:
 """
 ```
 
-## Exa Search Tool
+## Exa Search Tool {#exa-search-tool}
 
 !!! info
-    Exa is a paid service with free credits to explore their product.
+    Exa 是带免费试用额度的付费服务。
 
-    You need to [sign up for an account](https://dashboard.exa.ai) and get an API key to use the Exa tools.
+    你需要[注册账号](https://dashboard.exa.ai)并获取 API key，才能使用 Exa tools。
 
-Exa is a neural search engine that finds high-quality, relevant results across billions of web pages.
-It provides several tools including web search, finding similar pages, content retrieval, and AI-powered answers.
+Exa 是一个 neural search engine，可在数十亿网页中查找高质量、相关的结果。它提供多个工具，包括 web search、查找相似页面、内容检索和 AI-powered answers。
 
-### Installation
+### 安装 {#installation}
 
-To use Exa tools, you need to install [`pydantic-ai-slim`](install.md#slim-install) with the `exa` optional group:
+要使用 Exa tools，你需要安装带有 `exa` 可选组的 [`pydantic-ai-slim`](install.md#slim-install)：
 
 ```bash
 pip/uv-add "pydantic-ai-slim[exa]"
 ```
 
-### Usage
+### 用法 {#usage}
 
-You can use Exa tools individually or as a toolset. The following tools are available:
+你可以单独使用 Exa tools，也可以将其作为 toolset 使用。可用工具如下：
 
-- [`exa_search_tool`][pydantic_ai.common_tools.exa.exa_search_tool]: Search the web with various search types (auto, keyword, neural, fast, deep)
-- [`exa_find_similar_tool`][pydantic_ai.common_tools.exa.exa_find_similar_tool]: Find pages similar to a given URL
-- [`exa_get_contents_tool`][pydantic_ai.common_tools.exa.exa_get_contents_tool]: Get full text content from URLs
-- [`exa_answer_tool`][pydantic_ai.common_tools.exa.exa_answer_tool]: Get AI-powered answers with citations
+- [`exa_search_tool`][pydantic_ai.common_tools.exa.exa_search_tool]：使用多种搜索类型（auto、keyword、neural、fast、deep）搜索 web
+- [`exa_find_similar_tool`][pydantic_ai.common_tools.exa.exa_find_similar_tool]：查找与给定 URL 相似的页面
+- [`exa_get_contents_tool`][pydantic_ai.common_tools.exa.exa_get_contents_tool]：从 URLs 获取全文内容
+- [`exa_answer_tool`][pydantic_ai.common_tools.exa.exa_answer_tool]：获取带 citations 的 AI-powered answers
 
-#### Using Individual Tools
+#### 使用单个工具 {#using-individual-tools}
 
 ```py {title="exa_search.py" test="skip"}
 import os
@@ -257,10 +249,9 @@ result = agent.run_sync('What are the latest developments in quantum computing?'
 print(result.output)
 ```
 
-#### Using ExaToolset
+#### 使用 ExaToolset {#using-exatoolset}
 
-For better efficiency when using multiple Exa tools, use [`ExaToolset`][pydantic_ai.common_tools.exa.ExaToolset]
-which shares a single API client across all tools. You can configure which tools to include:
+使用多个 Exa tools 时，为了提高效率，请使用 [`ExaToolset`][pydantic_ai.common_tools.exa.ExaToolset]，它会在所有工具之间共享单个 API client。你可以配置要包含哪些工具：
 
 ```py {title="exa_toolset.py" test="skip"}
 import os
@@ -274,11 +265,11 @@ assert api_key is not None
 toolset = ExaToolset(
     api_key,
     num_results=5,
-    max_characters=1000,  # Limit text content to control token usage
-    include_search=True,  # Include the search tool (default: True)
-    include_find_similar=True,  # Include the find_similar tool (default: True)
-    include_get_contents=False,  # Exclude the get_contents tool
-    include_answer=True,  # Include the answer tool (default: True)
+    max_characters=1000,  # 限制文本内容以控制 token 使用量
+    include_search=True,  # 包含 search tool（默认：True）
+    include_find_similar=True,  # 包含 find_similar tool（默认：True）
+    include_get_contents=False,  # 排除 get_contents tool
+    include_answer=True,  # 包含 answer tool（默认：True）
 )
 
 agent = Agent(

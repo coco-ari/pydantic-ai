@@ -1,36 +1,36 @@
-# Graph Builder API
+# Graph Builder API {#graph-builder-api}
 
-The graph builder API provides a powerful builder pattern for constructing parallel execution graphs. The original [`BaseNode`][pydantic_graph.basenode.BaseNode]-based graph API is still available (and interoperable with the builder API) and is documented in the [main graph documentation](../../graph.md).
+graph builder API 提供了强大的 builder pattern，用于构建并行执行图。原始的基于 [`BaseNode`][pydantic_graph.basenode.BaseNode] 的 graph API 仍然可用（并且可与 builder API 互操作），其文档位于[主 graph 文档](../../graph.md)。
 
-## Overview
+## 概览 {#overview}
 
-The graph builder API in `pydantic-graph` provides:
+`pydantic-graph` 中的 graph builder API 提供：
 
-- **Step nodes** for executing async functions
-- **Decision nodes** for conditional branching
-- **Spread operations** for parallel processing of iterables
-- **Broadcast operations** for sending the same data to multiple parallel paths
-- **Join nodes and Reducers** for aggregating results from parallel execution
+- **Step nodes**：用于执行 async functions
+- **Decision nodes**：用于条件分支
+- **Spread operations**：用于并行处理 iterables
+- **Broadcast operations**：用于将相同数据发送到多个并行路径
+- **Join nodes and Reducers**：用于聚合并行执行结果
 
-This API is designed for advanced workflows where you want declarative control over parallelism, routing, and data aggregation.
+该 API 面向高级 workflows 设计，适合需要声明式控制并行性、路由和数据聚合的场景。
 
-## Installation
+## 安装 {#installation}
 
-The graph builder API is included with `pydantic-graph`:
+graph builder API 随 `pydantic-graph` 提供：
 
 ```bash
 pip install pydantic-graph
 ```
 
-Or as part of `pydantic-ai`:
+也作为 `pydantic-ai` 的一部分提供：
 
 ```bash
 pip install pydantic-ai
 ```
 
-## Quick Start
+## 快速开始 {#quick-start}
 
-Here's a simple example to get you started:
+下面是一个帮助你入门的简单示例：
 
 ```python {title="simple_counter.py"}
 from dataclasses import dataclass
@@ -46,10 +46,10 @@ class CounterState:
 
 
 async def main():
-    # Create a graph builder with state and output types
+    # 创建带 state 和 output types 的 graph builder
     g = GraphBuilder(state_type=CounterState, output_type=int)
 
-    # Define steps using the decorator
+    # 使用装饰器定义 steps
     @g.step
     async def increment(ctx: StepContext[CounterState, None, None]) -> int:
         """Increment the counter and return its value."""
@@ -61,14 +61,14 @@ async def main():
         """Double the input value."""
         return ctx.inputs * 2
 
-    # Add edges connecting the nodes
+    # 添加连接 nodes 的 edges
     g.add(
         g.edge_from(g.start_node).to(increment),
         g.edge_from(increment).to(double_it),
         g.edge_from(double_it).to(g.end_node),
     )
 
-    # Build and run the graph
+    # 构建并运行 graph
     graph = g.build()
     state = CounterState()
     result = await graph.run(state=state)
@@ -78,45 +78,45 @@ async def main():
     #> Final state: 1
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Key Concepts
+## 核心概念 {#key-concepts}
 
-### GraphBuilder
+### GraphBuilder {#graphbuilder}
 
-The [`GraphBuilder`][pydantic_graph.graph_builder.GraphBuilder] is the main entry point for constructing graphs. It's generic over:
+[`GraphBuilder`][pydantic_graph.graph_builder.GraphBuilder] 是构建 graphs 的主要入口。它对以下类型泛型化：
 
-- `StateT` - The type of mutable state shared across all nodes
-- `DepsT` - The type of dependencies injected into nodes
-- `InputT` - The type of initial input to the graph
-- `OutputT` - The type of final output from the graph
+- `StateT` - 所有 nodes 共享的 mutable state 类型
+- `DepsT` - 注入到 nodes 中的 dependencies 类型
+- `InputT` - graph 的 initial input 类型
+- `OutputT` - graph 的 final output 类型
 
-### Steps
+### Steps {#steps}
 
-Steps are async functions decorated with [`@g.step`][pydantic_graph.graph_builder.GraphBuilder.step] that define the actual work to be done in each node. They receive a [`StepContext`][pydantic_graph.step.StepContext] with access to:
+Steps 是用 [`@g.step`][pydantic_graph.graph_builder.GraphBuilder.step] 装饰的 async functions，用于定义每个 node 中要完成的实际工作。它们会接收 [`StepContext`][pydantic_graph.step.StepContext]，可访问：
 
-- `ctx.state` - The mutable graph state
-- `ctx.deps` - Injected dependencies
-- `ctx.inputs` - Input data for this step
+- `ctx.state` - mutable graph state
+- `ctx.deps` - 注入的 dependencies
+- `ctx.inputs` - 此 step 的 input data
 
-### Edges
+### Edges {#edges}
 
-Edges define the connections between nodes. The builder provides multiple ways to create edges:
+Edges 定义 nodes 之间的连接。builder 提供多种创建 edges 的方式：
 
-- [`g.add()`][pydantic_graph.graph_builder.GraphBuilder.add] - Add one or more edge paths
-- [`g.add_edge()`][pydantic_graph.graph_builder.GraphBuilder.add_edge] - Add a simple edge between two nodes
-- [`g.edge_from()`][pydantic_graph.graph_builder.GraphBuilder.edge_from] - Start building a complex edge path
+- [`g.add()`][pydantic_graph.graph_builder.GraphBuilder.add] - 添加一个或多个 edge paths
+- [`g.add_edge()`][pydantic_graph.graph_builder.GraphBuilder.add_edge] - 在两个 nodes 之间添加简单 edge
+- [`g.edge_from()`][pydantic_graph.graph_builder.GraphBuilder.edge_from] - 开始构建复杂 edge path
 
-### Start and End Nodes
+### Start 和 End Nodes {#start-and-end-nodes}
 
-Every graph has:
+每个 graph 都有：
 
-- [`g.start_node`][pydantic_graph.graph_builder.GraphBuilder.start_node] - The entry point receiving initial inputs
-- [`g.end_node`][pydantic_graph.graph_builder.GraphBuilder.end_node] - The exit point producing final outputs
+- [`g.start_node`][pydantic_graph.graph_builder.GraphBuilder.start_node] - 接收 initial inputs 的入口点
+- [`g.end_node`][pydantic_graph.graph_builder.GraphBuilder.end_node] - 产生 final outputs 的出口点
 
-## A More Complex Example
+## 更复杂的示例 {#a-more-complex-example}
 
-Here's an example showcasing parallel execution with a map operation:
+下面的示例展示如何用 map operation 进行并行执行：
 
 ```python {title="parallel_processing.py"}
 from dataclasses import dataclass
@@ -144,10 +144,10 @@ async def main():
         ctx.state.items_processed += 1
         return ctx.inputs * ctx.inputs
 
-    # Create a join to collect results
+    # 创建 join 以收集结果
     collect_results = g.join(reduce_list_append, initial_factory=list[int])
 
-    # Build the graph with map operation
+    # 使用 map operation 构建 graph
     g.add(
         g.edge_from(g.start_node).map().to(square),
         g.edge_from(square).to(collect_results),
@@ -164,31 +164,31 @@ async def main():
     #> Items processed: 5
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-In this example:
+在此示例中：
 
-1. The start node receives a list of integers
-2. The `.map()` operation fans out each item to a separate parallel execution of the `square` step
-3. All results are collected back together using [`reduce_list_append`][pydantic_graph.join.reduce_list_append]
-4. The joined results flow to the end node
+1. start node 接收整数列表
+2. `.map()` operation 将每个 item fan out 到单独的 `square` step 并行执行
+3. 所有结果使用 [`reduce_list_append`][pydantic_graph.join.reduce_list_append] 收集回来
+4. joined results 流向 end node
 
-## Next Steps
+## 后续步骤 {#next-steps}
 
-Explore the detailed documentation for each feature:
+继续阅读各功能的详细文档：
 
-- [**Steps**](steps.md) - Learn about step nodes and execution contexts
-- [**Joins**](joins.md) - Understand join nodes and reducer patterns
-- [**Decisions**](decisions.md) - Implement conditional branching
-- [**Parallel Execution**](parallel.md) - Master broadcasting and mapping
+- [**Steps**](steps.md) - 了解 step nodes 和 execution contexts
+- [**Joins**](joins.md) - 理解 join nodes 和 reducer patterns
+- [**Decisions**](decisions.md) - 实现条件分支
+- [**Parallel Execution**](parallel.md) - 掌握 broadcasting 和 mapping
 
-## Advanced Execution Control
+## 高级执行控制 {#advanced-execution-control}
 
-Beyond the basic [`graph.run()`][pydantic_graph.graph_builder.Graph.run] method, the builder API provides fine-grained control over graph execution.
+除了基本的 [`graph.run()`][pydantic_graph.graph_builder.Graph.run] 方法，builder API 还提供对 graph execution 的细粒度控制。
 
-### Step-by-Step Execution
+### 逐步执行 {#step-by-step-execution}
 
-Use [`graph.iter()`][pydantic_graph.graph_builder.Graph.iter] to execute the graph one step at a time:
+使用 [`graph.iter()`][pydantic_graph.graph_builder.Graph.iter] 一次执行 graph 的一个 step：
 
 ```python {title="step_by_step.py"}
 from dataclasses import dataclass
@@ -222,12 +222,12 @@ async def main():
     graph = g.build()
     state = CounterState()
 
-    # Use iter() for step-by-step execution
+    # 使用 iter() 进行逐步执行
     async with graph.iter(state=state) as graph_run:
         print(f'Initial state: {state.value}')
         #> Initial state: 0
 
-        # Advance execution step by step
+        # 逐步推进执行
         async for event in graph_run:
             print(f'{state.value=} | {event=}')
             #> state.value=0 | event=[GraphTask(node_id='increment', inputs=None)]
@@ -240,18 +240,18 @@ async def main():
                 break
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `import asyncio; asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-The [`GraphRun`][pydantic_graph.graph_builder.GraphRun] object provides:
+[`GraphRun`][pydantic_graph.graph_builder.GraphRun] 对象提供：
 
-- **Async iteration**: Iterate through execution events
-- **`next_task` property**: Inspect upcoming tasks
-- **`output` property**: Check if the graph has completed and get the final output
-- **`next()` method**: Manually advance execution with optional value injection
+- **Async iteration**：迭代 execution events
+- **`next_task` property**：检查即将执行的 tasks
+- **`output` property**：检查 graph 是否已完成并获取 final output
+- **`next()` method**：手动推进执行，并可选择注入值
 
-### Visualizing Graphs
+### 可视化 Graphs {#visualizing-graphs #mermaid-diagrams}
 
-Generate Mermaid diagrams of your graph structure using [`graph.render()`][pydantic_graph.graph_builder.Graph.render]:
+使用 [`graph.render()`][pydantic_graph.graph_builder.Graph.render] 生成 graph 结构的 Mermaid diagrams：
 
 ```python {title="visualize_graph.py"}
 from dataclasses import dataclass
@@ -282,7 +282,7 @@ g.add(
 
 graph = g.build()
 
-# Generate a Mermaid diagram
+# 生成 Mermaid diagram
 mermaid_diagram = graph.render(title='My Graph', direction='LR')
 print(mermaid_diagram)
 """
@@ -300,27 +300,29 @@ stateDiagram-v2
 """
 ```
 
-The rendered diagram can be displayed in documentation, notebooks, or any tool that supports Mermaid syntax.
+渲染后的 diagram 可以显示在文档、notebooks 或任何支持 Mermaid syntax 的工具中。
 
-## Comparison with Original API
+## 与原始 API 对比 {#comparison-with-original-api}
 
-The original graph API (documented in the [main graph page](../../graph.md)) uses a class-based approach with [`BaseNode`][pydantic_graph.basenode.BaseNode] subclasses. The builder API uses a builder pattern with decorated functions, which provides:
+原始 graph API（记录在[主 graph 页面](../../graph.md)）使用基于 [`BaseNode`][pydantic_graph.basenode.BaseNode] 子类的 class-based approach。builder API 使用带装饰函数的 builder pattern，提供：
 
-**Advantages:**
-- More concise syntax for simple workflows
-- Explicit control over parallelism with map/broadcast
-- Native reducers for common aggregation patterns
-- Easier to visualize complex data flows
+**优势：**
 
-**Trade-offs:**
-- Requires understanding of builder patterns
-- Less object-oriented, more functional style
+- 简单 workflows 的语法更简洁
+- 通过 map/broadcast 显式控制并行性
+- 为常见聚合模式提供 native reducers
+- 更容易可视化复杂数据流
 
-Both APIs are fully supported and can even be integrated together when needed.
+**权衡：**
 
-## Persistence and Resumability
+- 需要理解 builder patterns
+- 面向对象程度较低，更偏函数式风格
 
-!!! info "No Native Persistence"
-    Unlike the [original Graph API](../../graph.md#state-persistence), the graph builder API does not include built-in state persistence. This is due to the [complexity of achieving consistent snapshotting with parallel execution](https://github.com/pydantic/pydantic-ai/issues/530#issuecomment-3504609992).
+两个 APIs 都得到完整支持，并且在需要时甚至可以集成在一起。
 
-For workflows that need to preserve progress across failures, restarts, or long-running operations, use one of the supported [durable execution](../../durable_execution/overview.md) solutions.
+## 持久化和可恢复性 {#persistence-and-resumability}
+
+!!! info "没有原生持久化"
+    不同于[原始 Graph API](../../graph.md#state-persistence)，graph builder API 不包含内置 state persistence。这是因为[在并行执行中实现一致 snapshotting 很复杂](https://github.com/pydantic/pydantic-ai/issues/530#issuecomment-3504609992)。
+
+对于需要在失败、重启或长时间运行操作期间保留进度的 workflows，请使用支持的[持久化执行](../../durable_execution/overview.md)方案之一。

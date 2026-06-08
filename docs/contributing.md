@@ -1,154 +1,154 @@
-We'd love you to contribute to Pydantic AI!
+我们欢迎你为 Pydantic AI 做贡献！
 
-## How we work — the short version
+## 我们如何工作：简短版 {#how-we-work--the-short-version}
 
-Pydantic AI is maintained by a small team. We set our own priorities based on what benefits the most users, and we work through issues and PRs in that order — not in the order they arrive.
+Pydantic AI 由一个小团队维护。我们会根据什么最能惠及最多用户来设定优先级，并按这个顺序处理 issues 和 PRs，而不是按提交时间顺序处理。
 
-- **Found a bug?** Open an issue with a clear description and a minimal reproducible example. Including a [Logfire](https://logfire.pydantic.dev/) trace link helps us debug dramatically faster.
-- **Want a feature or API change?** Open an issue describing the problem you're solving. Do not start with code.
-- **Want to help build a feature?** Comment on the issue explaining why you need it and what context you bring. We call this being a "champion" — more on that below.
-- **Have a fix or code to share?** Make sure a maintainer has agreed to the approach on the issue and assigned you. Then open a PR.
+- **发现 bug？** 请开 issue，提供清晰描述和最小可复现示例。附上 [Logfire](https://logfire.pydantic.dev/) trace 链接能显著加快我们的调试速度。
+- **想要功能或 API 变更？** 请开 issue 描述你要解决的问题。不要从代码开始。
+- **想帮助构建某个功能？** 请在 issue 下评论，说明你为什么需要它以及你能带来什么上下文。我们称之为成为 "champion"，下文会详细说明。
+- **有修复或代码想分享？** 请先确保 maintainer 已在 issue 上同意方案并分配给你，然后再开 PR。
 
-The rest of this page explains why we work this way and what to expect.
+本页其余部分会解释我们为什么这样工作，以及你可以期待什么。
 
-## Before you write code
+## 写代码之前 {#before-you-write-code}
 
-For anything non-trivial, align with a maintainer on the approach before writing code. A pre-aligned PR is much faster to land than one we're seeing cold.
+对于任何非平凡变更，请在写代码前先与 maintainer 对齐方案。提前对齐的 PR 会比我们第一次看到的 PR 更快合入。
 
-### Trivial fixes
+### 小修复 {#trivial-fixes}
 
-Typos, broken links, small doc improvements, obvious one-line fixes: just open a PR. No issue needed.
+错别字、坏链接、小型文档改进、明显的一行修复：直接开 PR 即可，不需要 issue。
 
-### Bug fixes
+### Bug 修复 {#bug-fixes}
 
-If the fix could reasonably go more than one way, or you're unsure it's actually a bug: open an issue first. Include a minimal reproducible example and ideally a [Logfire trace link](https://logfire.pydantic.dev/) showing the problem. For well-scoped bugs, we may generate a fix internally — the most valuable thing you can do is file a clear report and then validate that the fix works for your use case.
+如果修复方式可能不止一种，或你不确定它是否真的是 bug，请先开 issue。请包含最小可复现示例，并最好提供展示问题的 [Logfire trace link](https://logfire.pydantic.dev/)。对于范围明确的 bugs，我们可能会在内部生成修复。你能做的最有价值的事，是提交清晰报告，然后验证修复是否适用于你的用例。
 
-### Features, integrations, or API changes
+### 功能、集成或 API 变更 {#features-integrations-or-api-changes}
 
-Before writing code, ask whether the change needs to live in core at all. Most new agent behaviors belong in [**Pydantic AI Harness**](https://github.com/pydantic/pydantic-ai-harness), the official capability library — not in this repo. Pydantic AI core is for the agent loop, model providers, and capabilities that require model-specific support or are fundamental to the agent experience. Standalone capabilities — guardrails, memory, context management, file system access, etc. — belong in the harness, where they can iterate faster. See [What goes where?](harness/overview.md#what-goes-where) for the full distinction.
+写代码前，请先判断这个变更是否真的需要放在 core 中。大多数新的 agent behaviors 应该放在官方 capability 库 [**Pydantic AI Harness**](https://github.com/pydantic/pydantic-ai-harness) 中，而不是这个仓库。Pydantic AI core 用于 agent loop、model providers，以及需要模型特定支持或对 agent 体验很基础的 capabilities。独立 capabilities，例如 guardrails、memory、context management、file system access 等，应该放在 harness 中，以便更快迭代。完整区别请参见[哪些内容放在哪里？](harness/overview.md#what-goes-where)。
 
-**If your idea is a capability**, open an issue on [pydantic-ai-harness](https://github.com/pydantic/pydantic-ai-harness/issues) instead. You can also publish capabilities as your own package using the `pydantic-ai-<name>` convention — see [Publishing capability packages](extensibility.md#publishing-capability-packages). Once a capability has real users and a stable shape, we can talk about upstreaming to harness or core.
+**如果你的想法是 capability**，请改在 [pydantic-ai-harness](https://github.com/pydantic/pydantic-ai-harness/issues) 上开 issue。你也可以按 `pydantic-ai-<name>` 约定将 capabilities 作为自己的包发布，见[发布 capability 包](extensibility.md#publishing-capability-packages)。一旦 capability 有真实用户且形态稳定，我们可以讨论 upstream 到 harness 或 core。
 
-If it does belong in core:
+如果它确实属于 core：
 
-1. **Search first.** If an existing issue covers your need, comment there. If the closest match is only related, open a new issue and link it.
-2. **Describe the problem, not just the solution.** Tell us what you're building, what's blocking you, and what you've tried. This context matters more than code.
-3. **Propose a plan before building.** Post the shape of the solution on the issue, or open a draft PR with just a `PLAN.md`. For larger features, we do short video calls with contributors to iterate on the design — a 20-minute call often saves weeks of async review cycles.
-4. **Wait for assignment.** A maintainer needs to agree on the approach and assign the issue to you before you open a PR. Unassigned PRs may be auto-closed.
+1. **先搜索。** 如果已有 issue 覆盖你的需求，请在那里评论。如果最接近的 issue 只是相关，请开一个新 issue 并链接它。
+2. **描述问题，不只是方案。** 告诉我们你在构建什么、什么阻塞了你、你尝试过什么。这些上下文比代码更重要。
+3. **构建前先提出计划。** 在 issue 上发布解决方案形态，或只带一个 `PLAN.md` 开 draft PR。对于较大功能，我们会与贡献者进行简短视频通话来迭代设计；20 分钟通话通常能省下数周异步 review 周期。
+4. **等待分配。** maintainer 需要先同意方案并把 issue 分配给你，然后你再开 PR。未分配 PR 可能会被自动关闭。
 
 !!! warning
-    Writing a large feature PR without prior alignment is the most common way for a contribution to stall or be closed.
+    未事先对齐就编写大型 feature PR，是贡献停滞或被关闭的最常见原因。
 
-## Champions
+## Champions（倡导者） {#champions}
 
-A "champion" is someone who needs a feature, has context on the problem, and is willing to invest time to help us get it right. If you want to champion a feature:
+"champion" 是指需要某个功能、对问题有上下文，并愿意投入时间帮助我们把它做对的人。如果你想 champion 某个功能：
 
-- Comment on the issue explaining: what you're building, why you need this, and what you can contribute (domain knowledge, testing, validation).
-- We prioritize features where one or more champions with production use cases have stepped up. A feature with no champion stays in the backlog until either we prioritize it ourselves or someone with real context shows up.
-- Being a champion doesn't mean writing the code. It means shaping the plan and validating the result. For significant features, we'll set up a call to iterate on the design together.
+- 在 issue 下评论说明：你在构建什么、为什么需要它，以及你能贡献什么（领域知识、测试、验证）。
+- 我们会优先处理有一个或多个带生产用例的 champions 站出来的功能。没有 champion 的功能会留在 backlog 中，直到我们自己将其排上优先级，或有真实上下文的人出现。
+- 成为 champion 不等于要写代码。它意味着塑造计划并验证结果。对于重要功能，我们会安排通话一起迭代设计。
 
-Champions are credited as co-authors when the feature ships.
+功能发布时，champions 会作为 co-authors 得到署名。
 
-## What to expect during review
+## Review 期间可以期待什么 {#what-to-expect-during-review}
 
-### We review PRs in our priority order, not submission order
+### 我们按优先级顺序 review PRs，而不是按提交顺序 {#we-review-prs-in-our-priority-order-not-submission-order}
 
-We do not automatically triage every new PR. PRs on issues we have not pre-aligned on are not in our review queue, regardless of how well written they are. If no maintainer has agreed to the change on an issue and assigned it to you, assume we have not seen your PR.
+我们不会自动 triage 每个新 PR。未事先对齐的 issue 对应 PR 不在我们的 review queue 中，无论它写得多好。如果没有 maintainer 在 issue 上同意变更并分配给你，请假设我们还没有看到你的 PR。
 
-Even for PRs with code we've previously engaged with: we treat all contributed code as a starting point, not a finished product. We review and prioritize PRs based on the feature's importance to the project, not on how much effort went into the code. This is a change from how open source traditionally worked, and we'd rather be honest about it than leave PRs sitting with no signal.
+即使是我们之前参与讨论过代码的 PR，我们也会把所有贡献代码视为起点，而不是最终产品。我们根据功能对项目的重要性 review 和排序 PR，而不是根据代码投入了多少努力。这不同于传统开源工作方式，我们宁愿坦诚说明，也不愿让 PR 长期没有任何信号。
 
-**If you want to know where your PR stands**, the best thing to do is ping `#pydantic-ai` on [Pydantic Slack](https://logfire.pydantic.dev/docs/join-slack/).
+**如果你想知道 PR 当前状态**，最好的做法是在 [Pydantic Slack](https://logfire.pydantic.dev/docs/join-slack/) 的 `#pydantic-ai` 频道 ping 我们。
 
-### We may rewrite or supersede your code
+### 我们可能重写或取代你的代码 {#we-may-rewrite-or-supersede-your-code}
 
-We treat contributed code as illustrative: a starting point that shows the shape of the change and proves the approach works, not the final form we merge. The most useful thing you can give us for a non-trivial change is a plan plus a working example — not a polished, merge-ready implementation.
+我们将贡献代码视为说明性材料：它是展示变更形态并证明方案可行的起点，而不是我们最终合并的形式。对于非平凡变更，你能给我们的最有用内容是计划加可运行示例，而不是打磨好的、可直接合并的实现。
 
-On any PR, we may push commits to your branch, open a follow-up PR that supersedes yours, or rewrite from scratch. For security reasons, we lean toward rewriting contributed code rather than merging as-is. You will still be credited as the original author.
+对于任何 PR，我们都可能向你的分支推送 commits，打开一个取代它的后续 PR，或从头重写。出于安全原因，我们倾向于重写贡献代码，而不是原样合并。你仍会作为原作者获得署名。
 
-Please don't spend effort chasing green CI, addressing every automated review comment, or rebasing for merge conflicts on a PR we haven't pre-aligned on. If we take the change forward, that polish gets thrown away when we rewrite. Get the approach working, then stop and ping us on Slack.
+请不要在未事先对齐的 PR 上花精力追求绿色 CI、处理每条自动 review 评论或为 merge conflicts 反复 rebase。如果我们推进该变更，这些打磨会在重写时被丢弃。让方案跑通，然后停下来在 Slack 上 ping 我们。
 
-### Automated review is advisory, not a gate
+### 自动 review 是建议，不是门禁 {#automated-review-is-advisory-not-a-gate}
 
-PRs are automatically reviewed by Devin and our own tooling. These reviews are advisory:
+PRs 会由 Devin 和我们自己的工具自动 review。这些 review 是建议性的：
 
-- A bot approval does not mean your PR is ready to merge. Only a human maintainer's review counts.
-- A bot finding does not mean you must act on it. If you disagree, say so.
-- If automated review is generating noise on your PR, tell us. We use that feedback to retune the tooling.
+- bot approval 不表示你的 PR 可以合并。只有人类 maintainer 的 review 才算数。
+- bot finding 不表示你必须按它行动。如果你不同意，请说明。
+- 如果自动 review 在你的 PR 上产生噪声，请告诉我们。我们会用这些反馈重新调校工具。
 
-### Priority
+### 优先级 {#priority}
 
-We receive far more contributions than we can review, and we focus where it has the most impact. We cannot promise to get to every PR, even good ones, and we'd rather say so up front than leave your work open indefinitely with no signal.
+我们收到的贡献远多于能 review 的数量，因此会专注于影响最大的地方。我们无法承诺处理每个 PR，即使是好的 PR；相比让你的工作无限期没有信号地挂着，我们宁愿提前说明。
 
-How we weigh priorities:
+我们如何权衡优先级：
 
-- **User demand** -- features that more users need get priority. Champion-backed features with production use cases outrank speculative additions.
-- **Provider significance** -- work that affects frontier providers (Anthropic, OpenAI, Google) or providers we know are heavily used gets priority. A model integration for a niche provider will wait; a fix for Anthropic won't.
-- **Roadmap alignment** -- features that align with our current focus areas get priority. Right now that includes the capabilities/hooks API, provider-adaptive tools, and the [Pydantic AI Harness](https://github.com/pydantic/pydantic-ai-harness) capability library.
-- **Capabilities over core** -- features that could live as a [capability](capabilities.md) should go to [Pydantic AI Harness](https://github.com/pydantic/pydantic-ai-harness) or ship as your own package — that's often the fastest path. Once it has traction, come back and we can talk about upstreaming.
+- **用户需求**：更多用户需要的功能优先。有生产用例 champion 支持的功能，优先级高于 speculative additions。
+- **Provider 重要性**：影响 frontier providers（Anthropic、OpenAI、Google）或我们知道被大量使用的 providers 的工作优先。小众 provider 的 model integration 会等待；Anthropic 的修复不会。
+- **Roadmap 对齐**：与当前重点方向一致的功能优先。目前包括 capabilities/hooks API、provider-adaptive tools，以及 [Pydantic AI Harness](https://github.com/pydantic/pydantic-ai-harness) capability library。
+- **Capabilities 优先于 core**：可以作为 [capability](capabilities.md) 存在的功能应该进入 [Pydantic AI Harness](https://github.com/pydantic/pydantic-ai-harness) 或作为你自己的包发布，这通常是最快路径。一旦它有 traction，再回来讨论 upstream。
 
-## If your PR or issue has gone quiet
+## 如果你的 PR 或 issue 没有动静 {#if-your-pr-or-issue-has-gone-quiet}
 
-1. Ping `#pydantic-ai` on [Pydantic Slack](https://logfire.pydantic.dev/docs/join-slack/) with a link.
-2. Say what you need: "Can you take a look?", "I'm blocked — is this on your radar?", or "Should I close this?" are all fine.
-3. If you've been waiting weeks without any human response, flag it. That's a process failure on our side and we want to know.
+1. 带上链接，在 [Pydantic Slack](https://logfire.pydantic.dev/docs/join-slack/) 的 `#pydantic-ai` 频道 ping 我们。
+2. 说明你需要什么："Can you take a look?"、"I'm blocked - is this on your radar?" 或 "Should I close this?" 都可以。
+3. 如果你已经等了几周仍没有任何人类回应，请明确指出。这是我们流程上的失败，我们想知道。
 
-## Installation and Setup
+## 安装和设置 {#installation-and-setup}
 
-Clone your fork and cd into the repo directory
+克隆你的 fork 并进入仓库目录：
 
 ```bash
 git clone git@github.com:<your username>/pydantic-ai.git
 cd pydantic-ai
 ```
 
-Install `uv` (version 0.4.30 or later) and `pre-commit`:
+安装 `uv`（0.4.30 或更高版本）和 `pre-commit`：
 
 - [`uv` install docs](https://docs.astral.sh/uv/getting-started/installation/)
 - [`pre-commit` install docs](https://pre-commit.com/#install)
 
-To install `pre-commit` you can run the following command:
+要安装 `pre-commit`，可以运行以下命令：
 
 ```bash
 uv tool install pre-commit
 ```
 
-Install `pydantic-ai`, all dependencies and pre-commit hooks
+安装 `pydantic-ai`、所有依赖和 pre-commit hooks：
 
 ```bash
 make install
 ```
 
-## Running Tests etc.
+## 运行测试等命令 {#running-tests-etc}
 
-We use `make` to manage most commands you'll need to run.
+我们使用 `make` 管理大多数你需要运行的命令。
 
-For details on available commands, run:
+要查看可用命令详情，请运行：
 
 ```bash
 make help
 ```
 
-To run code formatting, linting, static type checks, and tests with coverage report generation, run:
+要运行代码格式化、linting、静态类型检查，以及带 coverage report 生成的测试，请运行：
 
 ```bash
 make
 ```
 
-## Documentation Changes
+## 文档变更 {#documentation-changes}
 
-To run the documentation page locally, run:
+要在本地运行文档页面，请运行：
 
 ```bash
 uv run mkdocs serve
 ```
 
-## Rules for adding new models to Pydantic AI {#new-model-rules}
+## 向 Pydantic AI 添加新模型的规则 {#new-model-rules}
 
-To avoid an excessive workload for the maintainers of Pydantic AI, we can't accept all model contributions, so we're setting the following rules for when we'll accept new models and when we won't. This should hopefully reduce the chances of disappointment and wasted work.
+为了避免给 Pydantic AI 维护者带来过多工作量，我们无法接受所有模型贡献，因此制定了以下规则，说明何时会接受新模型、何时不会。希望这能减少失望和无效工作的可能性。
 
-- To add a new model with an extra dependency, that dependency needs > 500k monthly downloads from PyPI consistently over 3 months or more
-- To add a new model which uses another models logic internally and has no extra dependencies, that model's GitHub org needs > 20k stars in total
-- For any other model that's just a custom URL and API key, we're happy to add a one-paragraph description with a link and instructions on the URL to use
-- For any other model that requires more logic, we recommend you release your own Python package `pydantic-ai-xxx`, which depends on [`pydantic-ai-slim`](install.md#slim-install) and implements a model that inherits from our [`Model`][pydantic_ai.models.Model] ABC
+- 要添加带额外依赖的新模型，该依赖需要在 PyPI 上连续 3 个月或更久保持每月下载量超过 50 万。
+- 要添加内部使用另一个模型逻辑且没有额外依赖的新模型，该模型所属 GitHub org 总星数需要超过 2 万。
+- 对于任何只是自定义 URL 和 API key 的其他模型，我们乐意添加一段描述，包含链接和要使用的 URL 说明。
+- 对于任何需要更多逻辑的其他模型，我们推荐你发布自己的 Python 包 `pydantic-ai-xxx`，它依赖 [`pydantic-ai-slim`](install.md#slim-install)，并实现一个继承自我们 [`Model`][pydantic_ai.models.Model] ABC 的模型。
 
-If you're unsure about adding a model, please [create an issue](https://github.com/pydantic/pydantic-ai/issues).
+如果你不确定是否该添加某个模型，请[创建 issue](https://github.com/pydantic/pydantic-ai/issues)。
