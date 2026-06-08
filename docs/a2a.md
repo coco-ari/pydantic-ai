@@ -1,7 +1,7 @@
 # Agent2Agent (A2A) Protocol
 
-!!! warning "Deprecated in 1.x, removed in 2.0"
-    `Agent.to_a2a()` and the `pydantic-ai-slim[a2a]` extra are deprecated and will be removed in 2.0. The `fasta2a` package is now maintained at [datalayer/fasta2a](https://github.com/datalayer/fasta2a) and ships a Pydantic AI bridge since [v0.6.1](https://github.com/datalayer/fasta2a/releases/tag/v0.6.1). Install it with the `pydantic-ai` extra and use `agent_to_a2a` directly:
+!!! warning "在 1.x 中已弃用，将在 2.0 中移除"
+    `Agent.to_a2a()` 和 `pydantic-ai-slim[a2a]` extra 已弃用，并将在 2.0 中移除。`fasta2a` 包现在由 [datalayer/fasta2a](https://github.com/datalayer/fasta2a) 维护，并从 [v0.6.1](https://github.com/datalayer/fasta2a/releases/tag/v0.6.1) 开始提供 Pydantic AI bridge。请安装带 `pydantic-ai` extra 的版本，并直接使用 `agent_to_a2a`：
 
     ```bash
     pip/uv-add 'fasta2a[pydantic-ai]>=0.6.1'
@@ -16,10 +16,9 @@
     app = agent_to_a2a(agent)
     ```
 
-The [Agent2Agent (A2A) Protocol](https://a2a-protocol.org/) is an open standard introduced by Google that enables
-communication and interoperability between AI agents, regardless of the framework or vendor they are built on.
+[Agent2Agent (A2A) Protocol](https://a2a-protocol.org/) 是 Google 推出的开放标准，用于实现 AI agents 之间的通信和互操作，无论这些 agents 基于什么框架或供应商构建。
 
-At Pydantic, we built the [FastA2A](#fasta2a) library to make it easier to implement the A2A protocol in Python. It is now maintained at [datalayer/fasta2a](https://github.com/datalayer/fasta2a) and ships a Pydantic AI bridge since [v0.6.1](https://github.com/datalayer/fasta2a/releases/tag/v0.6.1) — install it with the `pydantic-ai` extra and use `agent_to_a2a` to expose a Pydantic AI agent as an A2A server:
+在 Pydantic，我们构建了 [FastA2A](#fasta2a) 库，让用 Python 实现 A2A protocol 更容易。它现在由 [datalayer/fasta2a](https://github.com/datalayer/fasta2a) 维护，并从 [v0.6.1](https://github.com/datalayer/fasta2a/releases/tag/v0.6.1) 开始提供 Pydantic AI bridge。请安装带 `pydantic-ai` extra 的版本，并使用 `agent_to_a2a` 将 Pydantic AI agent 暴露为 A2A server：
 
 ```py {title="agent_to_a2a.py"}
 from fasta2a.pydantic_ai import agent_to_a2a
@@ -30,29 +29,27 @@ agent = Agent('openai:gpt-5.2', instructions='Be fun!')
 app = agent_to_a2a(agent)
 ```
 
-_You can run the example with `uvicorn agent_to_a2a:app --host 0.0.0.0 --port 8000`_
+_你可以用 `uvicorn agent_to_a2a:app --host 0.0.0.0 --port 8000` 运行此示例_
 
-This will expose the agent as an A2A server, and you can start sending requests to it.
+这会将 agent 暴露为 A2A server，随后你就可以开始向它发送请求。
 
-See more about [exposing Pydantic AI agents as A2A servers](#pydantic-ai-agent-to-a2a-server).
+关于[将 Pydantic AI agents 暴露为 A2A servers](#pydantic-ai-agent-to-a2a-server)，请阅读更多内容。
 
 ## FastA2A
 
-**FastA2A** is an agentic framework agnostic implementation of the A2A protocol in Python.
-The library is designed to be used with any agentic framework, and is **not exclusive to Pydantic AI**.
+**FastA2A** 是 A2A protocol 的 Python 实现，与具体 agentic framework 无关。该库被设计为可与任何 agentic framework 一起使用，并且**不专属于 Pydantic AI**。
 
-### Design
+### 设计 {#design}
 
-**FastA2A** is built on top of [Starlette](https://www.starlette.io), which means it's fully compatible with any ASGI server.
+**FastA2A** 构建在 [Starlette](https://www.starlette.io) 之上，因此完全兼容任何 ASGI server。
 
-Given the nature of the A2A protocol, it's important to understand the design before using it, as a developer
-you'll need to provide some components:
+考虑到 A2A protocol 的性质，在使用前理解其设计很重要，因为作为开发者，你需要提供一些组件：
 
-- [`Storage`][fasta2a.Storage]: to save and load tasks, as well as store context for conversations
-- [`Broker`][fasta2a.Broker]: to schedule tasks
-- [`Worker`][fasta2a.Worker]: to execute tasks
+- [`Storage`][fasta2a.Storage]：保存和加载 tasks，并存储对话 context
+- [`Broker`][fasta2a.Broker]：调度 tasks
+- [`Worker`][fasta2a.Worker]：执行 tasks
 
-Let's have a look at how those components fit together:
+下面看看这些组件如何协作：
 
 ```mermaid
 flowchart TB
@@ -69,55 +66,55 @@ flowchart TB
     Worker["Worker<br>(implementation)"]
 ```
 
-FastA2A allows you to bring your own [`Storage`][fasta2a.Storage], [`Broker`][fasta2a.Broker] and [`Worker`][fasta2a.Worker].
+FastA2A 允许你自带 [`Storage`][fasta2a.Storage]、[`Broker`][fasta2a.Broker] 和 [`Worker`][fasta2a.Worker]。
 
-#### Understanding Tasks and Context
+#### 理解 Tasks 和 Context {#understanding-tasks-and-context}
 
-In the A2A protocol:
+在 A2A protocol 中：
 
-- **Task**: Represents one complete execution of an agent. When a client sends a message to the agent, a new task is created. The agent runs until completion (or failure), and this entire execution is considered one task. The final output is stored as a task artifact.
+- **Task**：表示 agent 的一次完整执行。当 client 向 agent 发送消息时，会创建一个新 task。agent 会运行直到完成（或失败），整个执行过程都被视为一个 task。最终输出会存储为 task artifact。
 
-- **Context**: Represents a conversation thread that can span multiple tasks. The A2A protocol uses a `context_id` to maintain conversation continuity:
-  - When a new message is sent without a `context_id`, the server generates a new one
-  - Subsequent messages can include the same `context_id` to continue the conversation
-  - All tasks sharing the same `context_id` have access to the complete message history
+- **Context**：表示可以跨越多个 tasks 的对话线程。A2A protocol 使用 `context_id` 维护对话连续性：
+  - 发送新消息但没有 `context_id` 时，server 会生成一个新的
+  - 后续消息可以包含相同的 `context_id` 以继续对话
+  - 共享同一个 `context_id` 的所有 tasks 都可以访问完整 message history
 
-#### Storage Architecture
+#### Storage 架构 {#storage-architecture}
 
-The [`Storage`][fasta2a.Storage] component serves two purposes:
+[`Storage`][fasta2a.Storage] 组件有两个用途：
 
-1. **Task Storage**: Stores tasks in A2A protocol format, including their status, artifacts, and message history
-2. **Context Storage**: Stores conversation context in a format optimized for the specific agent implementation
+1. **Task Storage**：以 A2A protocol 格式存储 tasks，包括 status、artifacts 和 message history
+2. **Context Storage**：以针对具体 agent 实现优化的格式存储 conversation context
 
-This design allows for agents to store rich internal state (e.g., tool calls, reasoning traces) as well as store task-specific A2A-formatted messages and artifacts.
+这种设计让 agents 既能存储丰富的内部状态（例如 tool calls、reasoning traces），也能存储特定 task 的 A2A 格式 messages 和 artifacts。
 
-For example, a Pydantic AI agent might store its complete internal message format (including tool calls and responses) in the context storage, while storing only the A2A-compliant messages in the task history.
+例如，Pydantic AI agent 可以在 context storage 中存储完整内部 message 格式（包括 tool calls 和 responses），同时在 task history 中只存储符合 A2A 的 messages。
 
-### Installation
+### 安装 {#installation}
 
-FastA2A is available on PyPI as [`fasta2a`](https://pypi.org/project/fasta2a/) so installation is as simple as:
+FastA2A 以 [`fasta2a`](https://pypi.org/project/fasta2a/) 的名称发布在 PyPI 上，因此安装很简单：
 
 ```bash
 pip/uv-add fasta2a
 ```
 
-The only dependencies are:
+它只有以下依赖：
 
-- [starlette](https://www.starlette.io): to expose the A2A server as an [ASGI application](https://asgi.readthedocs.io/en/latest/)
-- [pydantic](https://pydantic.dev): to validate the request/response messages
-- [opentelemetry-api](https://opentelemetry-python.readthedocs.io/en/latest): to provide tracing capabilities
+- [starlette](https://www.starlette.io)：将 A2A server 暴露为 [ASGI application](https://asgi.readthedocs.io/en/latest/)
+- [pydantic](https://pydantic.dev)：验证 request/response messages
+- [opentelemetry-api](https://opentelemetry-python.readthedocs.io/en/latest)：提供 tracing 能力
 
-Install **FastA2A** with the Pydantic AI bridge included:
+安装包含 Pydantic AI bridge 的 **FastA2A**：
 
 ```bash
 pip/uv-add 'fasta2a[pydantic-ai]>=0.6.1'
 ```
 
-The `pydantic-ai-slim[a2a]` extra still works for back-compat in 1.x but is deprecated and removed in 2.0.
+`pydantic-ai-slim[a2a]` extra 在 1.x 中仍可用于向后兼容，但已弃用并会在 2.0 中移除。
 
-### Pydantic AI Agent to A2A Server
+### Pydantic AI Agent 转 A2A Server {#pydantic-ai-agent-to-a2a-server}
 
-To expose a Pydantic AI agent as an A2A server, use [`agent_to_a2a`][fasta2a.pydantic_ai.agent_to_a2a] from `fasta2a.pydantic_ai`:
+要将 Pydantic AI agent 暴露为 A2A server，请使用 `fasta2a.pydantic_ai` 中的 [`agent_to_a2a`][fasta2a.pydantic_ai.agent_to_a2a]：
 
 ```python {title="agent_to_a2a.py"}
 from fasta2a.pydantic_ai import agent_to_a2a
@@ -128,19 +125,19 @@ agent = Agent('openai:gpt-5.2', instructions='Be fun!')
 app = agent_to_a2a(agent)
 ```
 
-Since `app` is an ASGI application, it can be used with any ASGI server.
+由于 `app` 是 ASGI application，它可以与任何 ASGI server 一起使用。
 
 ```bash
 uvicorn agent_to_a2a:app --host 0.0.0.0 --port 8000
 ```
 
-`agent_to_a2a` is a convenience function that accepts the same arguments as the [`FastA2A`][fasta2a.FastA2A] constructor.
+`agent_to_a2a` 是一个便捷函数，接受与 [`FastA2A`][fasta2a.FastA2A] 构造函数相同的参数。
 
-When using `agent_to_a2a()`, Pydantic AI automatically:
+使用 `agent_to_a2a()` 时，Pydantic AI 会自动：
 
-- Stores the complete conversation history (including tool calls and responses) in the context storage
-- Ensures that subsequent messages with the same `context_id` have access to the full conversation history
-- Persists agent results as A2A artifacts:
-  - String results become `TextPart` artifacts and also appear in the message history
-  - Structured data (Pydantic models, dataclasses, tuples, etc.) become `DataPart` artifacts with the data wrapped as `{"result": <your_data>}`
-  - Artifacts include metadata with type information and JSON schema when available
+- 在 context storage 中存储完整 conversation history（包括 tool calls 和 responses）
+- 确保带有相同 `context_id` 的后续 messages 可以访问完整 conversation history
+- 将 agent 结果持久化为 A2A artifacts：
+  - 字符串结果会变成 `TextPart` artifacts，并且也会出现在 message history 中
+  - 结构化数据（Pydantic models、dataclasses、tuples 等）会变成 `DataPart` artifacts，数据会包装为 `{"result": <your_data>}`
+  - artifacts 会包含带类型信息的 metadata，并在可用时包含 JSON schema

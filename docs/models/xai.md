@@ -1,28 +1,28 @@
 # xAI
 
-## Install
+## 安装 {#install}
 
-To use [`XaiModel`][pydantic_ai.models.xai.XaiModel], you need to either install `pydantic-ai`, or install `pydantic-ai-slim` with the `xai` optional group:
+要使用 [`XaiModel`][pydantic_ai.models.xai.XaiModel]，你需要安装 `pydantic-ai`，或者安装带有 `xai` 可选组的 `pydantic-ai-slim`：
 
 ```bash
 pip/uv-add "pydantic-ai-slim[xai]"
 ```
 
-## Configuration
+## 配置 {#configuration}
 
-To use xAI models from [xAI](https://x.ai/api) through their API, go to [console.x.ai](https://console.x.ai/team/default/api-keys) to create an API key.
+要通过 [xAI](https://x.ai/api) API 使用 xAI models，请前往 [console.x.ai](https://console.x.ai/team/default/api-keys) 创建 API key。
 
-[docs.x.ai](https://docs.x.ai/docs/models) contains a list of available xAI models.
+[docs.x.ai](https://docs.x.ai/docs/models) 包含可用 xAI models 列表。
 
-## Environment variable
+## 环境变量 {#environment-variable}
 
-Once you have the API key, you can set it as an environment variable:
+拿到 API key 后，可以将它设置为环境变量：
 
 ```bash
 export XAI_API_KEY='your-api-key'
 ```
 
-You can then use [`XaiModel`][pydantic_ai.models.xai.XaiModel] by name:
+随后你可以按名称使用 [`XaiModel`][pydantic_ai.models.xai.XaiModel]：
 
 ```python
 from pydantic_ai import Agent
@@ -31,33 +31,33 @@ agent = Agent('xai:grok-4-1-fast-non-reasoning')
 ...
 ```
 
-Or initialise the model directly:
+也可以直接初始化模型：
 
 ```python
 from pydantic_ai import Agent
 from pydantic_ai.models.xai import XaiModel
 
-# Uses XAI_API_KEY environment variable
+# 使用 XAI_API_KEY 环境变量
 model = XaiModel('grok-4-1-fast-non-reasoning')
 agent = Agent(model)
 ...
 ```
 
-You can also customize the [`XaiModel`][pydantic_ai.models.xai.XaiModel] with a custom provider:
+你也可以用自定义 provider 定制 [`XaiModel`][pydantic_ai.models.xai.XaiModel]：
 
 ```python
 from pydantic_ai import Agent
 from pydantic_ai.models.xai import XaiModel
 from pydantic_ai.providers.xai import XaiProvider
 
-# Custom API key
+# 自定义 API key
 provider = XaiProvider(api_key='your-api-key')
 model = XaiModel('grok-4-1-fast-non-reasoning', provider=provider)
 agent = Agent(model)
 ...
 ```
 
-Or with a custom `xai_sdk.AsyncClient`:
+或者使用自定义 `xai_sdk.AsyncClient`：
 
 ```python
 from xai_sdk import AsyncClient
@@ -75,7 +75,7 @@ agent = Agent(model)
 
 ## X Search
 
-xAI models support searching X (formerly Twitter) for real-time posts and content. The recommended way to enable it is with the [`XSearch`][pydantic_ai.capabilities.XSearch] capability — see the [capability documentation](../capabilities.md#provider-adaptive-tools) for more details, including cross-provider usage. For the full list of supported options, see the [xAI X Search documentation](https://docs.x.ai/developers/tools/x-search).
+xAI models 支持搜索 X（原 Twitter）上的实时 posts 和内容。推荐用 [`XSearch`][pydantic_ai.capabilities.XSearch] capability 启用它。更多细节（包括跨 provider 用法）请参见 [capability 文档](../capabilities.md#provider-adaptive-tools)。支持选项的完整列表请参见 [xAI X Search 文档](https://docs.x.ai/developers/tools/x-search)。
 
 ```py {title="xai_x_search.py"}
 from datetime import datetime
@@ -104,24 +104,24 @@ OpenAI announced their latest model updates, while Anthropic shared research on 
 """
 ```
 
-_(This example is complete, it can be run "as is")_
+_（此示例是完整的，可以"原样"运行）_
 
-The `XSearch` capability accepts:
+`XSearch` capability 接受：
 
-- **`allowed_x_handles`** / **`excluded_x_handles`**: filter results to (or away from) up to 10 X handles. These are mutually exclusive.
-- **`from_date`** / **`to_date`**: restrict results to posts created within the given datetime range (naive datetimes are interpreted as UTC).
-- **`enable_image_understanding`** (default: `False`): analyze images attached to posts.
-- **`enable_video_understanding`** (default: `False`): analyze video content attached to posts.
-- **`include_output`** (default: `False`): include the raw X search results on the [`NativeToolReturnPart`][pydantic_ai.messages.NativeToolReturnPart] available via [`ModelResponse.native_tool_calls`][pydantic_ai.messages.ModelResponse.native_tool_calls]. Without this, the model uses the search results internally but only returns its text summary; enabling it gives programmatic access to the searched posts, sources, and metadata.
+- **`allowed_x_handles`** / **`excluded_x_handles`**：将结果过滤到（或排除）最多 10 个 X handles。二者互斥。
+- **`from_date`** / **`to_date`**：将结果限制为给定 datetime 范围内创建的 posts（naive datetimes 会按 UTC 解释）。
+- **`enable_image_understanding`**（默认：`False`）：分析 posts 附带的图片。
+- **`enable_video_understanding`**（默认：`False`）：分析 posts 附带的视频内容。
+- **`include_output`**（默认：`False`）：在可通过 [`ModelResponse.native_tool_calls`][pydantic_ai.messages.ModelResponse.native_tool_calls] 访问的 [`NativeToolReturnPart`][pydantic_ai.messages.NativeToolReturnPart] 上包含原始 X search 结果。若不启用，模型会在内部使用搜索结果，但只返回文本摘要；启用后可以通过程序访问搜索到的 posts、sources 和 metadata。
 
-As an alternative to the capability, you can pass the lower-level [`XSearchTool`][pydantic_ai.native_tools.XSearchTool] directly via `capabilities=[NativeTool(XSearchTool(...))]` — see the [X Search Tool documentation](../native-tools.md#x-search-tool) — or enable raw output globally via the [`XaiModelSettings.xai_include_x_search_output`][pydantic_ai.models.xai.XaiModelSettings.xai_include_x_search_output] [model setting](../agent.md#model-run-settings).
+作为 capability 的替代方案，你可以通过 `capabilities=[NativeTool(XSearchTool(...))]` 直接传入更底层的 [`XSearchTool`][pydantic_ai.native_tools.XSearchTool]（参见 [X Search Tool 文档](../native-tools.md#x-search-tool)），也可以通过 [`XaiModelSettings.xai_include_x_search_output`][pydantic_ai.models.xai.XaiModelSettings.xai_include_x_search_output] [model setting](../agent.md#model-run-settings) 全局启用原始 output。
 
-## Streaming cancellation
+## 流式取消 {#streaming-cancellation}
 
-!!! warning "Cancellation limitations"
-    The `xai-sdk` SDK exposes streaming responses only as an async iterator, with no separate handle for cancelling the underlying gRPC call. Because of a [Python language rule on async generators](https://peps.python.org/pep-0525/), [`cancel()`][pydantic_ai.result.StreamedRunResult.cancel] cannot interrupt an in-flight chunk read while another coroutine is iterating the stream. Pydantic AI marks the response with `state='interrupted'`, but upstream generation may continue until the surrounding `async with agent.run_stream(...)` block exits.
+!!! warning "取消限制"
+    `xai-sdk` SDK 只以 async iterator 形式暴露流式响应，没有单独的 handle 可用于取消底层 gRPC 调用。由于 [Python 关于 async generators 的语言规则](https://peps.python.org/pep-0525/)，当另一个 coroutine 正在迭代 stream 时，[`cancel()`][pydantic_ai.result.StreamedRunResult.cancel] 无法中断正在进行的 chunk 读取。Pydantic AI 会用 `state='interrupted'` 标记响应，但上游生成可能会持续到外围的 `async with agent.run_stream(...)` 代码块退出。
 
-    For reliable cancellation, either pass `debounce_by=None` to [`stream_text()`][pydantic_ai.result.StreamedRunResult.stream_text], [`stream_output()`][pydantic_ai.result.StreamedRunResult.stream_output], or [`stream_response()`][pydantic_ai.result.StreamedRunResult.stream_response] and call `cancel()` from the same task that's iterating:
+    若要可靠取消，请向 [`stream_text()`][pydantic_ai.result.StreamedRunResult.stream_text]、[`stream_output()`][pydantic_ai.result.StreamedRunResult.stream_output] 或 [`stream_response()`][pydantic_ai.result.StreamedRunResult.stream_response] 传入 `debounce_by=None`，并从正在迭代的同一个 task 中调用 `cancel()`：
 
     ```python {title="cancel_xai.py" test="skip"}
     from pydantic_ai import Agent
@@ -141,7 +141,7 @@ As an alternative to the capability, you can pass the lower-level [`XSearchTool`
                     break
     ```
 
-    Or, if you need to keep debouncing, wrap the stream with [`contextlib.aclosing`](https://docs.python.org/3/library/contextlib.html#contextlib.aclosing) so the iterator is closed before `cancel()` runs:
+    或者，如果需要保留 debouncing，请用 [`contextlib.aclosing`](https://docs.python.org/3/library/contextlib.html#contextlib.aclosing) 包装 stream，让 iterator 在 `cancel()` 运行前关闭：
 
     ```python {title="cancel_xai_aclosing.py" test="skip"}
     from contextlib import aclosing
@@ -164,4 +164,4 @@ As an alternative to the capability, you can pass the lower-level [`XSearchTool`
             await result.cancel()
     ```
 
-    Calling `cancel()` from a different task while iteration is in progress is not currently reliable on this provider.
+    在迭代进行期间从另一个 task 调用 `cancel()`，目前在此 provider 上并不可靠。

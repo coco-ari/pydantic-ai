@@ -1,41 +1,41 @@
 # Pydantic Evals
 
-**Pydantic Evals** is a powerful evaluation framework for systematically testing and evaluating AI systems, from simple LLM calls to complex multi-agent applications.
+**Pydantic Evals** 是一个强大的评估框架，用于系统化测试和评估 AI 系统，范围从简单 LLM 调用到复杂多智能体应用。
 
-## What is Pydantic Evals?
+## Pydantic Evals 是什么？ {#what-is-pydantic-evals}
 
-Pydantic Evals helps you:
+Pydantic Evals 帮你：
 
-- **Create test datasets** with type-safe structured inputs and expected outputs
-- **Run evaluations** against your AI systems with automatic concurrency
-- **Score results** using deterministic checks, LLM judges, or custom evaluators
-- **Generate reports** with detailed metrics, assertions, and performance data
-- **Track changes** by comparing evaluation runs over time
-- **Integrate with Logfire** for visualization and collaborative analysis
+- **创建测试数据集**，包含类型安全的结构化 inputs 和 expected outputs
+- **运行 evaluations**，用自动并发评估你的 AI 系统
+- **为结果评分**，使用确定性检查、LLM judges 或自定义 evaluators
+- **生成报告**，包含详细 metrics、assertions 和性能数据
+- **跟踪变更**，通过比较不同时期的 evaluation runs
+- **集成 Logfire**，用于可视化和协作分析
 
-## Installation
+## 安装 {#installation}
 
 ```bash
 pip install pydantic-evals
 ```
 
-For OpenTelemetry tracing and Logfire integration:
+对于 OpenTelemetry tracing 和 Logfire 集成：
 
 ```bash
 pip install 'pydantic-evals[logfire]'
 ```
 
-## Quick Start
+## 快速开始 {#quick-start}
 
-While evaluations are typically used to test AI systems, the Pydantic Evals framework works with any function call. To demonstrate the core functionality, we'll start with a simple, deterministic example.
+虽然 evaluations 通常用于测试 AI 系统，但 Pydantic Evals 框架可以用于任何函数调用。为了演示核心功能，我们先从一个简单、确定性的示例开始。
 
-Here's a complete example of evaluating a simple text transformation function:
+下面是评估简单文本转换函数的完整示例：
 
 ```python
 from pydantic_evals import Case, Dataset
 from pydantic_evals.evaluators import Contains, EqualsExpected
 
-# Create a dataset with test cases
+# 创建包含测试 cases 的数据集
 dataset = Dataset(
     name='uppercase_tests',
     cases=[
@@ -51,21 +51,21 @@ dataset = Dataset(
         ),
     ],
     evaluators=[
-        EqualsExpected(),  # Check exact match with expected_output
-        Contains(value='HELLO', case_sensitive=True),  # Check contains "HELLO"
+        EqualsExpected(),  # 检查是否与 expected_output 完全匹配
+        Contains(value='HELLO', case_sensitive=True),  # 检查是否包含 "HELLO"
     ],
 )
 
 
-# Define the function to evaluate
+# 定义要评估的函数
 def uppercase_text(text: str) -> str:
     return text.upper()
 
 
-# Run the evaluation
+# 运行 evaluation
 report = dataset.evaluate_sync(uppercase_text)
 
-# Print the results
+# 打印结果
 report.print()
 """
         Evaluation Summary: uppercase_text
@@ -81,7 +81,7 @@ report.print()
 """
 ```
 
-Output:
+输出：
 
 ```
                   Evaluation Summary: uppercase_text
@@ -96,22 +96,22 @@ Output:
 └─────────────────────────┴────────────┴──────────┘
 ```
 
-## Key Concepts
+## 核心概念 {#key-concepts}
 
-Understanding a few core concepts will help you get the most out of Pydantic Evals:
+理解几个核心概念，有助于你更充分地使用 Pydantic Evals：
 
-- **[`Dataset`][pydantic_evals.dataset.Dataset]** - A collection of test cases and (optional) evaluators
-- **[`Case`][pydantic_evals.dataset.Case]** - A single test scenario with inputs and optional expected outputs and case-specific evaluators
-- **[`Evaluator`][pydantic_evals.evaluators.Evaluator]** - A function that scores or validates task outputs
-- **[`EvaluationReport`][pydantic_evals.reporting.EvaluationReport]** - Results from running an evaluation
+- **[`Dataset`][pydantic_evals.dataset.Dataset]** - 测试 cases 和（可选）evaluators 的集合
+- **[`Case`][pydantic_evals.dataset.Case]** - 单个测试场景，包含 inputs、可选 expected outputs 以及 case-specific evaluators
+- **[`Evaluator`][pydantic_evals.evaluators.Evaluator]** - 对任务 outputs 评分或验证的函数
+- **[`EvaluationReport`][pydantic_evals.reporting.EvaluationReport]** - 运行 evaluation 得到的结果
 
-For a deeper dive, see [Core Concepts](core-concepts.md).
+深入了解请参见 [Core Concepts](core-concepts.md)。
 
-## Common Use Cases
+## 常见用例 {#common-use-cases}
 
-### Deterministic Validation
+### 确定性验证 {#deterministic-validation}
 
-Test that your AI system produces correctly-structured outputs:
+测试你的 AI 系统是否产生结构正确的 outputs：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -129,9 +129,9 @@ dataset = Dataset(
 )
 ```
 
-### LLM-as-a-Judge Evaluation
+### LLM-as-a-Judge Evaluation {#llm-as-a-judge-evaluation}
 
-Use an LLM to evaluate subjective qualities like accuracy or helpfulness:
+使用 LLM 评估准确性或有用性等主观质量：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -152,9 +152,9 @@ dataset = Dataset(
 )
 ```
 
-### Performance Testing
+### 性能测试 {#performance-testing}
 
-Ensure your system meets performance requirements:
+确保你的系统满足性能要求：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -171,12 +171,12 @@ dataset = Dataset(
 )
 ```
 
-## Next Steps
+## 后续步骤 {#next-steps}
 
-Explore the documentation to learn more:
+继续阅读文档了解更多内容：
 
-- **[Core Concepts](core-concepts.md)** - Understand the data model and evaluation flow
-- **[Native Evaluators](evaluators/built-in.md)** - Learn about all available evaluators
-- **[Custom Evaluators](evaluators/custom.md)** - Write your own evaluation logic
-- **[Dataset Management](how-to/dataset-management.md)** - Save, load, and generate datasets
-- **[Examples](examples/simple-validation.md)** - Practical examples for common scenarios
+- **[Core Concepts](core-concepts.md)** - 理解数据模型和 evaluation 流程
+- **[Native Evaluators](evaluators/built-in.md)** - 了解所有可用 evaluators
+- **[Custom Evaluators](evaluators/custom.md)** - 编写自己的 evaluation 逻辑
+- **[Dataset Management](how-to/dataset-management.md)** - 保存、加载和生成数据集
+- **[Examples](examples/simple-validation.md)** - 常见场景的实用示例

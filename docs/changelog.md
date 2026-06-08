@@ -1,106 +1,101 @@
-# Upgrade Guide
+# 升级指南 {#upgrade-guide}
 
-In September 2025, Pydantic AI reached V1, which means we're committed to API stability: we will not introduce changes that break your code until V2. For more information, review our [Version Policy](version-policy.md).
+2025 年 9 月，Pydantic AI 达到 V1，这意味着我们承诺 API 稳定性：在 V2 之前不会引入破坏你代码的变更。更多信息请查看我们的[版本政策](version-policy.md)。
 
-## Breaking Changes
+## 破坏性变更 {#breaking-changes}
 
-Here's a filtered list of the breaking changes for each version to help you upgrade Pydantic AI.
+下面按版本列出经过筛选的破坏性变更，帮助你升级 Pydantic AI。
 
 ### v1.0.1 (2025-09-05)
 
-The following breaking change was accidentally left out of v1.0.0:
+以下破坏性变更意外遗漏在 v1.0.0 之外：
 
-- See [#2808](https://github.com/pydantic/pydantic-ai/pull/2808) - Remove `Python` evaluator from `pydantic_evals` for security reasons
+- 见 [#2808](https://github.com/pydantic/pydantic-ai/pull/2808) - 出于安全原因，从 `pydantic_evals` 中移除 `Python` evaluator
 
 ### v1.0.0 (2025-09-04)
 
-- See [#2725](https://github.com/pydantic/pydantic-ai/pull/2725) - Drop support for Python 3.9
-- See [#2738](https://github.com/pydantic/pydantic-ai/pull/2738) - Make many dataclasses require keyword arguments
-- See [#2715](https://github.com/pydantic/pydantic-ai/pull/2715) - Remove `cases` and `averages` attributes from `pydantic_evals` spans
-- See [#2798](https://github.com/pydantic/pydantic-ai/pull/2798) - Change `ModelRequest.parts` and `ModelResponse.parts` types from `list` to `Sequence`
-- See [#2726](https://github.com/pydantic/pydantic-ai/pull/2726) - Default `InstrumentationSettings` version to 2
-- See [#2717](https://github.com/pydantic/pydantic-ai/pull/2717) - Remove errors when passing `AsyncRetrying` or `Retrying` object to `AsyncTenacityTransport` or `TenacityTransport` instead of `RetryConfig`
+- 见 [#2725](https://github.com/pydantic/pydantic-ai/pull/2725) - 放弃支持 Python 3.9
+- 见 [#2738](https://github.com/pydantic/pydantic-ai/pull/2738) - 让许多 dataclasses 要求使用关键字参数
+- 见 [#2715](https://github.com/pydantic/pydantic-ai/pull/2715) - 从 `pydantic_evals` spans 中移除 `cases` 和 `averages` 属性
+- 见 [#2798](https://github.com/pydantic/pydantic-ai/pull/2798) - 将 `ModelRequest.parts` 和 `ModelResponse.parts` 类型从 `list` 改为 `Sequence`
+- 见 [#2726](https://github.com/pydantic/pydantic-ai/pull/2726) - 将 `InstrumentationSettings` 默认版本设为 2
+- 见 [#2717](https://github.com/pydantic/pydantic-ai/pull/2717) - 当向 `AsyncTenacityTransport` 或 `TenacityTransport` 传入 `AsyncRetrying` 或 `Retrying` 对象而不是 `RetryConfig` 时，不再报错
 
 ### v0.x.x
 
-Before V1, minor versions were used to introduce breaking changes:
+V1 之前，minor versions 用于引入破坏性变更：
 
 **v0.8.0 (2025-08-26)**
 
-See [#2689](https://github.com/pydantic/pydantic-ai/pull/2689) - `AgentStreamEvent` was expanded to be a union of `ModelResponseStreamEvent` and `HandleResponseEvent`, simplifying the `event_stream_handler` function signature. Existing code accepting `AgentStreamEvent | HandleResponseEvent` will continue to work.
+见 [#2689](https://github.com/pydantic/pydantic-ai/pull/2689) - `AgentStreamEvent` 扩展为 `ModelResponseStreamEvent` 和 `HandleResponseEvent` 的 union，简化了 `event_stream_handler` 函数签名。接受 `AgentStreamEvent | HandleResponseEvent` 的现有代码会继续工作。
 
 **v0.7.6 (2025-08-26)**
 
-The following breaking change was inadvertently released in a patch version rather than a minor version:
+以下破坏性变更被意外发布在 patch version 中，而不是 minor version 中：
 
-See [#2670](https://github.com/pydantic/pydantic-ai/pull/2670) - `TenacityTransport` and `AsyncTenacityTransport` now require the use of `pydantic_ai.retries.RetryConfig` (which is just a `TypedDict` containing the kwargs to `tenacity.retry`) instead of `tenacity.Retrying` or `tenacity.AsyncRetrying`.
+见 [#2670](https://github.com/pydantic/pydantic-ai/pull/2670) - `TenacityTransport` 和 `AsyncTenacityTransport` 现在要求使用 `pydantic_ai.retries.RetryConfig`（它只是一个包含传给 `tenacity.retry` 的 kwargs 的 `TypedDict`），而不是 `tenacity.Retrying` 或 `tenacity.AsyncRetrying`。
 
 **v0.7.0 (2025-08-12)**
 
-See [#2458](https://github.com/pydantic/pydantic-ai/pull/2458) - `pydantic_ai.models.StreamedResponse` now yields a `FinalResultEvent` along with the existing `PartStartEvent` and `PartDeltaEvent`. If you're using `pydantic_ai.direct.model_request_stream` or `pydantic_ai.direct.model_request_stream_sync`, you may need to update your code to account for this.
+见 [#2458](https://github.com/pydantic/pydantic-ai/pull/2458) - `pydantic_ai.models.StreamedResponse` 现在除了现有的 `PartStartEvent` 和 `PartDeltaEvent`，还会 yield `FinalResultEvent`。如果你使用 `pydantic_ai.direct.model_request_stream` 或 `pydantic_ai.direct.model_request_stream_sync`，可能需要更新代码以适配这一点。
 
-See [#2458](https://github.com/pydantic/pydantic-ai/pull/2458) - `pydantic_ai.models.Model.request_stream` now receives a `run_context` argument. If you've implemented a custom `Model` subclass, you will need to account for this.
+见 [#2458](https://github.com/pydantic/pydantic-ai/pull/2458) - `pydantic_ai.models.Model.request_stream` 现在会接收 `run_context` 参数。如果你实现了自定义 `Model` 子类，需要适配这一点。
 
-See [#2458](https://github.com/pydantic/pydantic-ai/pull/2458) - `pydantic_ai.models.StreamedResponse` now requires a `model_request_parameters` field and constructor argument. If you've implemented a custom `Model` subclass and implemented `request_stream`, you will need to account for this.
+见 [#2458](https://github.com/pydantic/pydantic-ai/pull/2458) - `pydantic_ai.models.StreamedResponse` 现在要求提供 `model_request_parameters` 字段和构造参数。如果你实现了自定义 `Model` 子类并实现了 `request_stream`，需要适配这一点。
 
 **v0.6.0 (2025-08-06)**
 
-This release was meant to clean some old deprecated code, so we can get a step closer to V1.
+此版本旨在清理一些旧的弃用代码，让我们离 V1 更近一步。
 
-See [#2440](https://github.com/pydantic/pydantic-ai/pull/2440) - The `next` method was removed from the `Graph` class. Use `async with graph.iter(...) as run:  run.next()` instead.
+见 [#2440](https://github.com/pydantic/pydantic-ai/pull/2440) - 从 `Graph` 类中移除了 `next` 方法。请改用 `async with graph.iter(...) as run:  run.next()`。
 
-See [#2441](https://github.com/pydantic/pydantic-ai/pull/2441) - The `result_type`, `result_tool_name` and `result_tool_description` arguments were removed from the `Agent` class. Use `output_type` instead.
+见 [#2441](https://github.com/pydantic/pydantic-ai/pull/2441) - 从 `Agent` 类中移除了 `result_type`、`result_tool_name` 和 `result_tool_description` 参数。请改用 `output_type`。
 
-See [#2441](https://github.com/pydantic/pydantic-ai/pull/2441) - The `result_retries` argument was also removed from the `Agent` class. Use `output_retries` instead.
+见 [#2441](https://github.com/pydantic/pydantic-ai/pull/2441) - 同样从 `Agent` 类中移除了 `result_retries` 参数。请改用 `output_retries`。
 
-See [#2443](https://github.com/pydantic/pydantic-ai/pull/2443) - The `data` property was removed from the `FinalResult` class. Use `output` instead.
+见 [#2443](https://github.com/pydantic/pydantic-ai/pull/2443) - 从 `FinalResult` 类中移除了 `data` 属性。请改用 `output`。
 
-See [#2445](https://github.com/pydantic/pydantic-ai/pull/2445) - The `get_data` and `validate_structured_result` methods were removed from the
-`StreamedRunResult` class. Use `get_output` and `validate_structured_output` instead.
+见 [#2445](https://github.com/pydantic/pydantic-ai/pull/2445) - 从 `StreamedRunResult` 类中移除了 `get_data` 和 `validate_structured_result` 方法。请改用 `get_output` 和 `validate_structured_output`。
 
-See [#2446](https://github.com/pydantic/pydantic-ai/pull/2446) - The `format_as_xml` function was moved to the `pydantic_ai.format_as_xml` module.
-Import it via `from pydantic_ai import format_as_xml` instead.
+见 [#2446](https://github.com/pydantic/pydantic-ai/pull/2446) - `format_as_xml` 函数移动到了 `pydantic_ai.format_as_xml` 模块。请改为通过 `from pydantic_ai import format_as_xml` 导入它。
 
-See [#2451](https://github.com/pydantic/pydantic-ai/pull/2451) - Removed deprecated `Agent.result_validator` method, `Agent.last_run_messages` property, `AgentRunResult.data` property, and `result_tool_return_content` parameters from result classes.
+见 [#2451](https://github.com/pydantic/pydantic-ai/pull/2451) - 移除了弃用的 `Agent.result_validator` 方法、`Agent.last_run_messages` 属性、`AgentRunResult.data` 属性，以及 result classes 中的 `result_tool_return_content` 参数。
 
 **v0.5.0 (2025-08-04)**
 
-See [#2388](https://github.com/pydantic/pydantic-ai/pull/2388) - The `source` field of an `EvaluationResult` is now of type `EvaluatorSpec` rather than the actual source `Evaluator` instance, to help with serialization/deserialization.
+见 [#2388](https://github.com/pydantic/pydantic-ai/pull/2388) - `EvaluationResult` 的 `source` 字段现在是 `EvaluatorSpec` 类型，而不是实际 source `Evaluator` 实例，以帮助序列化/反序列化。
 
-See [#2163](https://github.com/pydantic/pydantic-ai/pull/2163) - The `EvaluationReport.print` and `EvaluationReport.console_table` methods now require most arguments be passed by keyword.
+见 [#2163](https://github.com/pydantic/pydantic-ai/pull/2163) - `EvaluationReport.print` 和 `EvaluationReport.console_table` 方法现在要求大多数参数按关键字传入。
 
 **v0.4.0 (2025-07-08)**
 
-See [#1799](https://github.com/pydantic/pydantic-ai/pull/1799) - Pydantic Evals `EvaluationReport` and `ReportCase` are now generic dataclasses instead of Pydantic models. If you were serializing them using `model_dump()`, you will now need to use the `EvaluationReportAdapter` and `ReportCaseAdapter` type adapters instead.
+见 [#1799](https://github.com/pydantic/pydantic-ai/pull/1799) - Pydantic Evals 的 `EvaluationReport` 和 `ReportCase` 现在是 generic dataclasses，而不是 Pydantic models。如果你之前使用 `model_dump()` 序列化它们，现在需要改用 `EvaluationReportAdapter` 和 `ReportCaseAdapter` type adapters。
 
-See [#1507](https://github.com/pydantic/pydantic-ai/pull/1507) - The `ToolDefinition` `description` argument is now optional and the order of positional arguments has changed from `name, description, parameters_json_schema, ...` to `name, parameters_json_schema, description, ...` to account for this.
+见 [#1507](https://github.com/pydantic/pydantic-ai/pull/1507) - `ToolDefinition` 的 `description` 参数现在是可选的，位置参数顺序也因此从 `name, description, parameters_json_schema, ...` 改为 `name, parameters_json_schema, description, ...`。
 
 **v0.3.0 (2025-06-18)**
 
-See [#1142](https://github.com/pydantic/pydantic-ai/pull/1142) — Adds support for thinking parts.
+见 [#1142](https://github.com/pydantic/pydantic-ai/pull/1142) - 增加对 thinking parts 的支持。
 
-We now convert the thinking blocks (`"<think>..."</think>"`) in provider specific text parts to
-Pydantic AI `ThinkingPart`s. Also, as part of this release, we made the choice to not send back the
-`ThinkingPart`s to the provider - the idea is to save costs on behalf of the user. In the future, we
-intend to add a setting to customize this behavior.
+我们现在会将 provider-specific text parts 中的 thinking blocks（`"<think>..."</think>"`）转换为 Pydantic AI `ThinkingPart`s。作为此版本的一部分，我们也选择不把 `ThinkingPart`s 发回 provider，目的是为用户节省成本。未来我们计划添加一个设置来自定义此行为。
 
 **v0.2.0 (2025-05-12)**
 
-See [#1647](https://github.com/pydantic/pydantic-ai/pull/1647) — usage makes sense as part of `ModelResponse`, and could be really useful in "messages" (really a sequence of requests and response). In this PR:
+见 [#1647](https://github.com/pydantic/pydantic-ai/pull/1647) - usage 作为 `ModelResponse` 的一部分是合理的，并且在 "messages"（实际上是一串 requests 和 response）中可能非常有用。此 PR 中：
 
-- Adds `usage` to `ModelResponse` (field has a default factory of `Usage()` so it'll work to load data that doesn't have usage)
-- changes the return type of `Model.request` to just `ModelResponse` instead of `tuple[ModelResponse, Usage]`
+- 向 `ModelResponse` 添加 `usage`（该字段有 `Usage()` 默认工厂，因此加载没有 usage 的数据也能工作）
+- 将 `Model.request` 的返回类型从 `tuple[ModelResponse, Usage]` 改为仅 `ModelResponse`
 
 **v0.1.0 (2025-04-15)**
 
-See [#1248](https://github.com/pydantic/pydantic-ai/pull/1248) — the attribute/parameter name `result` was renamed to `output` in many places. Hopefully all changes keep a deprecated attribute or parameter with the old name, so you should get many deprecation warnings.
+见 [#1248](https://github.com/pydantic/pydantic-ai/pull/1248) - 许多地方的属性/参数名 `result` 重命名为 `output`。希望所有变更都保留了旧名称对应的弃用属性或参数，因此你应该会看到许多 deprecation warnings。
 
-See [#1484](https://github.com/pydantic/pydantic-ai/pull/1484) — `format_as_xml` was moved and made available to import from the package root, e.g. `from pydantic_ai import format_as_xml`.
+见 [#1484](https://github.com/pydantic/pydantic-ai/pull/1484) - `format_as_xml` 被移动，并可从包根导入，例如 `from pydantic_ai import format_as_xml`。
 
-## Full Changelog
+## 完整 Changelog {#full-changelog}
 
 <div id="display-changelog">
-  For the full changelog, see <a href="https://github.com/pydantic/pydantic-ai/releases">GitHub Releases</a>.
+  完整 changelog 请参见 <a href="https://github.com/pydantic/pydantic-ai/releases">GitHub Releases</a>。
 </div>
 
 <script>

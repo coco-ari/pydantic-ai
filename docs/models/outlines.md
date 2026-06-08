@@ -1,25 +1,25 @@
 # Outlines
 
-!!! warning "Deprecated"
-    [`OutlinesModel`][pydantic_ai.models.outlines.OutlinesModel] is deprecated and will be removed in Pydantic AI v2.
+!!! warning "已弃用"
+    [`OutlinesModel`][pydantic_ai.models.outlines.OutlinesModel] 已弃用，并将在 Pydantic AI v2 中移除。
 
-    If you would like to keep using Outlines with Pydantic AI, please file an issue at <https://github.com/dottxt-ai/outlines/issues>.
+    如果你希望继续将 Outlines 与 Pydantic AI 一起使用，请在 <https://github.com/dottxt-ai/outlines/issues> 提交 issue。
 
-## Install
+## 安装 {#install}
 
-As Outlines is a library allowing you to run models from various different providers, it does not include the necessary dependencies for any provider by default. As a result, to use the [`OutlinesModel`][pydantic_ai.models.outlines.OutlinesModel], you must install `pydantic-ai-slim` with an optional group composed of outlines, a dash, and the name of the specific model provider you would use through Outlines. For instance:
+Outlines 是一个允许你运行来自多个不同 providers 的模型的库，因此默认不包含任何 provider 所需的依赖。因此，要使用 [`OutlinesModel`][pydantic_ai.models.outlines.OutlinesModel]，必须安装带可选组的 `pydantic-ai-slim`；该可选组由 outlines、短横线以及你会通过 Outlines 使用的具体 model provider 名称组成。例如：
 
 ```bash
 pip/uv-add "pydantic-ai-slim[outlines-transformers]"
 ```
 
-Or
+或：
 
 ```bash
 pip/uv-add "pydantic-ai-slim[outlines-mlxlm]"
 ```
 
-There are 5 optional groups for the 5 model providers supported through Outlines:
+通过 Outlines 支持的 5 个 model providers 分别有 5 个可选组：
 
 - `outlines-transformers`
 - `outlines-llamacpp`
@@ -27,13 +27,13 @@ There are 5 optional groups for the 5 model providers supported through Outlines
 - `outlines-sglang`
 - `outlines-vllm-offline`
 
-## Model Initialization
+## 模型初始化 {#model-initialization}
 
-As Outlines is not an inference provider, but instead a library allowing you to run both local and API-based models, instantiating the model is a bit different from the other models available on Pydantic AI.
+Outlines 不是 inference provider，而是一个让你运行本地模型和基于 API 的模型的库，因此实例化模型的方式与 Pydantic AI 中其他可用模型略有不同。
 
-To initialize the `OutlinesModel` through the `__init__` method, the first argument you must provide has to be an `outlines.Model` or an `outlines.AsyncModel` instance.
+要通过 `__init__` 方法初始化 `OutlinesModel`，你提供的第一个参数必须是 `outlines.Model` 或 `outlines.AsyncModel` 实例。
 
-For instance:
+例如：
 
 ```python {test="skip"}
 import outlines
@@ -48,13 +48,13 @@ outlines_model = outlines.from_transformers(
 model = OutlinesModel(outlines_model)
 ```
 
-As you already providing an Outlines model instance, there is no need to provide an `OutlinesProvider` yourself.
+由于你已经提供了 Outlines model 实例，因此不需要自己提供 `OutlinesProvider`。
 
-### Model Loading Methods
+### 模型加载方法 {#model-loading-methods}
 
-Alternatively, you can use some `OutlinesModel` class methods made to load a specific type of Outlines model directly. To do so, you must provide as arguments the same arguments you would have given to the associated Outlines model loading function (except in the case of SGLang).
+或者，你可以使用一些 `OutlinesModel` 类方法，直接加载特定类型的 Outlines model。为此，你必须传入与对应 Outlines model 加载函数相同的参数（SGLang 除外）。
 
-There are methods for the 5 Outlines models that are officially supported in the integration into Pydantic AI:
+Pydantic AI 集成中正式支持 5 种 Outlines models，并为它们提供了对应方法：
 
 - [`from_transformers`][pydantic_ai.models.outlines.OutlinesModel.from_transformers]
 - [`from_llamacpp`][pydantic_ai.models.outlines.OutlinesModel.from_llamacpp]
@@ -126,11 +126,11 @@ model = OutlinesModel.from_vllm_offline(
 )
 ```
 
-## Running the model
+## 运行模型 {#running-the-model}
 
-Once you have initialized an `OutlinesModel`, you can use it with an Agent as with all other Pydantic AI models.
+初始化 `OutlinesModel` 后，可以像使用其他 Pydantic AI models 一样，将它与 Agent 一起使用。
 
-As Outlines is focused on structured output, this provider supports the `output_type` component through the [`NativeOutput`][pydantic_ai.output.NativeOutput] format. There is not need to include information on the required output format in your prompt, instructions based on the `output_type` will be included automatically.
+由于 Outlines 专注于 structured output，此 provider 通过 [`NativeOutput`][pydantic_ai.output.NativeOutput] 格式支持 `output_type` 组件。你不需要在 prompt 中包含所需 output 格式的信息；基于 `output_type` 的 instructions 会自动包含。
 
 ```python {test="skip"}
 from pydantic import BaseModel
@@ -160,13 +160,13 @@ result = agent.run_sync(
 print(result.output) # width=20 height=30 depth=40 units='cm'
 ```
 
-Outlines does not support tools yet, but support for that feature will be added in the near future.
+Outlines 还不支持 tools，但未来会添加对此功能的支持。
 
-## Multimodal models
+## 多模态模型 {#multimodal-models}
 
-If the model you are running through Outlines and the provider selected supports it, you can include images in your prompts using [`ImageUrl`][pydantic_ai.messages.ImageUrl] or [`BinaryImage`][pydantic_ai.messages.BinaryImage]. In that case, the prompt you provide when running the agent should be a list containing a string and one or several images. See the [input documentation](../input.md) for details and examples on using assets in model inputs.
+如果通过 Outlines 运行的模型和所选 provider 支持，你可以用 [`ImageUrl`][pydantic_ai.messages.ImageUrl] 或 [`BinaryImage`][pydantic_ai.messages.BinaryImage] 在 prompts 中包含图片。在这种情况下，运行 agent 时提供的 prompt 应该是一个包含字符串以及一张或多张图片的列表。关于在 model inputs 中使用 assets 的细节和示例，请参见 [input 文档](../input.md)。
 
-This feature is supported in Outlines for the `SGLang` and `Transformers` models. If you want to run a multimodal model through `transformers`, you must provide a processor instead of a tokenizer as the second argument when initializing the model with the `OutlinesModel.from_transformers` method.
+Outlines 中的 `SGLang` 和 `Transformers` models 支持此功能。如果你想通过 `transformers` 运行多模态模型，在用 `OutlinesModel.from_transformers` 方法初始化模型时，第二个参数必须提供 processor，而不是 tokenizer。
 
 ```python {test="skip"}
 from datetime import date

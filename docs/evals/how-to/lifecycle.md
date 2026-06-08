@@ -1,24 +1,24 @@
-# Case Lifecycle Hooks
+# Case Lifecycle Hooks {#case-lifecycle-hooks}
 
-Control per-case setup, context preparation, and teardown during evaluation using [`CaseLifecycle`][pydantic_evals.lifecycle.CaseLifecycle].
+使用 [`CaseLifecycle`][pydantic_evals.lifecycle.CaseLifecycle] 控制 evaluation 期间每个 case 的 setup、context preparation 和 teardown。
 
-## Overview
+## 概览 {#overview}
 
-[`CaseLifecycle`][pydantic_evals.lifecycle.CaseLifecycle] provides hooks at each stage of case evaluation. You pass a lifecycle **class** (not an instance) to [`Dataset.evaluate`][pydantic_evals.dataset.Dataset.evaluate], and a new instance is created for each case, so instance attributes naturally hold case-specific state.
+[`CaseLifecycle`][pydantic_evals.lifecycle.CaseLifecycle] 在 case evaluation 的每个阶段提供 hooks。你将 lifecycle **类**（不是实例）传给 [`Dataset.evaluate`][pydantic_evals.dataset.Dataset.evaluate]，系统会为每个 case 创建一个新实例，因此实例属性天然可以保存 case-specific state。
 
-## Evaluation Flow
+## Evaluation 流程 {#evaluation-flow}
 
-Each case follows this flow:
+每个 case 遵循以下流程：
 
-1. **`setup()`** — called before task execution
-2. **Task runs**
-3. **`prepare_context()`** — called after task, before evaluators
-4. **Evaluators run**
-5. **`teardown()`** — called after evaluators complete, or during cleanup if the case is interrupted
+1. **`setup()`**：在任务执行前调用
+2. **任务运行**
+3. **`prepare_context()`**：在任务之后、evaluators 之前调用
+4. **Evaluators 运行**
+5. **`teardown()`**：在 evaluators 完成后调用；如果 case 被中断，则在 cleanup 期间调用
 
-## Per-Case Setup and Teardown
+## 每个 Case 的 Setup 和 Teardown {#per-case-setup-and-teardown}
 
-Use `setup()` and `teardown()` when each case needs its own environment — for example, creating a database, starting a service, or preparing fixtures driven by case metadata. Since a new lifecycle instance is created for each case, instance attributes are naturally case-scoped:
+当每个 case 都需要自己的环境时，请使用 `setup()` 和 `teardown()`，例如创建数据库、启动服务，或准备由 case metadata 驱动的 fixtures。由于每个 case 都会创建新的 lifecycle 实例，实例属性天然是 case-scoped：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -42,7 +42,7 @@ class SetupFromMetadata(CaseLifecycle[str, str, dict]):
         self,
         result: ReportCase[str, str, dict] | ReportCaseFailure[str, str, dict] | None,
     ) -> None:
-        pass  # Clean up resources here
+        pass  # 在这里清理资源
 
 
 dataset = Dataset(
@@ -62,11 +62,11 @@ print(metrics['with_prefix']['prefix_length'])
 #> 7
 ```
 
-The case metadata drives per-case behavior without needing custom [`Case`][pydantic_evals.dataset.Case] subclasses or serialization.
+case metadata 可以驱动每个 case 的行为，而不需要自定义 [`Case`][pydantic_evals.dataset.Case] 子类或序列化。
 
-### Conditional Teardown
+### 条件式 Teardown {#conditional-teardown}
 
-The `teardown()` hook receives the full result, so you can vary cleanup logic based on success or failure — for example, keeping test environments up for manual inspection when a case fails. The `result` can be `None` if evaluation is interrupted before the case produces a report result, so handle that branch when your cleanup depends on the case outcome:
+`teardown()` hook 会接收完整结果，因此你可以根据成功或失败调整 cleanup 逻辑，例如在 case 失败时保留测试环境以便人工检查。如果 evaluation 在 case 产生报告结果前被中断，`result` 可能是 `None`；当 cleanup 依赖 case 结果时，请处理这个分支：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -86,13 +86,13 @@ class ConditionalCleanup(CaseLifecycle[str, str, dict]):
     ) -> None:
         keep_on_failure = (self.case.metadata or {}).get('keep_on_failure', False)
         if result is None:
-            # abnormal exit
+            # 异常退出
             cleaned_up.append(self.resource_id)
         elif isinstance(result, ReportCaseFailure) and keep_on_failure:
-            # case failed
-            pass  # Keep resource for inspection
+            # case 失败
+            pass  # 保留资源以供检查
         else:
-            # case succeeded
+            # case 成功
             cleaned_up.append(self.resource_id)
 
 
@@ -117,9 +117,9 @@ print(cleaned_up)
 #> ['success_case']
 ```
 
-## Preparing Evaluator Context
+## 准备 Evaluator Context {#preparing-evaluator-context}
 
-The `prepare_context()` hook runs after the task completes but before evaluators see the context. This can be used to add metrics or attributes based on the task output, span tree, or any other state — for example, deriving metrics from instrumented spans (like tool call counts or API latency), or computing values from external resources set up during `setup()`:
+`prepare_context()` hook 会在任务完成后、evaluators 看到 context 前运行。它可用于基于任务 output、span tree 或任何其他状态添加 metrics 或 attributes。例如，可以从 instrumented spans 派生 metrics（如 tool call 计数或 API latency），也可以根据 `setup()` 期间设置的外部资源计算值：
 
 ```python
 from dataclasses import dataclass
@@ -157,9 +157,9 @@ for case in report.cases:
     #> long: output_length=11
 ```
 
-## Type Parameters
+## 类型参数 {#type-parameters}
 
-[`CaseLifecycle`][pydantic_evals.lifecycle.CaseLifecycle] is generic over the same three type parameters as [`Case`][pydantic_evals.dataset.Case]: `InputsT`, `OutputT`, and `MetadataT`. All three default to `Any`, so you can omit them when your hooks don't need type-specific access:
+[`CaseLifecycle`][pydantic_evals.lifecycle.CaseLifecycle] 与 [`Case`][pydantic_evals.dataset.Case] 一样，对三个类型参数泛型化：`InputsT`、`OutputT` 和 `MetadataT`。三者都默认为 `Any`，因此当 hooks 不需要类型特定访问时，可以省略它们：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -167,7 +167,7 @@ from pydantic_evals.evaluators.context import EvaluatorContext
 from pydantic_evals.lifecycle import CaseLifecycle
 
 
-# Works with any dataset — no type parameters needed
+# 适用于任何数据集，无需类型参数
 class GenericMetricEnricher(CaseLifecycle):
     async def prepare_context(self, ctx: EvaluatorContext) -> EvaluatorContext:
         ctx.metrics['custom'] = 42
@@ -181,8 +181,8 @@ print(report.cases[0].metrics['custom'])
 #> 42
 ```
 
-## Next Steps
+## 后续步骤 {#next-steps}
 
-- **[Metrics & Attributes](metrics-attributes.md)** — Recording metrics inside tasks
-- **[Custom Evaluators](../evaluators/custom.md)** — Using enriched metrics in evaluators
-- **[Span-Based Evaluation](../evaluators/span-based.md)** — Analyzing execution traces
+- **[Metrics & Attributes](metrics-attributes.md)**：在任务中记录 metrics
+- **[Custom Evaluators](../evaluators/custom.md)**：在 evaluators 中使用 enriched metrics
+- **[Span-Based Evaluation](../evaluators/span-based.md)**：分析执行 traces
