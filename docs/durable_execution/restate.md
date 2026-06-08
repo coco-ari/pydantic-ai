@@ -1,20 +1,20 @@
-# Durable Execution with Restate
+# 使用 Restate 的持久化执行
 
-[Restate](https://restate.dev) is a lightweight durable execution runtime with first-class support for AI agents. The Pydantic AI integration is provided via the [Restate Python SDK](https://github.com/restatedev/sdk-python/tree/main/python/restate/ext/pydantic).
+[Restate](https://restate.dev) 是一个轻量级持久化执行运行时，对 AI 智能体提供一等支持。Pydantic AI 集成通过 [Restate Python SDK](https://github.com/restatedev/sdk-python/tree/main/python/restate/ext/pydantic) 提供。
 
-Visit the [Restate documentation](https://docs.restate.dev/ai/patterns/durable-agents) for more information.
+更多信息请访问 [Restate 文档](https://docs.restate.dev/ai/patterns/durable-agents)。
 
-## Durable Execution
+## 持久化执行
 
-Restate makes your agent **durable** by recording every step of its execution in a journal. If your process crashes mid-execution, Restate replays the journal, skips completed steps, and resumes from exactly where it left off.
+Restate 会将智能体执行的每一步记录到 journal 中，从而让智能体具备**持久化**能力。如果进程在执行中崩溃，Restate 会重放 journal，跳过已完成步骤，并从中断位置继续执行。
 
-Your agent runs in a regular HTTP handler inside a Restate **service**. The Restate Server sits in front of your application and manages orchestration, journaling, and retries. Services run like regular Docker containers or serverless functions.
+你的智能体运行在 Restate **service** 内的普通 HTTP handler 中。Restate Server 位于应用前方，负责管理编排、journaling 和重试。服务可以像普通 Docker 容器或 serverless 函数一样运行。
 
-A durable agent has three building blocks:
+持久化智能体包含三个构建块：
 
-1. The **handler**: your agent logic, exposed as an HTTP endpoint in a Restate service.
-2. **LLM calls**: persisted so responses are not re-fetched on recovery — saving cost and time.
-3. **Tool executions**: wrapped in durable steps so side effects are not duplicated.
+1. **handler**：你的智能体逻辑，在 Restate service 中作为 HTTP endpoint 暴露。
+2. **LLM 调用**：会被持久化，因此恢复时不会重新获取响应，从而节省成本和时间。
+3. **工具执行**：包装在持久化步骤中，因此副作用不会重复发生。
 
 ```text
                   Clients
@@ -44,19 +44,19 @@ A durable agent has three building blocks:
       [External APIs, services, databases, etc.]
 ```
 
-See the [Restate documentation](https://docs.restate.dev/ai/patterns/durable-agents) for more information.
+更多信息请参见 [Restate 文档](https://docs.restate.dev/ai/patterns/durable-agents)。
 
-## Durable Agent
+## 持久化智能体
 
-Any Pydantic AI agent can be made durable by wrapping it with `RestateAgent` from the Restate SDK and running it inside a Restate service handler.
+任何 Pydantic AI 智能体都可以通过 Restate SDK 中的 `RestateAgent` 包装，并在 Restate service handler 中运行，从而变为持久化智能体。
 
-Install the Restate SDK:
+安装 Restate SDK：
 
 ```bash
 pip/uv-add pydantic-ai "restate_sdk[serde]"
 ```
 
-Here is a complete example of a durable Pydantic AI agent with Restate:
+下面是一个使用 Restate 构建持久化 Pydantic AI 智能体的完整示例：
 
 ```python {title="restate_agent.py" test="skip" lint="skip"}
 import restate
@@ -103,11 +103,11 @@ if __name__ == "__main__":  # (6)!
     asyncio.run(hypercorn.asyncio.serve(app, conf))
 ```
 
-1. Define your agent and tools as you normally would with Pydantic AI.
-2. Use `restate_context()` actions inside tools to make their execution durable. The result is persisted and retried until it succeeds. Side effects won't be duplicated on recovery.
-3. `RestateAgent` wraps the agent so every LLM response is saved in the Restate Server and replayed during recovery.
-4. The Restate service handler gives the agent a durable execution context and exposes it as an HTTP endpoint.
-5. `restate.app()` creates the application that can be served.
-6. Run the application with an ASGI server like Hypercorn.
+1. 像平常使用 Pydantic AI 一样定义智能体和工具。
+2. 在工具内部使用 `restate_context()` action，让工具执行具备持久化能力。结果会被持久化，并重试直到成功。恢复时不会重复执行副作用。
+3. `RestateAgent` 包装智能体，使每个 LLM 响应都保存在 Restate Server 中，并在恢复期间重放。
+4. Restate service handler 为智能体提供持久化执行上下文，并将其作为 HTTP endpoint 暴露。
+5. `restate.app()` 创建可被服务的应用。
+6. 使用 Hypercorn 等 ASGI server 运行应用。
 
-See the [Restate agent quickstart](https://docs.restate.dev/ai-quickstart) to learn how to run the agent.
+了解如何运行智能体，请参见 [Restate agent quickstart](https://docs.restate.dev/ai-quickstart)。

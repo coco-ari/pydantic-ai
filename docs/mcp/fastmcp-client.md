@@ -1,33 +1,33 @@
 # FastMCP Client
 
-[FastMCP](https://gofastmcp.com/) is a higher-level MCP framework that bills itself as "The fast, Pythonic way to build MCP servers and clients." It supports additional capabilities on top of the MCP specification like [Tool Transformation](https://gofastmcp.com/patterns/tool-transformation), [OAuth](https://gofastmcp.com/clients/auth/oauth), and more.
+[FastMCP](https://gofastmcp.com/) 是一个更高层次的 MCP 框架，自称是"构建 MCP server 和 client 的快速、Pythonic 方式"。它在 MCP 规范之上支持额外能力，例如 [Tool Transformation](https://gofastmcp.com/patterns/tool-transformation)、[OAuth](https://gofastmcp.com/clients/auth/oauth) 等。
 
-As an alternative to Pydantic AI's standard [`MCPServer` MCP client](client.md) built on the [MCP SDK](https://github.com/modelcontextprotocol/python-sdk), you can use the [`FastMCPToolset`][pydantic_ai.toolsets.fastmcp.FastMCPToolset] [toolset](../toolsets.md) that leverages the [FastMCP Client](https://gofastmcp.com/clients/) to connect to local and remote MCP servers, whether or not they're built using [FastMCP Server](https://gofastmcp.com/servers/).
+作为 Pydantic AI 基于 [MCP SDK](https://github.com/modelcontextprotocol/python-sdk) 构建的标准 [`MCPServer` MCP client](client.md) 的替代方案，你可以使用 [`FastMCPToolset`][pydantic_ai.toolsets.fastmcp.FastMCPToolset] [toolset](../toolsets.md)。它利用 [FastMCP Client](https://gofastmcp.com/clients/) 连接到本地和远程 MCP server，无论这些 server 是否使用 [FastMCP Server](https://gofastmcp.com/servers/) 构建。
 
-Note that it does not yet support integration elicitation or sampling, which are supported by the [standard `MCPServer` client](client.md).
+注意，它尚不支持 integration elicitation 或 sampling，而这些能力由[标准 `MCPServer` client](client.md) 支持。
 
-## Install
+## 安装
 
-To use the `FastMCPToolset`, you will need to install [`pydantic-ai-slim`](../install.md#slim-install) with the `fastmcp` optional group:
+要使用 `FastMCPToolset`，你需要安装带 `fastmcp` 可选组的 [`pydantic-ai-slim`](../install.md#slim-install)：
 
 ```bash
 pip/uv-add "pydantic-ai-slim[fastmcp]"
 ```
 
-## Usage
+## 使用
 
-A `FastMCPToolset` can then be created from:
+随后可以从以下来源创建 `FastMCPToolset`：
 
-- A FastMCP Server: `#!python FastMCPToolset(fastmcp.FastMCP('my_server'))`
-- A FastMCP Client: `#!python FastMCPToolset(fastmcp.Client(...))`
-- A FastMCP Transport: `#!python FastMCPToolset(fastmcp.StdioTransport(command='python', args=['mcp_server.py']))`
-- A Streamable HTTP URL: `#!python FastMCPToolset('http://localhost:8000/mcp')`
-- An HTTP SSE URL: `#!python FastMCPToolset('http://localhost:8000/sse')`
-- A Python Script: `#!python FastMCPToolset('my_server.py')`
-- A Node.js Script: `#!python FastMCPToolset('my_server.js')`
-- A JSON MCP Configuration: `#!python FastMCPToolset({'mcpServers': {'my_server': {'command': 'python', 'args': ['mcp_server.py']}}})`
+- FastMCP Server：`#!python FastMCPToolset(fastmcp.FastMCP('my_server'))`
+- FastMCP Client：`#!python FastMCPToolset(fastmcp.Client(...))`
+- FastMCP Transport：`#!python FastMCPToolset(fastmcp.StdioTransport(command='python', args=['mcp_server.py']))`
+- Streamable HTTP URL：`#!python FastMCPToolset('http://localhost:8000/mcp')`
+- HTTP SSE URL：`#!python FastMCPToolset('http://localhost:8000/sse')`
+- Python Script：`#!python FastMCPToolset('my_server.py')`
+- Node.js Script：`#!python FastMCPToolset('my_server.js')`
+- JSON MCP Configuration：`#!python FastMCPToolset({'mcpServers': {'my_server': {'command': 'python', 'args': ['mcp_server.py']}}})`
 
-If you already have a [FastMCP Server](https://gofastmcp.com/servers) in the same codebase as your Pydantic AI agent, you can create a `FastMCPToolset` directly from it and save agent a network round trip:
+如果你的 Pydantic AI 智能体所在代码库中已经有 [FastMCP Server](https://gofastmcp.com/servers)，可以直接从它创建 `FastMCPToolset`，从而省去智能体的一次网络往返：
 
 ```python
 from fastmcp import FastMCP
@@ -50,9 +50,9 @@ async def main():
     #> The answer is 12.
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `asyncio.run(main())` 来运行 `main`）_
 
-Connecting your agent to a Streamable HTTP MCP Server is as simple as:
+将智能体连接到 Streamable HTTP MCP Server 非常简单：
 
 ```python
 from pydantic_ai import Agent
@@ -63,9 +63,9 @@ toolset = FastMCPToolset('http://localhost:8000/mcp')
 agent = Agent('openai:gpt-5.2', toolsets=[toolset])
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `asyncio.run(main())` 来运行 `main`）_
 
-You can also create a `FastMCPToolset` from a JSON MCP Configuration:
+你也可以从 JSON MCP Configuration 创建 `FastMCPToolset`：
 
 ```python
 from pydantic_ai import Agent
@@ -89,4 +89,4 @@ toolset = FastMCPToolset(mcp_config)
 agent = Agent('openai:gpt-5.2', toolsets=[toolset])
 ```
 
-_(This example is complete, it can be run "as is" — you'll need to add `asyncio.run(main())` to run `main`)_
+_（此示例是完整的，可以"原样"运行；你需要添加 `asyncio.run(main())` 来运行 `main`）_

@@ -1,14 +1,14 @@
-# Multi-Run Evaluation
+# 多次运行评估
 
-Run each case multiple times to measure variability and get more reliable aggregate results.
+多次运行每个 case，以衡量波动性并获得更可靠的聚合结果。
 
-## Overview
+## 概览
 
-AI systems are inherently stochastic — the same input can produce different outputs across runs. The `repeat` parameter lets you run each case multiple times and automatically aggregates the results, giving you a clearer picture of your system's typical behavior.
+AI 系统天然具有随机性，同一输入在多次运行中可能产生不同输出。`repeat` 参数允许你多次运行每个 case，并自动聚合结果，从而更清楚地了解系统的典型行为。
 
-## Basic Usage
+## 基本用法
 
-Pass `repeat` to [`evaluate()`][pydantic_evals.dataset.Dataset.evaluate] or [`evaluate_sync()`][pydantic_evals.dataset.Dataset.evaluate_sync]:
+将 `repeat` 传给 [`evaluate()`][pydantic_evals.dataset.Dataset.evaluate] 或 [`evaluate_sync()`][pydantic_evals.dataset.Dataset.evaluate_sync]：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -34,11 +34,11 @@ print(len(report.cases))
 #> 10
 ```
 
-When `repeat > 1`, each run gets an indexed name like `greeting [1/5]`, `greeting [2/5]`, etc., while the original case name is preserved in [`source_case_name`][pydantic_evals.reporting.ReportCase.source_case_name] for grouping.
+当 `repeat > 1` 时，每次运行都会获得类似 `greeting [1/5]`、`greeting [2/5]` 的带索引名称，同时原始 case 名称会保存在 [`source_case_name`][pydantic_evals.reporting.ReportCase.source_case_name] 中用于分组。
 
-## Accessing Grouped Results
+## 访问分组结果
 
-Use [`case_groups()`][pydantic_evals.reporting.EvaluationReport.case_groups] to access runs organized by original case, with per-group aggregated statistics:
+使用 [`case_groups()`][pydantic_evals.reporting.EvaluationReport.case_groups] 访问按原始 case 组织的运行结果，以及每组的聚合统计：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -75,21 +75,21 @@ for group in groups:
     assert group.summary.task_duration > 0
 ```
 
-Each [`ReportCaseGroup`][pydantic_evals.reporting.ReportCaseGroup] contains:
+每个 [`ReportCaseGroup`][pydantic_evals.reporting.ReportCaseGroup] 包含：
 
-- `name` — the original case name
-- `runs` — the individual [`ReportCase`][pydantic_evals.reporting.ReportCase] results
-- `failures` — any runs that raised exceptions
-- `summary` — a [`ReportCaseAggregate`][pydantic_evals.reporting.ReportCaseAggregate] with averaged scores, metrics, labels, assertions, and durations
+- `name`，原始 case 名称
+- `runs`，单个 [`ReportCase`][pydantic_evals.reporting.ReportCase] 结果
+- `failures`，所有抛出异常的运行
+- `summary`，包含平均分数、指标、标签、断言和耗时的 [`ReportCaseAggregate`][pydantic_evals.reporting.ReportCaseAggregate]
 
-## Aggregation
+## 聚合
 
-With `repeat > 1`, the report's [`averages()`][pydantic_evals.reporting.EvaluationReport.averages] uses a two-level aggregation strategy:
+当 `repeat > 1` 时，报告的 [`averages()`][pydantic_evals.reporting.EvaluationReport.averages] 会使用两级聚合策略：
 
-1. **Per-group averages**: Each case's runs are averaged into a group summary
-2. **Cross-group averages**: The group summaries are averaged to produce the final result
+1. **组内平均**：将每个 case 的运行结果平均为组摘要
+2. **跨组平均**：将各组摘要平均为最终结果
 
-This ensures each original case contributes equally to the overall averages, regardless of how many runs succeeded or failed.
+这可确保每个原始 case 对整体平均值的贡献相同，而不受成功或失败运行次数影响。
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -117,9 +117,9 @@ print(f'Overall assertion rate: {averages.assertions}')
 #> Overall assertion rate: 1.0
 ```
 
-## Default Behavior
+## 默认行为
 
-When `repeat=1` (the default), behavior is identical to a standard evaluation — no run indexing, no `source_case_name`, and `case_groups()` returns `None`:
+当 `repeat=1`（默认值）时，行为与标准评估完全相同：没有运行索引，没有 `source_case_name`，且 `case_groups()` 返回 `None`：
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -137,8 +137,8 @@ assert report.case_groups() is None
 assert all(c.source_case_name is None for c in report.cases)
 ```
 
-## Next Steps
+## 下一步
 
-- **[Concurrency & Performance](concurrency.md)** — Control parallel execution with `max_concurrency`
-- **[Metrics & Attributes](metrics-attributes.md)** — Track custom metrics across runs
-- **[Logfire Integration](logfire-integration.md)** — Visualize multi-run results
+- **[并发与性能](concurrency.md)**，使用 `max_concurrency` 控制并行执行
+- **[指标与属性](metrics-attributes.md)**，跨运行跟踪自定义指标
+- **[Logfire 集成](logfire-integration.md)**，可视化多次运行结果
