@@ -1,10 +1,10 @@
 # `pydantic_ai.models.google`
 
-Interface that uses the [`google-genai`](https://pypi.org/project/google-genai/) package under the hood to
-access Google's Gemini models via both the Gemini API and Google Cloud (formerly known as Vertex AI).
+底层使用 [`google-genai`](https://pypi.org/project/google-genai/) 包的接口，
+可通过 Gemini API 和 Google Cloud（以前称为 Vertex AI）访问 Google 的 Gemini 模型。
 
-## Setup
+## 设置
 
-For details on how to set up authentication with this model, see [model configuration for Google](../../models/google.md).
+有关如何为此模型设置认证的详细信息，请参见 [Google 模型配置](../../models/google.md)。
 
 ::: pydantic_ai.models.google

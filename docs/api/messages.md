@@ -1,6 +1,6 @@
 # `pydantic_ai.messages`
 
-The structure of [`ModelMessage`][pydantic_ai.messages.ModelMessage] can be shown as a graph:
+[`ModelMessage`][pydantic_ai.messages.ModelMessage] 的结构可以用图表示：
 
 ```mermaid
 graph RL

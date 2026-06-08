@@ -1,7 +1,7 @@
 # `pydantic_ai.models.openai`
 
-## Setup
+## 设置
 
-For details on how to set up authentication with this model, see [model configuration for OpenAI](../../models/openai.md).
+有关如何为此模型设置认证的详细信息，请参见 [OpenAI 模型配置](../../models/openai.md)。
 
 ::: pydantic_ai.models.openai

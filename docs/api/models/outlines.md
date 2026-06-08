@@ -1,7 +1,7 @@
 # `pydantic_ai.models.outlines`
 
-## Setup
+## 设置
 
-For details on how to set up this model, see [model configuration for Outlines](../../models/outlines.md).
+有关如何设置此模型的详细信息，请参见 [Outlines 模型配置](../../models/outlines.md)。
 
 ::: pydantic_ai.models.outlines

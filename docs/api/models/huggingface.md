@@ -1,7 +1,7 @@
 # `pydantic_ai.models.huggingface`
 
-## Setup
+## 设置
 
-For details on how to set up authentication with this model, see [model configuration for Hugging Face](../../models/huggingface.md).
+有关如何为此模型设置认证的详细信息，请参见 [Hugging Face 模型配置](../../models/huggingface.md)。
 
 ::: pydantic_ai.models.huggingface

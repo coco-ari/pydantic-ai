@@ -1,13 +1,13 @@
 # `pydantic_ai.models.function`
 
-A model controlled by a local function.
+由本地函数控制的模型。
 
-[`FunctionModel`][pydantic_ai.models.function.FunctionModel] is similar to [`TestModel`](test.md),
-but allows greater control over the model's behavior.
+[`FunctionModel`][pydantic_ai.models.function.FunctionModel] 与 [`TestModel`](test.md) 类似，
+但可以更细致地控制模型行为。
 
-Its primary use case is for more advanced unit testing than is possible with `TestModel`.
+它的主要用例是执行比 `TestModel` 更高级的单元测试。
 
-Here's a minimal example:
+下面是一个最小示例：
 
 ```py {title="function_model_usage.py" call_name="test_my_agent" noqa="I001"}
 from pydantic_ai import Agent
@@ -59,6 +59,6 @@ async def test_my_agent():
         assert result.output == 'hello world'
 ```
 
-See [Unit testing with `FunctionModel`](../../testing.md#unit-testing-with-functionmodel) for detailed documentation.
+详细文档请参见[使用 `FunctionModel` 进行单元测试](../../testing.md#unit-testing-with-functionmodel)。
 
 ::: pydantic_ai.models.function

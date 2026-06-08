@@ -1,7 +1,7 @@
 # `pydantic_ai.models.ollama`
 
-## Setup
+## 设置
 
-For details on how to set up authentication with this model, see [model configuration for Ollama](../../models/ollama.md).
+有关如何为此模型设置认证的详细信息，请参见 [Ollama 模型配置](../../models/ollama.md)。
 
 ::: pydantic_ai.models.ollama

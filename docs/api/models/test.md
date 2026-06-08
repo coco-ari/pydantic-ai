@@ -1,8 +1,8 @@
 # `pydantic_ai.models.test`
 
-Utility model for quickly testing apps built with Pydantic AI.
+用于快速测试使用 Pydantic AI 构建的应用的工具模型。
 
-Here's a minimal example:
+下面是一个最小示例：
 
 ```py {title="test_model_usage.py" call_name="test_my_agent" noqa="I001"}
 from pydantic_ai import Agent
@@ -20,6 +20,6 @@ async def test_my_agent():
     assert m.last_model_request_parameters.function_tools == []
 ```
 
-See [Unit testing with `TestModel`](../../testing.md#unit-testing-with-testmodel) for detailed documentation.
+详细文档请参见[使用 `TestModel` 进行单元测试](../../testing.md#unit-testing-with-testmodel)。
 
 ::: pydantic_ai.models.test
