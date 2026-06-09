@@ -1,6 +1,6 @@
-# Model Context Protocol (MCP)
+# 模型上下文协议（MCP） {#model-context-protocol-mcp}
 
-Pydantic AI 通过多种方式支持 [Model Context Protocol (MCP)](https://modelcontextprotocol.io)：
+Pydantic AI 通过多种方式支持 [Model Context Protocol（MCP）](https://modelcontextprotocol.io)：
 
 1. [智能体](../agent.md)可以通过三种不同方式连接到 MCP server 并使用其工具：
     1. Pydantic AI 可以充当 MCP client，并直接连接到本地和远程 MCP server。进一步了解 [`MCPServer`][pydantic_ai.mcp.MCPServer] 请参见[这里](client.md)。

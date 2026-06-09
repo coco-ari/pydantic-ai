@@ -25,7 +25,7 @@ Pydantic AI 提供三种连接 MCP servers 的方式：
 
 你可以使用 [`async with agent`][pydantic_ai.agent.Agent.__aenter__] context manager，在 agent runs 会使用这些 servers 的上下文范围内打开并关闭所有已注册 server 的连接（对于 stdio servers，也会启动和停止 subprocesses）。你也可以使用 [`async with server`][pydantic_ai.mcp.MCPServer.__aenter__] 管理某个特定 server 的连接或 subprocess，例如当你想让它被多个 agents 使用时。如果你没有显式进入这些 context managers 来设置 server，Pydantic AI 会在需要时自动完成（例如列出可用工具或调用特定工具时），但围绕整个预期使用 servers 的上下文显式管理会更高效。
 
-### Streamable HTTP Client {#streamable-http-client}
+### Streamable HTTP 客户端 {#streamable-http-client}
 
 [`MCPServerStreamableHTTP`][pydantic_ai.mcp.MCPServerStreamableHTTP] 通过 HTTP 使用
 [Streamable HTTP](https://modelcontextprotocol.io/introduction#streamable-http) transport 连接到 server。
@@ -86,7 +86,7 @@ logfire.configure()
 logfire.instrument_pydantic_ai()
 ```
 
-### SSE Client {#sse-client}
+### SSE 客户端 {#sse-client}
 
 [`MCPServerSSE`][pydantic_ai.mcp.MCPServerSSE] 通过 HTTP 使用 [HTTP + Server Sent Events transport](https://spec.modelcontextprotocol.io/specification/2024-11-05/basic/transports/#http-with-sse) 连接到 server。
 
@@ -150,7 +150,7 @@ async def main():
     #> The weather in Paris is sunny and 26 degrees Celsius.
 ```
 
-## 从配置加载 MCP Servers {#loading-mcp-servers-from-configuration}
+## 从配置加载 MCP servers {#loading-mcp-servers-from-configuration}
 
 除了在代码中逐个创建 MCP server 实例，你也可以使用 [`load_mcp_servers()`][pydantic_ai.mcp.load_mcp_servers] 从 JSON 配置文件加载多个 servers。
 
@@ -336,7 +336,7 @@ calculator_server = MCPServerSSE(
 agent = Agent('openai:gpt-5.2', toolsets=[weather_server, calculator_server])
 ```
 
-## Server Instructions {#server-instructions}
+## Server instructions {#server-instructions}
 
 MCP servers 可以在初始化期间提供 instructions，用于说明如何最好地与 server 的工具交互。这些 instructions 会在连接建立后通过 [`instructions`][pydantic_ai.mcp.MCPServer.instructions] 属性访问；创建 server 时设置 `include_instructions=True` 可以将它们自动注入 agent 的 instructions。
 
@@ -394,7 +394,7 @@ toolset = MCPToolset('http://localhost:8000/mcp')
 agent = Agent('openai:gpt-5.2', toolsets=[toolset])
 ```
 
-## Resources {#resources}
+## 资源 {#resources}
 
 MCP servers 可以提供 [resources](https://modelcontextprotocol.io/docs/concepts/resources)，也就是 client 可以访问的文件、数据或内容。MCP 中的 resources 由应用驱动，host applications 会根据自身需要决定如何手动纳入上下文。这意味着它们**不会**自动暴露给 LLM（除非某个工具返回 `ResourceLink` 或 `EmbeddedResource`）。
 
@@ -404,7 +404,7 @@ Pydantic AI 提供了从 MCP servers 发现和读取 resources 的方法：
 - [`list_resource_templates()`][pydantic_ai.mcp.MCPServer.list_resource_templates] - 列出带参数 placeholders 的 resource templates
 - [`read_resource(uri)`][pydantic_ai.mcp.MCPServer.read_resource] - 通过 URI 读取特定 resource 的内容
 
-Resources 会被自动转换：文本内容返回为 `str`，二进制内容返回为 [`BinaryContent`][pydantic_ai.messages.BinaryContent]。
+资源会被自动转换：文本内容返回为 `str`，二进制内容返回为 [`BinaryContent`][pydantic_ai.messages.BinaryContent]。
 
 在消费 resources 前，我们需要先运行一个暴露这些 resources 的 server：
 
@@ -460,7 +460,7 @@ _（这个示例是完整的，可以"原样"运行）_
 在某些环境中，你需要调整 HTTPS 连接的建立方式；
 例如，信任内部 Certificate Authority、为 **mTLS** 提供 client
 certificate，或者（仅限本地开发！）完全禁用
-certificate verification。
+certificate verification（证书验证）。
 所有基于 HTTP 的 MCP client classes
 （[`MCPServerStreamableHTTP`][pydantic_ai.mcp.MCPServerStreamableHTTP] 和
 [`MCPServerSSE`][pydantic_ai.mcp.MCPServerSSE]）都暴露 `http_client`
@@ -502,7 +502,7 @@ async def main():
    因此，**httpx** 支持的任何内容（`verify`、`cert`、custom
    proxies、timeouts 等）都会应用到所有 MCP traffic。
 
-## Client Identification {#client-identification}
+## 客户端标识 {#client-identification}
 
 连接到 MCP server 时，你可以选择指定一个 [Implementation](https://modelcontextprotocol.io/specification/2025-11-25/schema#implementation) 对象作为 client information，并在初始化期间发送给 server。这适用于：
 
@@ -536,7 +536,7 @@ server = MCPServerSSE(
 
     容易混淆的是，它与 observability 中的 "sampling" 概念无关，也坦率地说与其他领域的 "sampling" 概念无关。
 
-    ??? info "Sampling Diagram"
+    ??? info "Sampling 图"
         下面这个 mermaid diagram 可能会，也可能不会，让数据流更清楚：
 
         ```mermaid
@@ -566,7 +566,7 @@ Pydantic AI 同时支持作为 client 和 server 进行 sampling。有关如何�
 
 假设我们有一个希望使用 sampling 的 MCP server（在此例中按工具参数生成 SVG）。
 
-??? example "Sampling MCP Server"
+??? example "Sampling MCP server"
 
     ```python {title="generate_svg.py"}
     import re
@@ -768,8 +768,8 @@ if __name__ == '__main__':
 
 ### 支持的 Schema 类型 {#supported-schema-types}
 
-MCP elicitation 支持 string、number、boolean 和 enum 类型，并且仅支持 flat object structures。这些限制确保可靠的跨 client 兼容性。详情请参阅 [supported schema types](https://modelcontextprotocol.io/specification/2025-06-18/client/elicitation#supported-schema-types)。
+MCP elicitation 支持 string、number、boolean 和 enum 类型，并且仅支持扁平对象结构。这些限制确保可靠的跨 client 兼容性。详情请参阅[支持的 schema 类型](https://modelcontextprotocol.io/specification/2025-06-18/client/elicitation#supported-schema-types)。
 
 ### 安全性 {#security}
 
-MCP Elicitation 需要谨慎处理：servers 不得请求敏感信息，clients 必须实现带清晰说明的 user approval controls。详情请参阅 [security considerations](https://modelcontextprotocol.io/specification/2025-06-18/client/elicitation#security-considerations)。
+MCP Elicitation 需要谨慎处理：servers 不得请求敏感信息，clients 必须实现带清晰说明的用户批准控制。详情请参阅[安全注意事项](https://modelcontextprotocol.io/specification/2025-06-18/client/elicitation#security-considerations)。

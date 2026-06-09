@@ -131,7 +131,7 @@ agent = Agent('openai-responses:gpt-5.2')
 ...
 ```
 
-!!! note "v2 default change"
+!!! note "v2 默认变更"
     在 Pydantic AI v2 中，裸 `'openai:'` prefix 会解析为 `OpenAIResponsesModel`，而不是 `OpenAIChatModel`。在 v2 之前，只要使用裸 `'openai:'`，`pydantic-ai` 就会发出 `PydanticAIDeprecationWarning`；请选择显式 prefix 以静默警告并固定行为：
 
     - `'openai-chat:gpt-5.2'` 保持 Chat Completions routing。
@@ -274,9 +274,9 @@ print(result2.output)
 
 Pydantic AI 不会替你创建 OpenAI conversations。请使用 OpenAI client 创建 conversation，然后把其 ID 传给 `openai_conversation_id`。OpenAI API 中的 `conversation` 和 `previous_response_id` 参数互斥，因此 `openai_conversation_id` 不能与 [`openai_previous_response_id`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_previous_response_id] 组合。
 
-#### Message Compaction {#message-compaction}
+#### 消息压缩 {#message-compaction}
 
-Responses API 支持[压缩 message history](https://developers.openai.com/api/docs/guides/compaction)，以减少长对话中的 token usage。Compaction 会生成一个 encrypted summary，用其替换较旧 messages，同时保留上下文。
+Responses API 支持[压缩 message history](https://developers.openai.com/api/docs/guides/compaction)，以减少长对话中的 token usage。压缩会生成一个加密摘要，用其替换较旧 messages，同时保留上下文。
 
 启用 compaction 最简单的方法是使用 [`OpenAICompaction`][pydantic_ai.models.openai.OpenAICompaction] capability：
 
@@ -290,7 +290,7 @@ agent = Agent(
 )
 ```
 
-默认情况下，`OpenAICompaction` 以 **stateful mode** 运行：它通过普通 `/responses` 请求上的 `context_management` 字段配置 OpenAI 的 server-side auto-compaction，并且当 input token count 跨过 OpenAI 为你管理的阈值时触发 compaction。此模式兼容 [`openai_previous_response_id='auto'`](#referencing-earlier-responses) 和 [`openai_conversation_id`](#using-durable-conversations)。
+默认情况下，`OpenAICompaction` 以**有状态模式**运行：它通过普通 `/responses` 请求上的 `context_management` 字段配置 OpenAI 的 server-side auto-compaction，并且当 input token count 跨过 OpenAI 为你管理的阈值时触发 compaction。此模式兼容 [`openai_previous_response_id='auto'`](#referencing-earlier-responses) 和 [`openai_conversation_id`](#using-durable-conversations)。
 
 要覆盖阈值，请传入 [`token_threshold`][pydantic_ai.models.openai.OpenAICompaction]：
 
@@ -304,7 +304,7 @@ agent = Agent(
 )
 ```
 
-作为替代方案，`OpenAICompaction` 支持 **stateless mode**（`stateless=True`），它会通过 `before_model_request` hook 调用 stateless `/responses/compact` endpoint。在 [ZDR](https://openai.com/enterprise-privacy/) environments、使用 [`openai_store=False`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_store] 时，或你需要明确的 out-of-band control 来决定何时运行 compaction 时使用此模式。Stateless mode 要求你指定 [`message_count_threshold`][pydantic_ai.models.openai.OpenAICompaction] 或自定义 `trigger` callable：
+作为替代方案，`OpenAICompaction` 支持**无状态模式**（`stateless=True`），它会通过 `before_model_request` hook 调用 stateless `/responses/compact` endpoint。在 [ZDR](https://openai.com/enterprise-privacy/) environments、使用 [`openai_store=False`][pydantic_ai.models.openai.OpenAIResponsesModelSettings.openai_store] 时，或你需要明确的 out-of-band control 来决定何时运行 compaction 时使用此模式。无状态模式要求你指定 [`message_count_threshold`][pydantic_ai.models.openai.OpenAICompaction] 或自定义 `trigger` callable：
 
 ```python {title="openai_compaction_stateless.py" test="skip"}
 from pydantic_ai import Agent
@@ -316,19 +316,19 @@ agent = Agent(
 )
 ```
 
-模式会根据你传入的参数推断：提供 `message_count_threshold` 或 `trigger` 表示 stateless mode，否则使用 stateful mode。你也可以显式传入 `stateless=True` 或 `stateless=False`。混用不同模式的参数会引发 [`UserError`][pydantic_ai.exceptions.UserError]。
+模式会根据你传入的参数推断：提供 `message_count_threshold` 或 `trigger` 表示无状态模式，否则使用有状态模式。你也可以显式传入 `stateless=True` 或 `stateless=False`。混用不同模式的参数会引发 [`UserError`][pydantic_ai.exceptions.UserError]。
 
 !!! tip
-    Stateful compaction 与 [`openai_previous_response_id='auto'`](#referencing-earlier-responses) 或 [`openai_conversation_id`](#using-durable-conversations) 尤其搭配良好。二者都依赖 OpenAI 的 server-side conversation state，因此 OpenAI 可以用先前 compacted context 作为下一轮的起点，而无需你重新发送。
+    有状态压缩与 [`openai_previous_response_id='auto'`](#referencing-earlier-responses) 或 [`openai_conversation_id`](#using-durable-conversations) 尤其搭配良好。二者都依赖 OpenAI 的 server-side conversation state，因此 OpenAI 可以用先前压缩后的 context 作为下一轮的起点，而无需你重新发送。
 
 对于更底层的用例，你可以直接在 model 上调用 [`compact_messages`][pydantic_ai.models.openai.OpenAIResponsesModel.compact_messages]。
 
-## OpenAI-compatible Models {#openai-compatible-models}
+## OpenAI 兼容模型 {#openai-compatible-models}
 
 许多 providers 和 models 与 OpenAI API 兼容，可以在 Pydantic AI 中与 `OpenAIChatModel` 搭配使用。
 开始前，请查看上面的[安装和配置](#install)说明。
 
-要使用另一个 OpenAI-compatible API，你可以设置 `OPENAI_BASE_URL` 和 `OPENAI_API_KEY` 环境变量，或使用 [`OpenAIProvider`][pydantic_ai.providers.openai.OpenAIProvider] 的 `base_url` 和 `api_key` 参数：
+要使用另一个 OpenAI 兼容 API，你可以设置 `OPENAI_BASE_URL` 和 `OPENAI_API_KEY` 环境变量，或使用 [`OpenAIProvider`][pydantic_ai.providers.openai.OpenAIProvider] 的 `base_url` 和 `api_key` 参数：
 
 ```python
 from pydantic_ai import Agent
@@ -348,7 +348,7 @@ agent = Agent(model)
 多种 providers 也有自己的 provider classes，因此你无需自己指定 base URL，并且可以使用标准 `<PROVIDER>_API_KEY` 环境变量设置 API key。
 当 provider 有自己的 provider class 时，你可以使用 `Agent("<provider>:<model>")` 简写，例如 `Agent("deepseek:deepseek-chat")` 或 `Agent("moonshotai:kimi-k2-0711-preview")`，而不是显式构建 `OpenAIChatModel`。同样，你也可以把 provider name 作为字符串传给 `OpenAIChatModel` 上的 `provider` 参数，而不是显式实例化 provider class。
 
-### Model Profile {#model-profile}
+### 模型配置档案 {#model-profile}
 
 有时，你使用的 provider 或 model 会与 OpenAI API 或 models 有细微不同的要求，例如对 tool definitions 的 JSON schemas 有不同限制，或不支持将 tool definitions 标记为 strict。
 
@@ -377,7 +377,7 @@ agent = Agent(model)
 
 ### DeepSeek
 
-要使用 [DeepSeek](https://deepseek.com) provider，请先按照 [Quick Start guide](https://api-docs.deepseek.com/) 创建 API key。
+要使用 [DeepSeek](https://deepseek.com) provider，请先按照[快速开始指南](https://api-docs.deepseek.com/)创建 API key。
 
 然后你可以设置 `DEEPSEEK_API_KEY` 环境变量，并按名称使用 [`DeepSeekProvider`][pydantic_ai.providers.deepseek.DeepSeekProvider]：
 
@@ -553,7 +553,7 @@ Azure AI Foundry 也通过 [`OpenAIResponsesModel`][pydantic_ai.models.openai.Op
 
 ### Vercel AI Gateway
 
-要使用 [Vercel's AI Gateway](https://vercel.com/docs/ai-gateway)，请先按照 [documentation](https://vercel.com/docs/ai-gateway) 说明获取 API key 或 OIDC token。
+要使用 [Vercel AI Gateway](https://vercel.com/docs/ai-gateway)，请先按照[文档](https://vercel.com/docs/ai-gateway)说明获取 API key 或 OIDC token。
 
 你可以设置 `VERCEL_AI_GATEWAY_API_KEY` 和 `VERCEL_OIDC_TOKEN` 环境变量，并按名称使用 [`VercelProvider`][pydantic_ai.providers.vercel.VercelProvider]：
 
@@ -609,7 +609,7 @@ agent = Agent(model)
 
 ### GitHub Models
 
-要使用 [GitHub Models](https://docs.github.com/en/github-models)，你需要具有 `models: read` permission 的 GitHub personal access token。
+要使用 [GitHub Models](https://docs.github.com/en/github-models)，你需要具有 `models: read` 权限的 GitHub personal access token。
 
 你可以设置 `GITHUB_API_KEY` 环境变量，并按名称使用 [`GitHubProvider`][pydantic_ai.providers.github.GitHubProvider]：
 
@@ -635,12 +635,12 @@ agent = Agent(model)
 ...
 ```
 
-GitHub Models 支持具有不同 prefixes 的多种 model families。你可以在 [GitHub Marketplace](https://github.com/marketplace?type=models) 或 public [catalog endpoint](https://models.github.ai/catalog/models) 上查看完整列表。
+GitHub Models 支持具有不同 prefixes 的多种 model families。你可以在 [GitHub Marketplace](https://github.com/marketplace?type=models) 或公开的 [catalog endpoint](https://models.github.ai/catalog/models) 上查看完整列表。
 
 ### Perplexity
 
 按照 Perplexity [getting started](https://docs.perplexity.ai/guides/getting-started)
-guide 创建 API key，然后直接初始化 model 和 provider：
+指南创建 API key，然后直接初始化 model 和 provider：
 
 ```python
 from pydantic_ai import Agent
@@ -744,7 +744,7 @@ agent = Agent(model)
 
 ### LiteLLM
 
-要使用 [LiteLLM](https://www.litellm.ai/)，请按 [doc](https://docs.litellm.ai/docs/set_keys) 中说明设置 configs。在 `LiteLLMProvider` 中，你可以传入 `api_base` 和 `api_key`。这些 configs 的值取决于你的 setup。例如，如果你使用 OpenAI models，则需要把 `https://api.openai.com/v1` 作为 `api_base`，并把你的 OpenAI API key 作为 `api_key`。如果你使用在本机运行的 LiteLLM proxy server，则需要把 `http://localhost:<port>` 作为 `api_base`，并把你的 LiteLLM API key（或 placeholder）作为 `api_key`。
+要使用 [LiteLLM](https://www.litellm.ai/)，请按[文档](https://docs.litellm.ai/docs/set_keys)中的说明设置 configs。在 `LiteLLMProvider` 中，你可以传入 `api_base` 和 `api_key`。这些 configs 的值取决于你的 setup。例如，如果你使用 OpenAI models，则需要把 `https://api.openai.com/v1` 作为 `api_base`，并把你的 OpenAI API key 作为 `api_key`。如果你使用在本机运行的 LiteLLM proxy server，则需要把 `http://localhost:<port>` 作为 `api_base`，并把你的 LiteLLM API key（或 placeholder）作为 `api_key`。
 
 要使用自定义 LLMs，请在 model name 中使用 `custom/` prefix。
 
@@ -840,7 +840,7 @@ print(result.output)
 
 要使用 [SambaNova Cloud](https://cloud.sambanova.ai/)，你需要从 [SambaNova Cloud dashboard](https://cloud.sambanova.ai/dashboard) 获取 API key。
 
-SambaNova 提供对多个 model families 的访问，包括 Meta Llama、DeepSeek、Qwen 和 Mistral models，并提供快速 inference speeds。
+SambaNova 提供对多个 model families 的访问，包括 Meta Llama、DeepSeek、Qwen 和 Mistral models，并提供较快的推理速度。
 
 你可以设置 `SAMBANOVA_API_KEY` 环境变量，并按名称使用 [`SambaNovaProvider`][pydantic_ai.providers.sambanova.SambaNovaProvider]：
 
@@ -870,7 +870,7 @@ print(result.output)
 #> The capital of France is Paris.
 ```
 
-完整可用模型列表请参阅 [SambaNova supported models documentation](https://docs.sambanova.ai/docs/en/models/sambacloud-models)。
+完整可用模型列表请参阅 [SambaNova 支持模型文档](https://docs.sambanova.ai/docs/en/models/sambacloud-models)。
 
 如果需要，你可以自定义 base URL：
 

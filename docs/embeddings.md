@@ -1,4 +1,4 @@
-# Embeddings
+# 嵌入 {#embeddings}
 
 Embeddings 是文本的向量表示，用来捕捉语义含义。它们对于构建以下功能很关键：
 
@@ -38,12 +38,12 @@ async def main():
 
 _（这个示例是完整的，可以"原样"运行；你需要添加 `asyncio.run(main())` 来运行 `main`）_
 
-!!! tip "Queries vs Documents"
-    某些 embedding models 会分别针对 queries 和 documents 做不同优化。对搜索查询使用
+!!! tip "查询 vs 文档"
+    某些 embedding models 会分别针对查询和文档做不同优化。对搜索查询使用
     [`embed_query()`][pydantic_ai.embeddings.Embedder.embed_query]，对要建立索引的内容使用
     [`embed_documents()`][pydantic_ai.embeddings.Embedder.embed_documents]。
 
-## Embedding Result {#embedding-result}
+## 嵌入结果 {#embedding-result}
 
 所有 embed 方法都会返回 [`EmbeddingResult`][pydantic_ai.embeddings.EmbeddingResult]，其中包含 embeddings 和有用的 metadata。
 
@@ -87,13 +87,13 @@ _（这个示例是完整的，可以"原样"运行；你需要添加 `asyncio.r
 | 无 API key、私有、免费 | `sentence-transformers:google/embeddinggemma-300m`、`sentence-transformers:lightonai/DenseOn`、`sentence-transformers:Qwen/Qwen3-Embedding-0.6B`，或任何其他 [Hugging Face model](https://huggingface.co/models?library=sentence-transformers) |
 | 多语言 | `cohere:embed-multilingual-v3.0`、`sentence-transformers:jinaai/jina-embeddings-v5-text-small-retrieval` 或 `sentence-transformers:Snowflake/snowflake-arctic-embed-l-v2.0` |
 | 专门领域 | `voyageai:voyage-code-3`、`voyageai:voyage-law-2`、`voyageai:voyage-finance-2`、`sentence-transformers:nomic-ai/CodeRankEmbed` 或 `sentence-transformers:TechWolf/JobBERT-v3` |
-| 运行在已有 AWS infra 上 | `bedrock:amazon.titan-embed-text-v2:0` 或 `bedrock:cohere.embed-v4:0` |
-| 减小索引大小 | 任何支持 dimension control 的模型（见 [Settings](#settings)） |
+| 运行在已有 AWS 基础设施上 | `bedrock:amazon.titan-embed-text-v2:0` 或 `bedrock:cohere.embed-v4:0` |
+| 减小索引大小 | 任何支持维度控制的模型（见[设置](#settings)） |
 
 !!! tip "之后切换模型"
-    更换模型会改变输出维度和相似度分布，因此你需要重新 embed（并重新建立索引）你的 documents。请选择一个愿意长期使用的模型，或选择支持 [dimension control](#settings) 的模型，这样无需更换模型也能调整索引大小。
+    更换模型会改变输出维度和相似度分布，因此你需要重新 embed（并重新建立索引）你的文档。请选择一个愿意长期使用的模型，或选择支持[维度控制](#settings)的模型，这样无需更换模型也能调整索引大小。
 
-## Providers {#providers}
+## 提供商 {#providers}
 
 ### OpenAI
 
@@ -133,7 +133,7 @@ _（这个示例是完整的，可以"原样"运行；你需要添加 `asyncio.r
 
 可用模型请参阅 [OpenAI's embedding models](https://platform.openai.com/docs/guides/embeddings)。
 
-#### Dimension Control {#openai-dimension-control}
+#### 维度控制 {#openai-dimension-control}
 
 OpenAI 的 `text-embedding-3-*` models 支持通过 `dimensions` 设置降低维度：
 
@@ -155,9 +155,9 @@ async def main():
 
 _（这个示例是完整的，可以"原样"运行；你需要添加 `asyncio.run(main())` 来运行 `main`）_
 
-#### OpenAI-Compatible Providers {#openai-compatible}
+#### OpenAI 兼容提供商 {#openai-compatible}
 
-由于 [`OpenAIEmbeddingModel`][pydantic_ai.embeddings.openai.OpenAIEmbeddingModel] 使用与 [`OpenAIChatModel`][pydantic_ai.models.openai.OpenAIChatModel] 相同的 provider system，你可以将它与任何 [OpenAI-compatible provider](models/openai.md#openai-compatible-models) 搭配使用：
+由于 [`OpenAIEmbeddingModel`][pydantic_ai.embeddings.openai.OpenAIEmbeddingModel] 使用与 [`OpenAIChatModel`][pydantic_ai.models.openai.OpenAIChatModel] 相同的 provider system，你可以将它与任何 [OpenAI 兼容 provider](models/openai.md#openai-compatible-models) 搭配使用：
 
 ```python {title="openai_compatible_embeddings.py"}
 # Using Azure OpenAI
@@ -199,7 +199,7 @@ embedder = Embedder('azure:text-embedding-3-small')
 embedder = Embedder('ollama:nomic-embed-text')
 ```
 
-完整支持 provider 列表请参阅 [OpenAI-compatible Models](models/openai.md#openai-compatible-models)。
+完整支持 provider 列表请参阅 [OpenAI 兼容模型](models/openai.md#openai-compatible-models)。
 
 ### Google
 
@@ -261,7 +261,7 @@ embedder = Embedder(model)
 
 有关 Google Cloud authentication options（包括 application default credentials、service accounts 和 API keys）的更多细节，请参阅 [Google provider documentation](models/google.md#google-cloud-enterprise)。
 
-#### Dimension Control {#google-dimension-control}
+#### 维度控制 {#google-dimension-control}
 
 Google 的 embedding models 支持通过 `dimensions` 设置降低维度：
 
@@ -283,7 +283,7 @@ async def main():
 
 _（这个示例是完整的，可以"原样"运行；你需要添加 `asyncio.run(main())` 来运行 `main`）_
 
-#### Google-Specific Settings {#google-specific-settings}
+#### Google 专用设置 {#google-specific-settings}
 
 Google models 通过 [`GoogleEmbeddingSettings`][pydantic_ai.embeddings.google.GoogleEmbeddingSettings] 支持额外设置：
 
@@ -300,7 +300,7 @@ embedder = Embedder(
 )
 ```
 
-可用 task types 请参阅 [Google's task type documentation](https://ai.google.dev/gemini-api/docs/embeddings#task-types)。默认情况下，`embed_query()` 使用 `RETRIEVAL_QUERY`，`embed_documents()` 使用 `RETRIEVAL_DOCUMENT`。
+可用 task types 请参阅 [Google 的 task type 文档](https://ai.google.dev/gemini-api/docs/embeddings#task-types)。默认情况下，`embed_query()` 使用 `RETRIEVAL_QUERY`，`embed_documents()` 使用 `RETRIEVAL_DOCUMENT`。
 
 ### Cohere
 
@@ -338,9 +338,9 @@ async def main():
 
 _（这个示例是完整的，可以"原样"运行；你需要添加 `asyncio.run(main())` 来运行 `main`）_
 
-可用模型请参阅 [Cohere Embed documentation](https://docs.cohere.com/docs/cohere-embed)。
+可用模型请参阅 [Cohere Embed 文档](https://docs.cohere.com/docs/cohere-embed)。
 
-#### Cohere-Specific Settings {#cohere-specific-settings}
+#### Cohere 专用设置 {#cohere-specific-settings}
 
 Cohere models 通过 [`CohereEmbeddingSettings`][pydantic_ai.embeddings.cohere.CohereEmbeddingSettings] 支持额外设置：
 
@@ -394,9 +394,9 @@ async def main():
 
 _（这个示例是完整的，可以"原样"运行；你需要添加 `asyncio.run(main())` 来运行 `main`）_
 
-可用模型请参阅 [VoyageAI Embeddings documentation](https://docs.voyageai.com/docs/embeddings)。
+可用模型请参阅 [VoyageAI Embeddings 文档](https://docs.voyageai.com/docs/embeddings)。
 
-#### VoyageAI-Specific Settings {#voyageai-specific-settings}
+#### VoyageAI 专用设置 {#voyageai-specific-settings}
 
 VoyageAI models 通过 [`VoyageAIEmbeddingSettings`][pydantic_ai.embeddings.voyageai.VoyageAIEmbeddingSettings] 支持额外设置：
 
@@ -452,22 +452,22 @@ _（这个示例需要已配置 AWS credentials）_
 
 Bedrock 支持三类 embedding models。完整可用模型列表请参阅 [AWS Bedrock documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html)。
 
-**Amazon Titan:**
+**Amazon Titan：**
 
 - `amazon.titan-embed-text-v1`：1536 dimensions（固定），8K tokens
 - `amazon.titan-embed-text-v2:0`：256/384/1024 dimensions（可配置，默认 1024），8K tokens
 
-**Cohere Embed:**
+**Cohere Embed：**
 
-- `cohere.embed-english-v3`：仅 English，1024 dimensions（固定），512 tokens
+- `cohere.embed-english-v3`：仅英文，1024 dimensions（固定），512 tokens
 - `cohere.embed-multilingual-v3`：Multilingual，1024 dimensions（固定），512 tokens
 - `cohere.embed-v4:0`：256/512/1024/1536 dimensions（可配置，默认 1536），128K tokens
 
-**Amazon Nova:**
+**Amazon Nova：**
 
 - `amazon.nova-2-multimodal-embeddings-v1:0`：256/384/1024/3072 dimensions（可配置，默认 3072），8K tokens
 
-#### Titan-Specific Settings {#titan-specific-settings}
+#### Titan 专用设置 {#titan-specific-settings}
 
 Titan v2 支持通过 `bedrock_titan_normalize`（默认：`True`）进行 vector normalization，以便直接计算相似度。Titan v1 不支持此设置。
 
@@ -487,7 +487,7 @@ embedder = Embedder(
 !!! note
     Titan models 不支持 `truncate` 设置。`dimensions` 设置仅受 Titan v2 支持。
 
-#### Cohere-Specific Settings {#bedrock-cohere-specific-settings}
+#### Cohere 专用设置 {#bedrock-cohere-specific-settings}
 
 Bedrock 上的 Cohere models 通过 [`BedrockEmbeddingSettings`][pydantic_ai.embeddings.bedrock.BedrockEmbeddingSettings] 支持额外设置：
 
@@ -512,7 +512,7 @@ embedder = Embedder(
 !!! note
     `dimensions` 和 `bedrock_cohere_max_tokens` 设置仅受 Cohere v4 支持。Cohere v3 models 维度固定为 1024。
 
-#### Nova-Specific Settings {#nova-specific-settings}
+#### Nova 专用设置 {#nova-specific-settings}
 
 Bedrock 上的 Nova models 通过 [`BedrockEmbeddingSettings`][pydantic_ai.embeddings.bedrock.BedrockEmbeddingSettings] 支持额外设置：
 
@@ -556,9 +556,9 @@ embedder = Embedder(
 )
 ```
 
-#### Regional Prefixes（Cross-Region Inference） {#regional-prefixes-cross-region-inference}
+#### 区域前缀（跨区域推理） {#regional-prefixes-cross-region-inference}
 
-Bedrock 支持使用 `us.`、`eu.` 或 `apac.` 等 geographic prefixes 进行 cross-region inference：
+Bedrock 支持使用 `us.`、`eu.` 或 `apac.` 等地理前缀进行跨区域推理：
 
 ```python {title="bedrock_regional.py"}
 from pydantic_ai import Embedder
@@ -606,7 +606,7 @@ model = BedrockEmbeddingModel('amazon.titan-embed-text-v2:0', provider=provider)
 embedder = Embedder(model)
 ```
 
-!!! note "Token Counting"
+!!! note "Token 计数"
     Bedrock embedding models 不支持 `count_tokens()` 方法，因为 AWS Bedrock 的 token counting API 仅适用于 text generation models（Claude、Llama 等），不适用于 embedding models。调用 `count_tokens()` 会引发 `NotImplementedError`。
 
 ### Sentence Transformers（本地） {#sentence-transformers-local}
@@ -645,7 +645,7 @@ _（这个示例是完整的，可以"原样"运行；你需要添加 `asyncio.r
 
 [`lightonai/DenseOn`](https://huggingface.co/lightonai/DenseOn) 是一个近期较强的 149M 参数 general-purpose model，它会非对称编码 queries 和 documents：[`embed_query()`][pydantic_ai.embeddings.Embedder.embed_query] 和 [`embed_documents()`][pydantic_ai.embeddings.Embedder.embed_documents] 会自动应用模型的 `query:` / `document:` prompts。更多选项请参阅 [Sentence Transformers pretrained models](https://www.sbert.net/docs/sentence_transformer/pretrained_models.html) 文档和 [MTEB leaderboard](https://huggingface.co/spaces/mteb/leaderboard)；另请参阅上面的[选择模型](#choosing-a-model)。
 
-#### Device Selection {#device-selection}
+#### 设备选择 {#device-selection}
 
 控制用于 inference 的 device：
 
@@ -684,14 +684,14 @@ model = SentenceTransformerEmbeddingModel(st_model)
 embedder = Embedder(model)
 ```
 
-## Settings {#settings}
+## 设置 {#settings}
 
 [`EmbeddingSettings`][pydantic_ai.embeddings.EmbeddingSettings] 提供适用于跨 providers 的通用配置选项：
 
 - `dimensions`：降低输出 embedding dimensions（OpenAI、Google、Cohere、Bedrock、VoyageAI 支持）
 - `truncate`：当为 `True` 时，截断超出模型 context length 的 input text，而不是引发错误（Cohere、Bedrock、VoyageAI 支持）
 
-Settings 可以在 embedder level 指定（应用于所有 calls），也可以按 call 指定：
+设置可以在 embedder level 指定（应用于所有 calls），也可以按 call 指定：
 
 ```python {title="embedding_settings.py"}
 from pydantic_ai import Embedder
@@ -716,7 +716,7 @@ async def main():
 
 _（这个示例是完整的，可以"原样"运行；你需要添加 `asyncio.run(main())` 来运行 `main`）_
 
-## Token Counting {#token-counting}
+## Token 计数 {#token-counting}
 
 你可以在 embedding 前检查 token counts，以避免超出 model limits：
 
@@ -742,7 +742,7 @@ async def main():
 
 _（这个示例是完整的，可以"原样"运行；你需要添加 `asyncio.run(main())` 来运行 `main`）_
 
-## Testing {#testing}
+## 测试 {#testing}
 
 使用 [`TestEmbeddingModel`][pydantic_ai.embeddings.TestEmbeddingModel] 进行测试，无需发起 API calls：
 
@@ -765,9 +765,9 @@ async def test_my_rag_system():
         assert test_model.last_settings is not None
 ```
 
-## Instrumentation {#instrumentation}
+## 插桩 {#instrumentation}
 
-启用 OpenTelemetry instrumentation 以便 debugging 和 monitoring：
+启用 OpenTelemetry instrumentation 以便调试和监控：
 
 ```python {title="instrumented_embeddings.py"}
 import logfire
@@ -783,7 +783,7 @@ embedder = Embedder('openai:text-embedding-3-small', instrument=True)
 Embedder.instrument_all()
 ```
 
-有关在 Pydantic AI 中使用 Logfire 的更多细节，请参阅 [Debugging and Monitoring guide](logfire.md)。
+有关在 Pydantic AI 中使用 Logfire 的更多细节，请参阅[调试和监控指南](logfire.md)。
 
 ## 使用 rerankers 进行两阶段 retrieval {#two-stage-retrieval-with-rerankers}
 
@@ -816,7 +816,7 @@ async def rerank(query: str, candidates: list[str], top_k: int = 3) -> list[str]
 
 在把结果交给 LLM 前，对 vector search 返回的 candidates 调用 `rerank()`（例如在 [RAG example](examples/rag.md) 的 `retrieve` tool 中）。
 
-!!! tip "Managed reranker alternatives"
+!!! tip "托管 reranker 替代方案"
     如果你不想本地运行 reranker，多个 providers 提供 hosted rerankers，包括 [Cohere Rerank](https://docs.cohere.com/docs/rerank-overview)、[VoyageAI Rerank](https://docs.voyageai.com/docs/reranker) 和 [Jina Rerank](https://jina.ai/reranker)。请从与上面 `rerank()` 形状相同的 helper function 中调用它们的 HTTP clients 或 SDKs。
 
 ## 构建自定义 Embedding Models {#building-custom-embedding-models}

@@ -1,19 +1,19 @@
 
 # 可扩展性 {#extensibility}
 
-Pydantic AI 的设计目标之一就是易于扩展。[Capabilities](capabilities.md) 是主要扩展点：它们会把工具、生命周期 hooks、instructions 和模型设置打包成可复用单元，可在多个智能体之间共享、作为库发布，并从 [spec 文件](agent-spec.md)加载。
+Pydantic AI 的设计目标之一就是易于扩展。[能力](capabilities.md)是主要扩展点：它们会把工具、生命周期 hooks、instructions 和模型设置打包成可复用单元，可在多个智能体之间共享、作为库发布，并从 [spec 文件](agent-spec.md)加载。
 
-除了 capabilities，Pydantic AI 还为专门需求提供了其他几种扩展机制。
+除了能力，Pydantic AI 还为专门需求提供了其他几种扩展机制。
 
-## Capabilities
+## 能力 {#capabilities}
 
-Capabilities 是扩展 Pydantic AI 的推荐方式，适用于：
+能力是扩展 Pydantic AI 的推荐方式，适用于：
 
 - **团队**构建可复用的内部智能体组件（guardrails、审计日志、认证）
 - **包作者**发布可跨模型和智能体工作的扩展
 - **社区贡献者**分享常见问题的解决方案
 
-使用和构建 capabilities 请参见 [Capabilities](capabilities.md)；轻量级、基于装饰器的做法请参见 [Hooks](hooks.md)。
+使用和构建能力请参见[能力](capabilities.md)；轻量级、基于装饰器的做法请参见 [Hooks](hooks.md)。
 
 !!! tip
     如果你想贡献 capability，请在 [**Pydantic AI Harness**](https://github.com/pydantic/pydantic-ai-harness) 上开 issue，而不是在 pydantic-ai 上。大多数 capabilities 都属于 harness，区别请参见[哪些内容放在哪里？](harness/overview.md#what-goes-where)。
@@ -46,11 +46,11 @@ agent = Agent.from_file('agent.yaml', custom_capability_types=[MyCapability])
 
 ## 第三方生态 {#third-party-ecosystem}
 
-### Capabilities
+### 能力 {#third-party-capabilities}
 
-[Capabilities](capabilities.md) 是需要把工具与 hooks、instructions 或模型设置打包在一起的包的推荐扩展机制。社区包请参见[第三方 capabilities](capabilities.md#third-party-capabilities)。
+[能力](capabilities.md)是需要把工具与 hooks、instructions 或模型设置打包在一起的包的推荐扩展机制。社区包请参见[第三方 capabilities](capabilities.md#third-party-capabilities)。
 
-### Toolsets
+### 工具集 {#toolsets}
 
 许多第三方扩展以 [toolsets](toolsets.md) 形式提供；它们也可以包装成 [capabilities](capabilities.md)，以使用 hooks、instructions 和模型设置。完整列表请参见[第三方 toolsets](toolsets.md#third-party-toolsets)。
 
