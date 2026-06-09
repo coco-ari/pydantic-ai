@@ -1,6 +1,6 @@
-# Agent Specs {#agent-specs}
+# Agent 规格说明 {#agent-specs}
 
-Agent specs 允许你用 YAML 或 JSON 声明式定义 agents，包括 [model](models/overview.md)、[instructions](agent.md#instructions)、[capabilities](capabilities.md) 等。只需一行即可加载，无需编写 Python agent 构造代码。
+Agent 规格说明允许你用 YAML 或 JSON 声明式定义 agents，包括 [model](models/overview.md)、[instructions](agent.md#instructions)、[capabilities](capabilities.md) 等。只需一行即可加载，无需编写 Python agent 构造代码。
 
 这适用于：
 
@@ -70,7 +70,7 @@ agent = Agent.from_spec(
 
 若需要更精细地控制 spec 加载，请使用 [`AgentSpec.from_file`][pydantic_ai.agent.spec.AgentSpec.from_file] 单独加载 spec，然后再传给 `Agent.from_spec`。
 
-## Template strings {#template-strings}
+## 模板字符串 {#template-strings}
 
 [`TemplateStr`][pydantic_ai.TemplateStr] 提供 Handlebars 风格模板（`{{variable}}`），会在运行时根据 agent 的[依赖](dependencies.md)渲染。在 spec 文件中，包含 `{{` 的字符串会自动转换为 template strings：
 
@@ -78,7 +78,7 @@ agent = Agent.from_spec(
 instructions: "You are assisting {{name}}, who is a {{role}}."
 ```
 
-Template variables 会从 `deps` 对象字段解析。提供 `deps_type`（或 [`deps_schema`](#deps_schema)）时，template variable 名称会在构造时验证。
+模板变量会从 `deps` 对象字段解析。提供 `deps_type`（或 [`deps_schema`](#deps_schema)）时，模板变量名称会在构造时验证。
 
 在 Python 代码中，可以显式使用 [`TemplateStr`][pydantic_ai.TemplateStr]；不过通常更推荐使用带 [`RunContext`][pydantic_ai.tools.RunContext] 的 callable，以获得 IDE 自动补全和类型检查：
 
@@ -126,7 +126,7 @@ spec 中的 capabilities 支持三种形式：
 | `name` | `str \| None` | Agent 名称 |
 | `description` | `str \| None` | Agent 描述（支持 [templates](#template-strings)） |
 | `instructions` | `str \| list[str] \| None` | [Instructions](agent.md#instructions)（支持 [templates](#template-strings)） |
-| `model_settings` | `dict \| None` | [Model settings](agent.md#model-run-settings) |
+| `model_settings` | `dict \| None` | [模型设置](agent.md#model-run-settings) |
 | `capabilities` | `list` | [Capabilities](capabilities.md)（见 [spec syntax](#capability-spec-syntax)） |
 | `deps_schema` | `dict \| None` | 用于 [template string](#template-strings) 验证的 JSON Schema（见下文） |
 | `output_schema` | `dict \| None` | 用于[结构化输出](output.md)的 JSON Schema（见下文） |
@@ -134,7 +134,7 @@ spec 中的 capabilities 支持三种形式：
 | `end_strategy` | `EndStrategy` | 何时停止（`'early'` 或 `'exhaustive'`） |
 | `tool_timeout` | `float \| None` | 默认 [tool](tools.md) timeout，单位秒 |
 | `instrument` | `bool \| None` | 启用 [Logfire](logfire.md) instrumentation |
-| `metadata` | `dict \| None` | Agent [metadata](agent.md#run-metadata) |
+| `metadata` | `dict \| None` | Agent [元数据](agent.md#run-metadata) |
 
 ### `deps_schema`
 

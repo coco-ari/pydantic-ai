@@ -1,10 +1,10 @@
 # 常用工具 {#common-tools}
 
-Pydantic AI 提供了一些 native tools，可用于增强 agent 的能力。
+Pydantic AI 提供了一些原生工具，可用于增强 agent 的能力。
 
-## DuckDuckGo Search Tool {#duckduckgo-search-tool}
+## DuckDuckGo 搜索工具 {#duckduckgo-search-tool}
 
-DuckDuckGo search tool 允许你在 web 上搜索信息。它构建在 [DuckDuckGo API](https://github.com/deedy5/ddgs) 之上。
+DuckDuckGo 搜索工具允许你在 web 上搜索信息。它构建在 [DuckDuckGo API](https://github.com/deedy5/ddgs) 之上。
 
 ### 安装 {#installation}
 
@@ -79,9 +79,9 @@ Would you like help finding a current source or additional details on where to l
 """
 ```
 
-## Web Fetch Tool {#web-fetch-tool}
+## Web 抓取工具 {#web-fetch-tool}
 
-web fetch tool 允许你的 agent 获取网页内容并将其转换为 markdown。它使用 [SSRF protection](https://owasp.org/www-community/attacks/Server_Side_Request_Forgery) 来防止服务器端请求伪造攻击。
+Web 抓取工具允许你的 agent 获取网页内容并将其转换为 markdown。它使用 [SSRF protection](https://owasp.org/www-community/attacks/Server_Side_Request_Forgery) 来防止服务器端请求伪造攻击。
 
 ### 安装 {#installation}
 
@@ -112,14 +112,14 @@ print(result.output)
 !!! tip "通过 WebFetch capability 自动 fallback"
     你不需要直接使用 [`web_fetch_tool`][pydantic_ai.common_tools.web_fetch.web_fetch_tool]；当模型不支持 native URL fetching 时，[`WebFetch`][pydantic_ai.capabilities.WebFetch] capability 会自动将它用作本地 fallback。
 
-## Tavily Search Tool {#tavily-search-tool}
+## Tavily 搜索工具 {#tavily-search-tool}
 
 !!! info
     Tavily 是付费服务，但他们提供免费额度用于试用产品。
 
-    你需要[注册账号](https://app.tavily.com/home)并获取 API key，才能使用 Tavily search tool。
+    你需要[注册账号](https://app.tavily.com/home)并获取 API key，才能使用 Tavily 搜索工具。
 
-Tavily search tool 允许你在 web 上搜索信息。它构建在 [Tavily API](https://tavily.com/) 之上。
+Tavily 搜索工具允许你在 web 上搜索信息。它构建在 [Tavily API](https://tavily.com/) 之上。
 
 ### 安装 {#installation}
 
@@ -202,12 +202,12 @@ Here are some recent papers about transformer architectures from arxiv.org:
 """
 ```
 
-## Exa Search Tool {#exa-search-tool}
+## Exa 搜索工具 {#exa-search-tool}
 
 !!! info
     Exa 是带免费试用额度的付费服务。
 
-    你需要[注册账号](https://dashboard.exa.ai)并获取 API key，才能使用 Exa tools。
+    你需要[注册账号](https://dashboard.exa.ai)并获取 API key，才能使用 Exa 工具。
 
 Exa 是一个 neural search engine，可在数十亿网页中查找高质量、相关的结果。它提供多个工具，包括 web search、查找相似页面、内容检索和 AI-powered answers。
 

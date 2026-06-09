@@ -62,7 +62,7 @@ app = agent.to_web(
 )
 ```
 
-## 原生工具支持
+## 原生工具支持 {#native-tool-support}
 
 在 agent 上使用 `capabilities=[NativeTool(...)]` 配置[原生工具](native-tools.md)，可将它们作为 UI 中的选项暴露出来（仅对支持相应工具的模型显示）：
 

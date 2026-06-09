@@ -1,5 +1,5 @@
 
-# Hooks
+# 生命周期钩子 {#hooks}
 
 Hooks 让你可以在一次运行的每个阶段拦截和修改智能体行为，包括模型请求、工具调用、流式事件等；可以使用简单的装饰器或构造参数完成，不需要子类化。
 
@@ -74,7 +74,7 @@ print(result.output)
 
 ## Hook 类型
 
-### Run hooks
+### 运行 hooks {#run-hooks}
 
 | `hooks.on.` | 构造函数 kwarg | `AbstractCapability` 方法 |
 |---|---|---|
@@ -83,9 +83,9 @@ print(result.output)
 | `run` | `run=` | `wrap_run` |
 | `run_error` | `run_error=` | `on_run_error` |
 
-Run hooks 在每次智能体运行时触发一次。`wrap_run`（通过 `hooks.on.run` 注册）会包装整个运行过程，并支持错误恢复。
+运行 hooks 会在每次智能体运行时触发一次。`wrap_run`（通过 `hooks.on.run` 注册）会包装整个运行过程，并支持错误恢复。
 
-### Node hooks
+### 节点 hooks {#node-hooks}
 
 | `hooks.on.` | 构造函数 kwarg | `AbstractCapability` 方法 |
 |---|---|---|
@@ -94,7 +94,7 @@ Run hooks 在每次智能体运行时触发一次。`wrap_run`（通过 `hooks.o
 | `node_run` | `node_run=` | `wrap_node_run` |
 | `node_run_error` | `node_run_error=` | `on_node_run_error` |
 
-Node hooks 会在每个图步骤触发（[`UserPromptNode`][pydantic_ai.UserPromptNode]、[`ModelRequestNode`][pydantic_ai.ModelRequestNode]、[`CallToolsNode`][pydantic_ai.CallToolsNode]）。
+节点 hooks 会在每个图步骤触发（[`UserPromptNode`][pydantic_ai.UserPromptNode]、[`ModelRequestNode`][pydantic_ai.ModelRequestNode]、[`CallToolsNode`][pydantic_ai.CallToolsNode]）。
 
 !!! note
     `wrap_node_run` hooks 会由 [`agent.run()`][pydantic_ai.agent.AbstractAgent.run]、[`agent.run_stream()`][pydantic_ai.agent.AbstractAgent.run_stream] 和 [`agent_run.next()`][pydantic_ai.run.AgentRun.next] 自动调用，但在用裸 `async for node in agent_run:` 迭代时**不会**调用。
@@ -311,7 +311,7 @@ except HookTimeoutError as e:
 
 超时可以通过装饰器参数（`@hooks.on.before_model_request(timeout=5.0)`）设置，也可以在使用 kwargs 时通过构造函数设置。
 
-## Wrap hooks
+## 包装 hooks {#wrap-hooks}
 
 Wrap hooks 让你可以用设置/清理逻辑包围某个操作。在 `hooks.on` 命名空间中，wrap hooks 会去掉 `wrap_` 前缀；`hooks.on.model_request` 对应 `wrap_model_request`：
 
@@ -348,7 +348,7 @@ print(wrap_log)
 * **`after_*`** hooks 按反向顺序触发
 * **`wrap_*`** hooks 像中间件一样嵌套；第一个注册的 hook 是最外层
 
-多个 capabilities 的 hooks 如何交互，详见[组合](capabilities.md#composition)。
+多个 capabilities 的 hooks 如何交互，详见[组合](capabilities.md#composition-and-middleware-semantics)。
 
 ## 错误 hooks
 
@@ -362,7 +362,7 @@ print(wrap_log)
 
 ## 使用 `ModelRetry` 触发重试 {#triggering-retries-with-modelretry}
 
-Hooks 可以抛出 [`ModelRetry`][pydantic_ai.exceptions.ModelRetry]，要求模型带着自定义消息重试。这与[工具函数](tools.md#model-retry)和输出验证器中使用的是同一个异常。
+Hooks 可以抛出 [`ModelRetry`][pydantic_ai.exceptions.ModelRetry]，要求模型带着自定义消息重试。这与[工具函数](tools-advanced.md#tool-retries)和输出验证器中使用的是同一个异常。
 
 **模型请求 hooks**（`after_model_request`、`wrap_model_request`、`on_model_request_error`）：
 

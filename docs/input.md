@@ -138,16 +138,16 @@ result = agent.run_sync([
 
 对文件 URL 的支持因类型和 provider 而异：
 
-| Model | Send URL directly | Download and send bytes | Unsupported |
-|-------|-------------------|-------------------------|-------------|
-| [`OpenAIChatModel`][pydantic_ai.models.openai.OpenAIChatModel] | `ImageUrl` | `AudioUrl`, `DocumentUrl` | `VideoUrl`. `DocumentUrl` [not supported with `AzureProvider`](models/openai.md#using-azure-with-the-responses-api) |
+| 模型 | 直接发送 URL | 下载后发送字节内容 | 不支持 |
+|------|----------------|----------------------|--------|
+| [`OpenAIChatModel`][pydantic_ai.models.openai.OpenAIChatModel] | `ImageUrl` | `AudioUrl`, `DocumentUrl` | `VideoUrl`。`DocumentUrl` [不支持与 `AzureProvider` 搭配使用](models/openai.md#using-azure-with-the-responses-api) |
 | [`OpenAIResponsesModel`][pydantic_ai.models.openai.OpenAIResponsesModel] | `ImageUrl`, `AudioUrl`, `DocumentUrl` | — | `VideoUrl` |
-| [`AnthropicModel`][pydantic_ai.models.anthropic.AnthropicModel] | `ImageUrl`, `DocumentUrl` (PDF) | `DocumentUrl` (`text/plain`) | `AudioUrl`, `VideoUrl` |
-| [`GoogleModel`][pydantic_ai.models.google.GoogleModel] (Google Cloud) | All URL types | — | — |
-| [`GoogleModel`][pydantic_ai.models.google.GoogleModel] (Gemini API) | [YouTube](models/google.md#document-image-audio-and-video-input), [Files API](models/google.md#document-image-audio-and-video-input) | All other URLs | — |
+| [`AnthropicModel`][pydantic_ai.models.anthropic.AnthropicModel] | `ImageUrl`, `DocumentUrl`（PDF） | `DocumentUrl`（`text/plain`） | `AudioUrl`, `VideoUrl` |
+| [`GoogleModel`][pydantic_ai.models.google.GoogleModel]（Google Cloud） | 所有 URL 类型 | — | — |
+| [`GoogleModel`][pydantic_ai.models.google.GoogleModel]（Gemini API） | [YouTube](models/google.md#document-image-audio-and-video-input)、[Files API](models/google.md#document-image-audio-and-video-input) | 其他所有 URL | — |
 | [`XaiModel`][pydantic_ai.models.xai.XaiModel] | `ImageUrl` | `DocumentUrl` | `AudioUrl`, `VideoUrl` |
-| [`MistralModel`][pydantic_ai.models.mistral.MistralModel] | `ImageUrl`, `DocumentUrl` (PDF) | — | `AudioUrl`, `VideoUrl`, `DocumentUrl` (non-PDF) |
-| [`BedrockConverseModel`][pydantic_ai.models.bedrock.BedrockConverseModel] | S3 URLs (`s3://`) | `ImageUrl`, `DocumentUrl`, `VideoUrl` | `AudioUrl` |
+| [`MistralModel`][pydantic_ai.models.mistral.MistralModel] | `ImageUrl`, `DocumentUrl`（PDF） | — | `AudioUrl`, `VideoUrl`, `DocumentUrl`（非 PDF） |
+| [`BedrockConverseModel`][pydantic_ai.models.bedrock.BedrockConverseModel] | S3 URL（`s3://`） | `ImageUrl`, `DocumentUrl`, `VideoUrl` | `AudioUrl` |
 | [`OpenRouterModel`][pydantic_ai.models.openrouter.OpenRouterModel] | `ImageUrl`, `DocumentUrl`, `VideoUrl` | `AudioUrl` | — |
 
 即使模型 API 支持文件 URL，也可能无法下载某个文件（例如因为爬取或访问限制）。例如，Google Cloud 上的 [`GoogleModel`][pydantic_ai.models.google.GoogleModel] 将 YouTube 视频 URL 限制为每个请求一个 URL。
@@ -170,7 +170,7 @@ DocumentUrl(url='https://example.com/doc.pdf', force_download=True)
 
     [UI adapters](ui/overview.md) 会通过 [`UIAdapter.allowed_file_url_schemes`][pydantic_ai.ui.UIAdapter.allowed_file_url_schemes] 和 [`UIAdapter.allowed_file_url_force_download`][pydantic_ai.ui.UIAdapter.allowed_file_url_force_download] 对客户端提交的 messages 自动应用这种清理。
 
-## Uploaded Files
+## 已上传文件 {#uploaded-files}
 
 有些模型 providers 有自己的文件存储 API，你可以上传文件并通过 ID 或 URL 引用它们。
 
@@ -179,19 +179,19 @@ DocumentUrl(url='https://example.com/doc.pdf', force_download=True)
 !!! tip
     对于会返回文件 URL 的 providers（例如 Google Files API 或 Bedrock 的 S3 URLs），你也可以直接使用 [`DocumentUrl`][pydantic_ai.messages.DocumentUrl]、[`ImageUrl`][pydantic_ai.messages.ImageUrl] 或 [`VideoUrl`][pydantic_ai.messages.VideoUrl]。不过，我们推荐使用 `UploadedFile`，以便跨 providers 使用统一 API，并保持一致的 provider name validation。
 
-### Supported Models
+### 支持的模型 {#supported-models}
 
-| Model | Support |
-|-------|---------|
-| [`AnthropicModel`][pydantic_ai.models.anthropic.AnthropicModel] | ✅ via [Anthropic Files API](https://docs.anthropic.com/en/docs/build-with-claude/files) |
-| [`OpenAIChatModel`][pydantic_ai.models.openai.OpenAIChatModel] | ✅ via [OpenAI Files API](https://platform.openai.com/docs/api-reference/files) |
-| [`OpenAIResponsesModel`][pydantic_ai.models.openai.OpenAIResponsesModel] | ✅ via [OpenAI Files API](https://platform.openai.com/docs/api-reference/files) |
-| [`GoogleModel`][pydantic_ai.models.google.GoogleModel] | ✅ via [Google Files API](https://ai.google.dev/gemini-api/docs/files) |
-| [`BedrockConverseModel`][pydantic_ai.models.bedrock.BedrockConverseModel] | ✅ via S3 URLs (`s3://bucket/key`) |
-| [`XaiModel`][pydantic_ai.models.xai.XaiModel] | ✅ via [xAI Files API](https://docs.x.ai/docs/guides/files) |
-| Other models | ❌ Not supported |
+| 模型 | 支持方式 |
+|------|----------|
+| [`AnthropicModel`][pydantic_ai.models.anthropic.AnthropicModel] | ✅ 通过 [Anthropic Files API](https://docs.anthropic.com/en/docs/build-with-claude/files) |
+| [`OpenAIChatModel`][pydantic_ai.models.openai.OpenAIChatModel] | ✅ 通过 [OpenAI Files API](https://platform.openai.com/docs/api-reference/files) |
+| [`OpenAIResponsesModel`][pydantic_ai.models.openai.OpenAIResponsesModel] | ✅ 通过 [OpenAI Files API](https://platform.openai.com/docs/api-reference/files) |
+| [`GoogleModel`][pydantic_ai.models.google.GoogleModel] | ✅ 通过 [Google Files API](https://ai.google.dev/gemini-api/docs/files) |
+| [`BedrockConverseModel`][pydantic_ai.models.bedrock.BedrockConverseModel] | ✅ 通过 S3 URL（`s3://bucket/key`） |
+| [`XaiModel`][pydantic_ai.models.xai.XaiModel] | ✅ 通过 [xAI Files API](https://docs.x.ai/docs/guides/files) |
+| 其他模型 | ❌ 不支持 |
 
-### Provider Name 要求
+### `provider_name` 要求 {#provider-name-requirements}
 
 使用 [`UploadedFile`][pydantic_ai.messages.UploadedFile] 时必须设置 `provider_name`。Uploaded files 属于其上传到的系统，不能跨 providers 转移。如果尝试将包含 `UploadedFile` 的 message 用于不同 provider，会导致错误。
 
@@ -200,7 +200,7 @@ DocumentUrl(url='https://example.com/doc.pdf', force_download=True)
 
 如果你想在智能体逻辑中引入可移植性，让同一 prompt history 能与不同 provider backends 一起工作，可以使用 [history processor](message-history.md#processing-message-history)，在将 messages 发送给不支持这些文件的 provider 之前，移除或重写 `UploadedFile` parts。注意，去掉 `UploadedFile` 实例可能会让模型困惑，尤其是文本中仍然引用这些文件时。
 
-### Media Type 推断
+### `media_type` 推断 {#media-type-inference}
 
 [`UploadedFile`][pydantic_ai.messages.UploadedFile] 的 `media_type` 参数是可选的。如果没有指定，Pydantic AI 会尝试从 `file_id` 推断：
 
@@ -320,9 +320,9 @@ async def main():
 asyncio.run(main())
 ```
 
-### Bedrock (S3)
+### Bedrock（S3） {#bedrock-s3}
 
-对于 Bedrock，文件必须单独上传到 S3（例如使用 [boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html)）。Assumed role 必须对 bucket 具有 `s3:GetObject` 权限。
+对于 Bedrock，文件必须单独上传到 S3（例如使用 [boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html)）。假设角色（assumed role）必须对 bucket 具有 `s3:GetObject` 权限。
 
 !!! note "`media_type` 可能是必需的"
     当文件扩展名模糊或缺失时，Bedrock 要求提供 `media_type`。对于 `.pdf`、`.png` 等扩展名清晰的 S3 URLs，可以自动推断。

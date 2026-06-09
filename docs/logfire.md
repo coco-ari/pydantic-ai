@@ -230,7 +230,7 @@ print(result.output)
 
 以下 providers 有专门的 Pydantic AI 文档：
 
-<!--Feel free to add other platforms here. They MUST be added to the bottom of the list, and may only be a name with link.-->
+<!-- 如需在此添加其他平台，必须追加到列表底部，并且只能写平台名称和链接。 -->
 - [Langfuse](https://langfuse.com/docs/integrations/pydantic-ai)
 - [W&B Weave](https://weave-docs.wandb.ai/guides/integrations/pydantic_ai/)
 - [Arize](https://arize.com/docs/ax/observe/tracing-integrations-auto/pydantic-ai)
@@ -298,7 +298,7 @@ print(result.output)
 
 出于兼容性原因，一些 span 和属性名称并不完全符合 spec。使用 version 3 或 4 可以获得更好的合规性。
 
-#### Version 3
+#### 第 3 版 {#version-3}
 
 在 version 2 基础上提供以下改进：
 
@@ -310,7 +310,7 @@ print(result.output)
     - `tool_response` 变为 `gen_ai.tool.call.result`
 - **Thinking tokens 支持：** 在可用时捕获 thinking/reasoning tokens
 
-#### Version 4
+#### 第 4 版 {#version-4}
 
 在 version 3 基础上改进了多模态内容处理，以更好地对齐 [GenAI semantic conventions for multimodal inputs](https://opentelemetry.io/docs/specs/semconv/gen-ai/non-normative/examples-llm-calls/#multimodal-inputs-example)：
 
@@ -326,7 +326,7 @@ print(result.output)
 
 注意：根据 OTel spec，`modality` 字段只会包含在图像、音频和视频内容类型中。DocumentUrl 和不支持的媒体类型会省略 `modality` 字段。
 
-#### Version 5
+#### 第 5 版 {#version-5}
 
 在 version 4 基础上改进了延迟工具调用处理：
 
