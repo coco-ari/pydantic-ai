@@ -25,10 +25,10 @@ Pydantic Evals 围绕以下核心概念构建：
 
 | 单元测试 | Pydantic Evals |
 |--------------|----------------|
-| Test function | [`Case`][pydantic_evals.dataset.Case] + [`Evaluator`][pydantic_evals.evaluators.Evaluator] |
-| Test suite | [`Dataset`][pydantic_evals.dataset.Dataset] |
+| 测试函数 | [`Case`][pydantic_evals.dataset.Case] + [`Evaluator`][pydantic_evals.evaluators.Evaluator] |
+| 测试套件 | [`Dataset`][pydantic_evals.dataset.Dataset] |
 | 运行 tests（`pytest`） | **Experiment**（`dataset.evaluate(task)`） |
-| Test report | [`EvaluationReport`][pydantic_evals.reporting.EvaluationReport] |
+| 测试报告 | [`EvaluationReport`][pydantic_evals.reporting.EvaluationReport] |
 | `assert` | 返回 `bool` 的 Evaluator |
 
 **关键区别**：AI 系统是概率性的，因此 evaluation 不只是简单的通过/失败，还可以包含：
@@ -37,9 +37,9 @@ Pydantic Evals 围绕以下核心概念构建：
 - 定性标签（"good"、"acceptable"、"poor"）
 - 带解释原因的通过/失败断言
 
-就像你可以在同一个 test suite 上多次运行 `pytest` 一样，你也可以在同一个 dataset 上运行多个 experiments，以比较不同实现或跟踪随时间变化的表现。
+就像你可以在同一个测试套件上多次运行 `pytest` 一样，你也可以在同一个 dataset 上运行多个 experiments，以比较不同实现或跟踪随时间变化的表现。
 
-## Dataset
+## Dataset 数据集 {#dataset}
 
 [`Dataset`][pydantic_evals.dataset.Dataset] 是一组 test cases 和 evaluators，用于定义一个评估套件。
 
@@ -95,7 +95,7 @@ dataset = Dataset(
 )
 ```
 
-## Experiments
+## Experiments 实验 {#experiments}
 
 **Experiment** 是你针对 dataset 中所有 cases 执行 task function 时发生的事情。它连接了静态测试定义（Dataset）和结果（EvaluationReport）。
 
@@ -185,7 +185,7 @@ print(f'V2 pass rate: {avg_v2.assertions if avg_v2 and avg_v2.assertions else 0}
 - **A/B test** 不同方法
 - 在部署前**验证变更**
 
-## Case
+## Case 用例 {#case}
 
 [`Case`][pydantic_evals.dataset.Case] 表示一个带具体输入和可选预期输出的单个测试场景。
 
@@ -240,7 +240,7 @@ Case(
 
 如果没有提供 `expected_output`，依赖它的 evaluators（如 `EqualsExpected`）会跳过该 case。
 
-#### Metadata
+#### Metadata 元数据 {#metadata}
 Evaluators 可以通过 [`EvaluatorContext`][pydantic_evals.evaluators.EvaluatorContext] 访问的任意数据：
 
 ```python
@@ -260,13 +260,13 @@ Metadata 可用于：
 
 - 分析时过滤 cases
 - 为 evaluators 提供上下文
-- 组织 test suites
+- 组织测试套件
 
-#### Evaluators
+#### Evaluators 评估器 {#evaluators}
 
 Cases 可以拥有自己的 evaluators，并且这些 evaluators 只会针对该特定 case 运行。这对于构建全面评估套件尤其强大，因为不同 cases 可以有不同需求。如果你能写出一个适用于所有 cases 的 evaluator rubric，那你应该直接把它合并进 agent instructions。Case-specific [`LLMJudge`][pydantic_evals.evaluators.LLMJudge] evaluators 特别适合快速构建可维护的 golden datasets：为每个场景描述 "好" 是什么样。更详细的解释和示例见 [Case-specific evaluators](evaluators/overview.md#case-specific-evaluators)。
 
-## Evaluator
+## Evaluator 评估器 {#evaluator}
 
 [`Evaluator`][pydantic_evals.evaluators.Evaluator] 评估 task 输出，并返回一个或多个 scores、labels 或 assertions。每个 score、label 或 assertion 也可以关联一个可选的字符串原因。
 
@@ -310,7 +310,7 @@ class Classifier(Evaluator):
 Evaluators 还可以返回 [`EvaluationReason`][pydantic_evals.evaluators.EvaluationReason] 实例，以及从 labels 到输出值的字典。
 更多细节见[自定义 evaluator 返回类型](evaluators/custom.md#return-types)文档。
 
-### EvaluatorContext
+### EvaluatorContext 上下文 {#evaluatorcontext}
 
 所有 evaluators 都会收到一个 [`EvaluatorContext`][pydantic_evals.evaluators.EvaluatorContext]，其中包含：
 
@@ -344,7 +344,7 @@ class MultiCheck(Evaluator):
         }
 ```
 
-### Evaluation Reasons
+### Evaluation Reasons 评估原因 {#evaluation-reasons}
 
 使用 [`EvaluationReason`][pydantic_evals.evaluators.EvaluationReason] 为 evaluations 添加解释：
 
@@ -370,7 +370,7 @@ class SmartCheck(Evaluator):
 
 使用 `include_reasons=True` 时，原因会出现在报告中。
 
-## Evaluation Report
+## Evaluation Report 评估报告 {#evaluation-report}
 
 [`EvaluationReport`][pydantic_evals.reporting.EvaluationReport] 是运行 experiment 的结果。它包含针对 dataset cases 执行 task 并运行所有 evaluators 后得到的全部数据。
 
@@ -422,7 +422,7 @@ for case in report.cases:
 - `trace_id`：OpenTelemetry trace ID（可选）
 - `span_id`：OpenTelemetry span ID（可选）
 
-### ReportCase
+### ReportCase 报告用例 {#reportcase}
 
 每个成功的 case result 都包含：
 

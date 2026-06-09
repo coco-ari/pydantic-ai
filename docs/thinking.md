@@ -53,7 +53,7 @@ agent = Agent('anthropic:claude-opus-4-7', model_settings={'thinking': 'high'})
 | Bedrock（OpenAI） | `reasoning_effort='medium'` | `reasoning_effort='high'` | Converse 拒绝 `'none'`；`thinking=False` 会被静默忽略 |
 | Bedrock（Qwen） | `reasoning_config='high'` | `reasoning_config='high'` | 只有 `'low'` 和 `'high'`；`thinking=False` 会被静默忽略 |
 
-## OpenAI
+## OpenAI {#openai}
 
 使用 [`OpenAIChatModel`][pydantic_ai.models.openai.OpenAIChatModel] 时，`<think>` 标签内的文本输出会转换为 [`ThinkingPart`][pydantic_ai.messages.ThinkingPart] 对象。
 你可以通过[模型配置文件](models/openai.md#model-profile)上的 [`thinking_tags`][pydantic_ai.profiles.ModelProfile.thinking_tags] 字段自定义这些标签。
@@ -62,7 +62,7 @@ agent = Agent('anthropic:claude-opus-4-7', model_settings={'thinking': 'high'})
 
 如果你的提供商建议原样回传这些自定义字段，以获得缓存或交错思考收益，也可以通过 [`openai_chat_send_back_thinking_parts`][pydantic_ai.profiles.openai.OpenAIModelProfile.openai_chat_send_back_thinking_parts] 实现。
 
-### OpenAI Responses
+### OpenAI Responses {#openai-responses}
 
 [`OpenAIResponsesModel`][pydantic_ai.models.openai.OpenAIResponsesModel] 可以生成原生 thinking parts。
 要启用此功能，需要设置
@@ -88,7 +88,7 @@ agent = Agent(model, model_settings=settings)
 !!! note "没有摘要的原始推理"
     一些 OpenAI 兼容 API（例如 LM Studio、vLLM，或使用 gpt-oss 模型的 OpenRouter）可能返回没有 reasoning summary 的原始推理内容。这种情况下，[`ThinkingPart.content`][pydantic_ai.messages.ThinkingPart.content] 会为空，但原始推理可在 `provider_details['raw_content']` 中取得。根据 [OpenAI 指南](https://cookbook.openai.com/examples/responses_api/reasoning_items)，原始推理不应直接展示给用户，因此我们把它存到 `provider_details`，而不是主要的 `content` 字段。
 
-## Anthropic
+## Anthropic {#anthropic}
 
 要启用思考，请使用 [`AnthropicModelSettings.anthropic_thinking`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_thinking] [模型设置](agent.md#model-run-settings)。
 
@@ -148,7 +148,7 @@ agent = Agent(model, model_settings=settings)
 
 Thinking tokens 会计入 Anthropic 的循环级[任务预算](models/anthropic.md#task-budgets-beta)，因此随着预算消耗，自适应思考会自然缩减。
 
-## Google
+## Google {#google}
 
 高级用法可使用 [`GoogleModelSettings.google_thinking_config`][pydantic_ai.models.google.GoogleModelSettings.google_thinking_config] [模型设置](agent.md#model-run-settings)。
 
@@ -240,7 +240,7 @@ agent = Agent(model, model_settings=settings)
 
     ```
 
-## Groq
+## Groq {#groq}
 
 Groq 支持用不同格式接收 thinking parts：
 
@@ -263,7 +263,7 @@ agent = Agent(model, model_settings=settings)
 !!! note
     Groq 不支持真正禁用思考。通过统一设置指定 `thinking=False` 时，Pydantic AI 会发送 `reasoning_format='hidden'`，这会抑制推理输出，但模型仍可能在内部推理。
 
-## OpenRouter
+## OpenRouter {#openrouter}
 
 要启用思考，请使用 [`OpenRouterModelSettings.openrouter_reasoning`][pydantic_ai.models.openrouter.OpenRouterModelSettings.openrouter_reasoning] [模型设置](agent.md#model-run-settings)。
 
@@ -277,25 +277,25 @@ agent = Agent(model, model_settings=settings)
 ...
 ```
 
-!!! note "Wire format 细节"
+!!! note "线路格式细节"
     [`thinking`][pydantic_ai.settings.ModelSettings.thinking] 的 truthy 值会在线路格式中同时发送 `effort` 和 `enabled: True`。显式的 `enabled: True` 对默认启用推理的模型没有影响，但对可选启用推理的路由（例如 `google/gemma-*` 家族的一部分）是必要的；否则即便设置了 `effort`，推理仍会保持禁用。
 
     [`thinking=False`][pydantic_ai.settings.ModelSettings.thinking] 会在上游能够遵守禁用信号的路由（例如 `anthropic/claude-sonnet-4.5`、`z-ai/glm-4.6`）上发送 `reasoning={'effort': 'none'}`，这是[文档化的 OpenRouter 禁用信号](https://openrouter.ai/docs/guides/best-practices/reasoning-tokens)。在上游始终启用的路由（例如 `openai/o3`、`openai/gpt-5`、`mistralai/magistral-medium-*`、`deepseek/deepseek-r1`、`x-ai/grok-3-mini`）上，`thinking=False` 会在模型配置文件层被静默忽略，与同一模型的直接路由行为一致。如果你需要显式的逐路由控制，请直接设置 [`OpenRouterModelSettings.openrouter_reasoning`][pydantic_ai.models.openrouter.OpenRouterModelSettings.openrouter_reasoning]。
 
-## Mistral
+## Mistral {#mistral}
 
 `magistral` 模型家族支持思考，不需要专门启用。
 
-## Cohere
+## Cohere {#cohere}
 
 `command-a-reasoning-08-2025` 模型支持思考，不需要专门启用。
 
-## Hugging Face
+## Hugging Face {#hugging-face}
 
 `<think>` 标签内的文本输出会自动转换为 [`ThinkingPart`][pydantic_ai.messages.ThinkingPart] 对象。
 你可以通过[模型配置文件](models/openai.md#model-profile)上的 [`thinking_tags`][pydantic_ai.profiles.ModelProfile.thinking_tags] 字段自定义这些标签。
 
-## Outlines
+## Outlines {#outlines}
 
 一些通过 Outlines 运行的本地模型，会在文本输出中包含由标签分隔的 thinking part。这种情况下，Pydantic AI 会处理它，把 thinking part 从最终答案中分离出来，无需专门启用。默认使用的 thinking tags 是 `"<think>"` 和 `"</think>"`。如果你的模型使用不同标签，可以在[模型配置文件](models/openai.md#model-profile)中使用 [`thinking_tags`][pydantic_ai.profiles.ModelProfile.thinking_tags] 字段指定。
 

@@ -2,13 +2,13 @@
 
 [Agent-User Interaction（AG-UI）Protocol](https://docs.ag-ui.com/introduction) 是一个开放标准，由
 [CopilotKit](https://webflow.copilotkit.ai/blog/introducing-ag-ui-the-protocol-where-agents-meet-users)
-团队提出，用于标准化前端应用如何与 AI agents 通信，并支持 streaming、frontend tools、shared state 和 custom events。
+团队提出，用于标准化前端应用如何与 AI agents 通信，并支持流式传输、前端工具、共享状态和自定义事件。
 
 !!! note
     AG-UI 集成最初由 [Rocket Science](https://www.rocketscience.gg/) 团队构建，并与 Pydantic AI 和 CopilotKit 团队协作贡献。感谢 Rocket Science！
 
 !!! warning "正在使用 1.x 并迁移到 2.0？"
-    [`Agent.to_ag_ui()`][pydantic_ai.agent.AbstractAgent.to_ag_ui]、[`AGUIApp`][pydantic_ai.ui.ag_ui.app.AGUIApp] 和 `pydantic_ai.ag_ui` shim module 在 1.x 中已弃用，并将在 2.0 中移除。请直接跳到页面底部的[从已弃用 API 迁移](#migrating-from-deprecated-apis)，查看 before/after 示例。
+    [`Agent.to_ag_ui()`][pydantic_ai.agent.AbstractAgent.to_ag_ui]、[`AGUIApp`][pydantic_ai.ui.ag_ui.app.AGUIApp] 和 `pydantic_ai.ag_ui` shim module 在 1.x 中已弃用，并将在 2.0 中移除。请直接跳到页面底部的[从已弃用 API 迁移](#migrating-from-deprecated-apis)，查看迁移前/迁移后示例。
 
 ## 安装 {#installation}
 
@@ -159,10 +159,10 @@ uvicorn ag_ui_app:app
 
 Pydantic AI AG-UI 集成支持该 spec 的所有功能：
 
-- [Events](https://docs.ag-ui.com/concepts/events)
-- [Messages](https://docs.ag-ui.com/concepts/messages)
-- [State Management](https://docs.ag-ui.com/concepts/state)
-- [Tools](https://docs.ag-ui.com/concepts/tools)
+- [事件](https://docs.ag-ui.com/concepts/events)
+- [消息](https://docs.ag-ui.com/concepts/messages)
+- [状态管理](https://docs.ag-ui.com/concepts/state)
+- [工具](https://docs.ag-ui.com/concepts/tools)
 
 该集成以
 [`RunAgentInput`](https://docs.ag-ui.com/sdk/python/core/types#runagentinput) 对象形式接收 messages，
@@ -174,7 +174,7 @@ Pydantic AI AG-UI 集成支持该 spec 的所有功能：
 
 ## 功能 {#features}
 
-### State management {#state-management}
+### 状态管理 {#state-management}
 
 该集成为 [AG-UI state management](https://docs.ag-ui.com/concepts/state) 提供完整支持，从而支持 agents 与前端应用之间的实时同步。
 
@@ -231,15 +231,15 @@ app = Starlette(routes=[Route('/', run_agent, methods=['POST'])])
 uvicorn ag_ui_state:app --host 0.0.0.0 --port 9000
 ```
 
-### Tools
+### 工具 {#tools}
 
-AG-UI frontend tools 会无缝提供给 Pydantic AI agent，从而支持带前端用户界面的丰富用户体验。
+AG-UI 前端工具会无缝提供给 Pydantic AI agent，从而支持带前端用户界面的丰富用户体验。
 
-### Events
+### 事件 {#events}
 
 Pydantic AI tools 只需返回一个
 [`ToolReturn`](../tools-advanced.md#advanced-tool-returns) 对象，并把
-[`BaseEvent`](https://docs.ag-ui.com/sdk/python/core/events#baseevent)（或 events 列表）放在 `metadata` 中，就可以发送 [AG-UI events](https://docs.ag-ui.com/concepts/events)，从而支持 custom events 和 state updates。
+[`BaseEvent`](https://docs.ag-ui.com/sdk/python/core/events#baseevent)（或 events 列表）放在 `metadata` 中，就可以发送 [AG-UI events](https://docs.ag-ui.com/concepts/events)，从而支持自定义事件和状态更新。
 
 ```python {title="ag_ui_tool_events.py"}
 from dataclasses import replace
@@ -369,13 +369,13 @@ shim module 会重新导出在 2.0 中位于两个不同位置的符号：
 - [`SSE_CONTENT_TYPE`][pydantic_ai.ui.SSE_CONTENT_TYPE]、[`StateDeps`][pydantic_ai.ui.StateDeps]、[`StateHandler`][pydantic_ai.ui.StateHandler] 和 [`OnCompleteFunc`][pydantic_ai.ui.OnCompleteFunc] 位于 [`pydantic_ai.ui`][pydantic_ai.ui]。
 - `handle_ag_ui_request` 和 `run_ag_ui` helpers 会在 2.0 中移除。请直接调用 [`AGUIAdapter.dispatch_request()`][pydantic_ai.ui.ag_ui.AGUIAdapter.dispatch_request]，或像[用法](#usage)中展示的那样直接组合 [`AGUIAdapter`][pydantic_ai.ui.ag_ui.AGUIAdapter]。
 
-=== "Before (deprecated)"
+=== "迁移前（已弃用）"
 
     ```python {title="ag_ui_shim_before.py" test="skip" noqa="F401 I001"}
     from pydantic_ai.ag_ui import AGUIAdapter, SSE_CONTENT_TYPE, StateDeps
     ```
 
-=== "After"
+=== "迁移后"
 
     ```python {title="ag_ui_shim_after.py" noqa="F401 I001"}
     from pydantic_ai.ui import SSE_CONTENT_TYPE, StateDeps
@@ -386,7 +386,7 @@ shim module 会重新导出在 2.0 中位于两个不同位置的符号：
 
 挂载一个 Starlette/FastAPI route，调用 [`AGUIAdapter.dispatch_request()`][pydantic_ai.ui.ag_ui.AGUIAdapter.dispatch_request]（形状与[处理 Starlette request](#handle-a-starlette-request) 相同）：
 
-=== "Before (deprecated)"
+=== "迁移前（已弃用）"
 
     ```python {title="agent_to_ag_ui_before.py" test="skip"}
     from pydantic_ai import Agent
@@ -395,7 +395,7 @@ shim module 会重新导出在 2.0 中位于两个不同位置的符号：
     app = agent.to_ag_ui()
     ```
 
-=== "After"
+=== "迁移后"
 
     ```python {title="agent_to_ag_ui_after.py"}
     from fastapi import FastAPI
@@ -418,7 +418,7 @@ shim module 会重新导出在 2.0 中位于两个不同位置的符号：
 
 直接用 [`Starlette`](https://www.starlette.io/applications/) route 构建 ASGI app，并调用 [`AGUIAdapter.dispatch_request()`][pydantic_ai.ui.ag_ui.AGUIAdapter.dispatch_request]：
 
-=== "Before (deprecated)"
+=== "迁移前（已弃用）"
 
     ```python {title="agui_app_before.py" test="skip"}
     from pydantic_ai import Agent
@@ -428,7 +428,7 @@ shim module 会重新导出在 2.0 中位于两个不同位置的符号：
     app = AGUIApp(agent)
     ```
 
-=== "After"
+=== "迁移后"
 
     ```python {title="agui_app_after.py"}
     from starlette.applications import Starlette
