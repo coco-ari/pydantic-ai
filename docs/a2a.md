@@ -1,4 +1,4 @@
-# Agent2Agent (A2A) Protocol
+# Agent2Agent (A2A) Protocol 协议 {#agent2agent-a2a-protocol}
 
 !!! warning "在 1.x 中已弃用，将在 2.0 中移除"
     `Agent.to_a2a()` 和 `pydantic-ai-slim[a2a]` extra 已弃用，并将在 2.0 中移除。`fasta2a` 包现在由 [datalayer/fasta2a](https://github.com/datalayer/fasta2a) 维护，并从 [v0.6.1](https://github.com/datalayer/fasta2a/releases/tag/v0.6.1) 开始提供 Pydantic AI bridge。请安装带 `pydantic-ai` extra 的版本，并直接使用 `agent_to_a2a`：
@@ -35,7 +35,7 @@ _你可以用 `uvicorn agent_to_a2a:app --host 0.0.0.0 --port 8000` 运行此示
 
 关于[将 Pydantic AI agents 暴露为 A2A servers](#pydantic-ai-agent-to-a2a-server)，请阅读更多内容。
 
-## FastA2A
+## FastA2A 库 {#fasta2a}
 
 **FastA2A** 是 A2A protocol 的 Python 实现，与具体 agentic framework 无关。该库被设计为可与任何 agentic framework 一起使用，并且**不专属于 Pydantic AI**。
 

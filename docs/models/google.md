@@ -218,7 +218,7 @@ result = agent.run_sync(
 
 请求完成后，可检查 [`ModelResponse`][pydantic_ai.messages.ModelResponse] 的 `provider_details.get('traffic_type')`（例如 `ON_DEMAND_FLEX`、`ON_DEMAND_PRIORITY`），在 API 返回该值时确认由哪个层级提供服务。
 
-#### Model Garden
+#### Model Garden 模型库 {#model-garden}
 
 你可以访问 [Model Garden](https://cloud.google.com/model-garden?hl=en) 中支持 `generateContent` API、并且在你的 Google Cloud project 下可用的模型，包括但不限于 Gemini。可以使用以下 `model_name` 模式之一：
 
@@ -382,7 +382,7 @@ agent = Agent(model, model_settings=model_settings)
 更多安全设置说明请参阅 [Gemini API docs](https://ai.google.dev/gemini-api/docs/safety-settings)。
 
 
-### Logprobs
+### Logprobs 对数概率 {#logprobs}
 
 你可以在 [`GoogleModelSettings`][pydantic_ai.models.google.GoogleModelSettings] 中设置 `google_logprobs` 和 `google_top_logprobs`，让模型在响应中返回 logprobs。
 

@@ -40,7 +40,7 @@ agent = Agent.from_file('agent.yaml', custom_capability_types=[MyCapability])
 
 实现细节请参见 [spec 中的自定义 capabilities](agent-spec.md#custom-capabilities-in-specs)。
 
-## Pydantic AI Harness
+## Pydantic AI Harness 能力库 {#pydantic-ai-harness}
 
 [**Pydantic AI Harness**](harness/overview.md) 是 Pydantic AI 的官方 capability 库：memory、guardrails 和 context management 等独立 capabilities 位于这里，而不是 core 中。完整拆分请参见[哪些内容放在哪里？](harness/overview.md#what-goes-where)，也可以直接查看 [capability matrix](https://github.com/pydantic/pydantic-ai-harness#capability-matrix)。
 

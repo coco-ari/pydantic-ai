@@ -1,8 +1,8 @@
-# Web Chat UI
+# Web Chat UI 网页聊天界面 {#web-chat-ui}
 
 Pydantic AI 内置了一个 Web 聊天界面，你可以通过浏览器与自己的 agents 交互。
 
-![Web Chat UI](img/web-chat-ui.png)
+![Web Chat UI 网页聊天界面](img/web-chat-ui.png)
 
 关于使用 `clai web` 的 CLI 用法，请参见 [CLI - Web Chat UI 文档](cli.md#web-chat-ui)。
 
@@ -79,7 +79,7 @@ agent = Agent(
 app = agent.to_web(models=['anthropic:claude-sonnet-4-6'])
 ```
 
-!!! note "Memory Tool"
+!!! note "Memory Tool 记忆工具"
     `memory` 原生工具不支持通过 `to_web()` 或 `clai web` 使用。如果你的 agent 需要 memory，请在构造 agent 时直接配置 [`MemoryTool`][pydantic_ai.native_tools.MemoryTool]。
 
 ## 额外 Instructions

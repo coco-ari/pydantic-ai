@@ -375,7 +375,7 @@ class CustomSpanCheck(Evaluator):
         }
 ```
 
-### SpanTree API {#spantree-api}
+### SpanTree API 接口 {#spantree-api}
 
 [`SpanTree`][pydantic_evals.otel.SpanTree] 提供 span 分析方法：
 

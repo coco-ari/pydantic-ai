@@ -1,4 +1,4 @@
-# Case Lifecycle Hooks {#case-lifecycle-hooks}
+# Case Lifecycle Hooks 用例生命周期钩子 {#case-lifecycle-hooks}
 
 使用 [`CaseLifecycle`][pydantic_evals.lifecycle.CaseLifecycle] 控制 evaluation 期间每个 case 的 setup、context preparation 和 teardown。
 

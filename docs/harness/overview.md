@@ -1,4 +1,4 @@
-# Pydantic AI Harness
+# Pydantic AI Harness 能力库 {#pydantic-ai-harness}
 
 [**Pydantic AI Harness**](https://github.com/pydantic/pydantic-ai-harness) 是 Pydantic AI 的官方[能力](../capabilities.md)库，也就是智能体的"电池包"。
 

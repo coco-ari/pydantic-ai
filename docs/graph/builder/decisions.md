@@ -1,4 +1,4 @@
-# Decision Nodes {#decision-nodes}
+# Decision Nodes 决策节点 {#decision-nodes}
 
 Decision nodes 允许你根据流经 graph 的数据类型或值进行条件分支。
 

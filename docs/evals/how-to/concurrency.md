@@ -180,7 +180,7 @@ report = dataset.evaluate_sync(
 
 同步和异步 evaluation 都支持并发控制：
 
-### Sync API
+### Sync API 同步接口 {#sync-api}
 
 ```python
 from pydantic_evals import Case, Dataset
@@ -196,7 +196,7 @@ dataset = Dataset(name='sync_demo', cases=[Case(inputs='test1')])
 report = dataset.evaluate_sync(my_task, max_concurrency=10)
 ```
 
-### Async API
+### Async API 异步接口 {#async-api}
 
 ```python
 from pydantic_evals import Case, Dataset

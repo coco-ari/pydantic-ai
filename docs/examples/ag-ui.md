@@ -97,7 +97,7 @@ Perform the following steps, waiting for the response of each step before contin
 #### 计划 prompts {#plan-prompts}
 
 ```text
-Create a plan for breakfast and execute it
+创建一份早餐计划并执行它
 ```
 
 #### Agentic Generative UI 代码 {#agentic-generative-ui-code}
@@ -140,13 +140,13 @@ Generate a list of steps for cleaning a car for me to review
 起始文档文本：
 
 ```markdown
-Bruce was a good dog,
+Bruce 是一只好狗，
 ```
 
 智能体 prompt：
 
 ```text
-Help me complete my story about bruce the dog, is should be no longer than a sentence.
+帮我完成关于小狗 Bruce 的故事，不要超过一句话。
 ```
 
 #### Predictive State Updates 代码 {#predictive-state-updates-code}
@@ -187,7 +187,7 @@ Help me complete my story about bruce the dog, is should be no longer than a sen
 #### Haiku prompt {#haiku-prompt}
 
 ```text
-Generate a haiku about formula 1
+生成一首关于 Formula 1 的俳句
 ```
 
 #### Tool Based Generative UI 代码 {#tool-based-generative-ui-code}

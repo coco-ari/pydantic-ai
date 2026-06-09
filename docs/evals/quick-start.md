@@ -1,4 +1,4 @@
-# Pydantic Evals
+# Pydantic Evals 评估 {#pydantic-evals}
 
 **Pydantic Evals** 是一个强大的评估框架，用于系统化测试和评估 AI 系统，范围从简单 LLM 调用到复杂多智能体应用。
 
@@ -129,7 +129,7 @@ dataset = Dataset(
 )
 ```
 
-### LLM-as-a-Judge Evaluation {#llm-as-a-judge-evaluation}
+### LLM-as-a-Judge Evaluation 评估 {#llm-as-a-judge-evaluation}
 
 使用 LLM 评估准确性或有用性等主观质量：
 

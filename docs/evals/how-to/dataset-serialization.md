@@ -49,7 +49,7 @@ dataset.to_file('my_tests.yaml')
 
 这会创建两个文件：
 
-1. **`my_tests.yaml`** - dataset
+1. **`my_tests.yaml`** - 数据集
 2. **`my_tests_schema.json`** - 用于 IDE 支持的 JSON schema
 
 ### YAML 输出 {#yaml-output}
@@ -84,9 +84,9 @@ evaluators:
 !!! note "编辑器支持"
     `yaml-language-server` 注释受以下工具支持：
 
-    - VS Code (with YAML extension)
-    - JetBrains IDEs (PyCharm, IntelliJ, etc.)
-    - Most editors with YAML language server support
+    - VS Code（带 YAML 扩展）
+    - JetBrains IDEs（PyCharm、IntelliJ 等）
+    - 大多数支持 YAML language server 的编辑器
 
     更多细节请参见 [YAML Language Server docs](https://github.com/redhat-developer/yaml-language-server#using-inlined-schema)。
 

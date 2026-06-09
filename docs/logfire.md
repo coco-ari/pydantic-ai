@@ -25,7 +25,7 @@ Pydantic AI 对 Logfire 提供内置（但可选）支持。这意味着如果�
 
 下面示例展示了在 Logfire 中运行 [Weather Agent](examples/weather-agent.md) 的细节：
 
-![Weather Agent Logfire](img/logfire-weather-agent.png)
+![Weather Agent 的 Logfire 视图](img/logfire-weather-agent.png)
 
 一次智能体运行会生成一条 trace，并为每次模型请求和工具调用发出 spans。
 
@@ -85,7 +85,7 @@ _（这个示例是完整的，可以"按原样"运行）_
 
 它会在 Logfire 中显示如下：
 
-![Logfire Simple Agent Run](img/logfire-simple-agent.png)
+![Logfire 简单智能体运行](img/logfire-simple-agent.png)
 
 [Logfire 文档](https://logfire.pydantic.dev/docs/)包含更多使用 Logfire 的细节，
 包括如何为 [HTTPX](https://logfire.pydantic.dev/docs/integrations/http-clients/httpx/) 和 [FastAPI](https://logfire.pydantic.dev/docs/integrations/web-frameworks/fastapi/) 等其他库插桩。
@@ -102,7 +102,7 @@ _（这个示例是完整的，可以"按原样"运行）_
 
 我们也可以在 Logfire 中用 SQL 查询数据，从而监控应用性能。下面是一个真实示例：在 Logfire 自身内部使用 Logfire 监控 Pydantic AI 运行：
 
-![Logfire monitoring Pydantic AI](img/logfire-monitoring-pydanticai.png)
+![Logfire 监控 Pydantic AI](img/logfire-monitoring-pydanticai.png)
 
 ### 监控 HTTP 请求 {#monitoring-http-requests}
 
@@ -129,7 +129,7 @@ print(result.output)
 
 1. 更多细节请参阅 [`logfire.instrument_httpx` 文档][logfire.Logfire.instrument_httpx]；`capture_all=True` 表示同时捕获请求和响应的 headers 与 body。
 
-![Logfire with HTTPX instrumentation](img/logfire-with-httpx.png)
+![带 HTTPX 插桩的 Logfire](img/logfire-with-httpx.png)
 
 ## 使用 OpenTelemetry {#using-opentelemetry}
 
@@ -176,11 +176,11 @@ print(result.output)
 
 运行上面的代码会把 tracing 数据发送到 `otel-tui`，并显示如下：
 
-![otel tui simple](img/otel-tui-simple.png)
+![otel tui 简单视图](img/otel-tui-simple.png)
 
 把 [weather agent](examples/weather-agent.md) 示例连接到 `otel-tui` 时，可以看到它如何用于可视化更复杂的 trace：
 
-![otel tui weather agent](img/otel-tui-weather.png)
+![otel tui 天气智能体](img/otel-tui-weather.png)
 
 关于使用 Logfire SDK 向替代后端发送数据的更多信息，请参阅
 [Logfire 文档](https://logfire.pydantic.dev/docs/how-to-guides/alternative-backends/)。

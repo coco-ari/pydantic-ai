@@ -165,7 +165,7 @@ async def main():
 其 attributes 会展示队列深度和配置的限制。`ConcurrencyLimiter` 上的 `name` 参数
 有助于在 traces 中识别共享 limiter。
 
-<!-- TODO(Marcelo): We need to create a section in the docs about reliability. -->
+<!-- TODO(Marcelo): 需要在文档中创建一个关于可靠性的章节。 -->
 
 ## 回退模型 {#fallback-model}
 
@@ -187,7 +187,7 @@ async def main():
 
 在下面的示例中，智能体先向 OpenAI 模型发起请求（由于 API key 无效而失败），然后回退到 Anthropic 模型。
 
-<!-- TODO(Marcelo): Do not skip this test. For some reason it becomes a flaky test if we don't skip it. -->
+<!-- TODO(Marcelo): 不要跳过这个测试。由于某些原因，如果不跳过它，这会变成一个 flaky test。 -->
 
 ```python {title="fallback_model.py" test="skip"}
 from pydantic_ai import Agent

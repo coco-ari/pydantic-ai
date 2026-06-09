@@ -9,7 +9,7 @@ graph builder API 为并行执行提供了两种强大机制：**broadcasting** 
 
 二者都会在 execution graph 中创建 "forks"，随后可用 [join nodes](joins.md) 同步。
 
-## Broadcasting {#broadcasting}
+## Broadcasting 广播 {#broadcasting}
 
 Broadcasting 会同时将相同数据发送到多个目标：
 
@@ -63,7 +63,7 @@ _（此示例是完整的，可以"原样"运行；你需要添加 `import async
 
 三个 steps 都会接收相同 input value（`10`）并并行执行。
 
-## Spreading {#spreading}
+## Spreading 展开 {#spreading}
 
 Spreading 会 fan out iterable 中的元素，并行处理每个元素：
 
@@ -107,7 +107,7 @@ async def main():
 
 _（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-### Spreading AsyncIterables {#spreading-asynciterables}
+### Spreading AsyncIterables 展开异步可迭代对象 {#spreading-asynciterables}
 
 `.map()` operation 也适用于 `AsyncIterable` values。对 async iterable 进行 mapping 时，graph 会在 values 被 yielded 时动态创建 parallel tasks。这对于 streaming data 或处理动态生成的数据尤其有用：
 
@@ -346,7 +346,7 @@ async def main():
 
 _（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Edge Labels {#edge-labels}
+## Edge Labels 边标签 {#edge-labels}
 
 为 parallel edges 添加 labels，以改善文档：
 
@@ -443,7 +443,7 @@ async def main():
 
 _（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Edge Transformations {#edge-transformations}
+## Edge Transformations 边转换 {#edge-transformations}
 
 你可以使用 `.transform()` 方法，在数据沿 edges 流动时进行 inline 转换：
 

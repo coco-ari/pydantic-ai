@@ -654,7 +654,7 @@ async def main():
 - 比较 runs 时产生困惑
 - 浪费时间调试 "为什么结果不同"
 
-## Metrics vs Attributes vs Metadata {#metrics-vs-attributes-vs-metadata}
+## Metrics vs Attributes vs Metadata 指标、属性与元数据 {#metrics-vs-attributes-vs-metadata}
 
 理解它们的差异：
 

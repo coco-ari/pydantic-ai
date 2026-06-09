@@ -14,12 +14,12 @@ Function tools 为模型提供一种机制，让它们可以执行动作并检�
 
 对于更高级的用例，[toolsets](toolsets.md) 功能允许你管理一组 tools（由你构建，或由 [MCP server](mcp/client.md) 或其他[第三方](third-party-tools.md#third-party-tools)提供），并通过 `Agent` 的 [`toolsets`][pydantic_ai.agent.Agent.__init__] 关键字参数一次性注册到 agent。内部会把所有 `tools` 和 `toolsets` 收集到一个[组合 toolset](toolsets.md#combining-toolsets) 中，提供给模型使用。
 
-!!! info "Function tools vs. RAG"
+!!! info "Function tools 与 RAG"
     Function tools 基本上是 RAG（Retrieval-Augmented Generation）中的 "R"：它们通过让模型请求额外信息，扩展模型能做的事情。
 
     Pydantic AI Tools 和 RAG 的主要语义区别在于，RAG 通常等同于向量搜索，而 Pydantic AI tools 更通用。对于向量搜索，你可以使用我们的 [embeddings](embeddings.md) 支持，跨多个 providers 生成 embeddings。
 
-!!! info "Function Tools vs. Structured Outputs"
+!!! info "Function Tools 与 Structured Outputs"
     顾名思义，function tools 使用模型的 "tools" 或 "functions" API 告诉模型有哪些内容可以调用。使用默认[工具输出模式](output.md#tool-output)时，tools 或 functions 也用于定义[结构化输出](output.md)的 schema。因此，模型可能可以访问许多 tools，其中一些调用 function tools，另一些则结束运行并生成最终输出。
 
 ## 通过装饰器注册 {#registering-function-tools-via-decorator}

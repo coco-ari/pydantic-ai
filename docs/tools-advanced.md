@@ -599,7 +599,7 @@ async def lifespan(app):
 !!! note "限制工具执行"
     你可以使用 [`UsageLimits(tool_calls_limit=...)`](agent.md#usage-limits) 限制单次 run 内的 tool executions。Counter 只会在一次成功的工具调用后递增。用于[结构化输出](output.md)的 Output tools 不会计入 `tool_calls` metric。
 
-#### Output Tool Calls {#output-tool-calls}
+#### Output Tool Calls 输出工具调用 {#output-tool-calls}
 
 当模型在调用其他工具的同时并行调用 [output tool](output.md#tool-output) 时，agent 的 [`end_strategy`][pydantic_ai.agent.Agent.end_strategy] 参数会控制这些 tool calls 如何执行。
 `'graceful'` strategy 确保即使找到 final result 后，也会执行所有 function tools，同时跳过剩余 output tools。`'exhaustive'` strategy 更进一步，也会执行所有 output tools。当工具有 side effects（例如 logging、发送 notifications 或更新 metrics）并且应始终执行时，两者都很有用。

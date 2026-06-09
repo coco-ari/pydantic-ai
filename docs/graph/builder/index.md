@@ -1,4 +1,4 @@
-# Graph Builder API {#graph-builder-api}
+# Graph Builder API 图构建器接口 {#graph-builder-api}
 
 graph builder API 提供了强大的 builder pattern，用于构建并行执行图。原始的基于 [`BaseNode`][pydantic_graph.basenode.BaseNode] 的 graph API 仍然可用（并且可与 builder API 互操作），其文档位于[主 graph 文档](../../graph.md)。
 
@@ -82,7 +82,7 @@ _（此示例是完整的，可以"原样"运行；你需要添加 `import async
 
 ## 核心概念 {#key-concepts}
 
-### GraphBuilder {#graphbuilder}
+### GraphBuilder 构建器 {#graphbuilder}
 
 [`GraphBuilder`][pydantic_graph.graph_builder.GraphBuilder] 是构建 graphs 的主要入口。它对以下类型泛型化：
 
@@ -91,15 +91,15 @@ _（此示例是完整的，可以"原样"运行；你需要添加 `import async
 - `InputT` - graph 的 initial input 类型
 - `OutputT` - graph 的 final output 类型
 
-### Steps {#steps}
+### Steps 步骤 {#steps}
 
 Steps 是用 [`@g.step`][pydantic_graph.graph_builder.GraphBuilder.step] 装饰的 async functions，用于定义每个 node 中要完成的实际工作。它们会接收 [`StepContext`][pydantic_graph.step.StepContext]，可访问：
 
-- `ctx.state` - mutable graph state
+- `ctx.state` - 可变的 graph state
 - `ctx.deps` - 注入的 dependencies
 - `ctx.inputs` - 此 step 的 input data
 
-### Edges {#edges}
+### Edges 边 {#edges}
 
 Edges 定义 nodes 之间的连接。builder 提供多种创建 edges 的方式：
 

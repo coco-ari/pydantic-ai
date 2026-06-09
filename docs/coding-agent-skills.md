@@ -34,7 +34,7 @@ npx skills add pydantic/skills
 
 这可通过 [agentskills.io](https://agentskills.io) 标准用于 30 多种智能体，包括 Claude Code、Codex、Cursor 和 Gemini CLI。
 
-### Library Skills
+### Library Skills 库技能 {#library-skills}
 
 Pydantic AI 也会将其 skill 随包一起发布，因此你可以通过 [library-skills.io](https://library-skills.io) 直接从项目依赖中安装：
 

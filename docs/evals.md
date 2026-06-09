@@ -141,7 +141,7 @@ _（这个示例是完整的，可以直接运行）_
 
 参阅[数据集管理](evals/how-to/dataset-management.md)，了解如何保存、加载和生成 datasets。
 
-## Evaluators {#evaluators}
+## Evaluators 评估器 {#evaluators}
 
 [`Evaluator`][pydantic_evals.evaluators.Evaluator] 会在你的 Task 针对 Case 测试时分析并评分结果。
 
@@ -264,7 +264,7 @@ _（这个示例是完整的，可以直接运行）_
 
 ## 下一步 {#next-steps}
 
-<!-- TODO - this would be the perfect place for a full tutorial or case study  -->
+<!-- TODO - 这里非常适合放一个完整教程或案例研究 -->
 1. **从简单评估开始**：[快速开始](evals/quick-start.md)
 2. **理解数据模型**：[核心概念](evals/core-concepts.md)
 3. **探索内置评估器**：[内置评估器](evals/evaluators/built-in.md)

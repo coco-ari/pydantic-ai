@@ -1,4 +1,4 @@
-# UI Event Streams {#ui-event-streams}
+# UI Event Streams UI 事件流 {#ui-event-streams}
 
 如果你正在为 AI agent 构建聊天应用或其他交互式前端，后端需要从前端接收 agent run input（例如聊天消息或完整[消息历史](../message-history.md)），并需要将 [agent events](../agent.md#streaming-all-events)（例如文本、thinking 和 tool calls）流式传输到前端，让用户实时了解正在发生什么。
 
@@ -6,8 +6,8 @@
 
 Pydantic AI 原生支持两种 UI event stream protocols：
 
-- [Agent-User Interaction (AG-UI) Protocol](./ag-ui.md)
-- [Vercel AI Data Stream Protocol](./vercel-ai.md)
+- [Agent-User Interaction (AG-UI) Protocol 智能体用户交互协议](./ag-ui.md)
+- [Vercel AI Data Stream Protocol 数据流协议](./vercel-ai.md)
 
 这些集成都实现为抽象 [`UIAdapter`][pydantic_ai.ui.UIAdapter] 类的子类，因此也可以作为集成其他 UI event stream protocols 的参考。
 

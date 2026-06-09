@@ -230,7 +230,7 @@ dataset = Dataset(
 )
 ```
 
-## Case-specific evaluators {#case-specific-evaluators}
+## Case-specific evaluators 用例专属评估器 {#case-specific-evaluators}
 
 Case-specific evaluators 是构建全面评估套件时最强大的功能之一。你可以把评估器附加到单个 [`Case`][pydantic_evals.dataset.Case] 对象上，并且它们只会针对这些特定 cases 运行：
 
@@ -353,7 +353,7 @@ dataset = Dataset(
 
 LLM evaluator 擅长理解细微需求并评估合规性，因此这是一种实用方式，能创建彻底的评估覆盖，同时避免脆弱性。
 
-## Async vs Sync {#async-vs-sync}
+## Async vs Sync 异步与同步 {#async-vs-sync}
 
 Evaluators 可以是同步或异步的：
 

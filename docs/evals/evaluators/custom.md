@@ -27,7 +27,7 @@ class ExactMatch(Evaluator):
 - 实现 `evaluate(self, ctx: EvaluatorContext) -> EvaluatorOutput`
 - 返回 `bool`、`int`、`float`、`str`、[`EvaluationReason`][pydantic_evals.evaluators.EvaluationReason]，或由这些类型组成的 `dict`
 
-## EvaluatorContext
+## EvaluatorContext 上下文 {#evaluatorcontext}
 
 上下文提供 case 执行的所有信息：
 

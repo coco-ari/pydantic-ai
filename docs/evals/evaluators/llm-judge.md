@@ -40,7 +40,7 @@ dataset = Dataset(
 
 ## 配置选项 {#configuration-options}
 
-### Rubric
+### Rubric 评分准则 {#rubric}
 
 `rubric` 是你的评估标准。应具体且清晰：
 

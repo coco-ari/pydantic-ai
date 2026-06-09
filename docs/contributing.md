@@ -103,8 +103,8 @@ cd pydantic-ai
 
 安装 `uv`（0.4.30 或更高版本）和 `pre-commit`：
 
-- [`uv` install docs](https://docs.astral.sh/uv/getting-started/installation/)
-- [`pre-commit` install docs](https://pre-commit.com/#install)
+- [`uv` 安装文档](https://docs.astral.sh/uv/getting-started/installation/)
+- [`pre-commit` 安装文档](https://pre-commit.com/#install)
 
 要安装 `pre-commit`，可以运行以下命令：
 

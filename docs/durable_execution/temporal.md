@@ -172,7 +172,7 @@ _（这个示例是完整的，可以"按原样"运行；你需要添加 `asynci
 具体来说，默认只有 `deps`、`run_id`、`metadata`、`retries`、`tool_call_id`、`tool_name`、`tool_call_approved`、`tool_call_metadata`、`retry`、`max_retries`、`run_step`、`usage` 和 `partial_output` 字段可用；尝试访问 `model`、`prompt`、`messages` 或 `tracer` 会抛出错误。
 如果你需要在 activities 内访问其中一个或多个属性，可以创建 [`TemporalRunContext`][pydantic_ai.durable_exec.temporal.TemporalRunContext] 子类，实现自定义 `serialize_run_context` 和 `deserialize_run_context` 类方法，并把它作为 `run_context_type` 传给 [`TemporalAgent`][pydantic_ai.durable_exec.temporal.TemporalAgent]。
 
-### Streaming {#streaming}
+### Streaming 流式传输 {#streaming}
 
 因为 Temporal activities 不能直接向 activity 调用位置 streaming 输出，所以不支持 [`Agent.run_stream()`][pydantic_ai.agent.Agent.run_stream]、[`Agent.run_stream_events()`][pydantic_ai.agent.Agent.run_stream_events] 和 [`Agent.iter()`][pydantic_ai.agent.Agent.iter]。
 

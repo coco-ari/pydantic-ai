@@ -9,12 +9,12 @@
 - 速率限制
 - 网络超时
 - 临时 API 中断
-- Context length errors
+- 上下文长度错误
 
 Pydantic Evals 支持为以下两者配置 retry：
 
-- **Task execution** - 被评估的函数
-- **Evaluator execution** - evaluators 本身
+- **Task execution 任务执行** - 被评估的函数
+- **Evaluator execution 评估器执行** - evaluators 本身
 
 ## 基本 Retry 配置 {#basic-retry-configuration}
 
@@ -81,7 +81,7 @@ retry 配置接受 tenacity `retry` 装饰器的任何参数。常见参数包�
 
 所有可用选项请参见 [Tenacity documentation](https://tenacity.readthedocs.io/)。
 
-## Task Retries {#task-retries}
+## Task Retries 任务重试 {#task-retries}
 
 当 task function 失败时进行重试：
 
@@ -155,7 +155,7 @@ async def my_task(inputs: str) -> str:
 
 实际延迟取决于传给 `wait_exponential()` 的 `multiplier`、`min` 和 `max` 参数。
 
-## Evaluator Retries {#evaluator-retries}
+## Evaluator Retries 评估器重试 {#evaluator-retries}
 
 当 evaluators 失败时重试：
 
@@ -211,7 +211,7 @@ class APIEvaluator(Evaluator):
         return result
 ```
 
-### Evaluator Failures {#evaluator-failures}
+### Evaluator Failures 评估器失败 {#evaluator-failures}
 
 如果 evaluator 在所有 retries 后仍失败，会记录为 [`EvaluatorFailure`][pydantic_evals.evaluators.EvaluatorFailure]：
 
@@ -416,8 +416,8 @@ report = dataset.evaluate_sync(
 
 **Error handling 适用于：**
 
-- Validation errors
-- Logic errors
+- 校验错误
+- 逻辑错误
 - 永久失败
 - 预期错误条件
 

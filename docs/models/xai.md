@@ -73,7 +73,7 @@ agent = Agent(model)
 ...
 ```
 
-## X Search
+## X Search 搜索 {#x-search}
 
 xAI models 支持搜索 X（原 Twitter）上的实时 posts 和内容。推荐用 [`XSearch`][pydantic_ai.capabilities.XSearch] capability 启用它。更多细节（包括跨 provider 用法）请参见 [capability 文档](../capabilities.md#provider-adaptive-tools)。支持选项的完整列表请参见 [xAI X Search 文档](https://docs.x.ai/developers/tools/x-search)。
 

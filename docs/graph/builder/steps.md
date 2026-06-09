@@ -1,4 +1,4 @@
-# Steps {#steps}
+# Steps 步骤 {#steps}
 
 Steps 是 graph 中的基本工作单元。它们是接收 [`StepContext`][pydantic_graph.step.StepContext] 并返回值的 async functions。
 
@@ -39,7 +39,7 @@ async def main():
 
 _（此示例是完整的，可以"原样"运行；你需要添加 `import asyncio; asyncio.run(main())` 来运行 `main`）_
 
-## Step Context {#step-context}
+## Step Context 步骤上下文 {#step-context}
 
 每个 step function 都会将 [`StepContext`][pydantic_graph.step.StepContext] 作为第一个参数接收。context 提供对以下内容的访问：
 
@@ -286,7 +286,7 @@ _（此示例是完整的，可以"原样"运行；你需要添加 `import async
 
 计算过程是：`(10 + 5) * 2 - 3 = 27`
 
-## Streaming Steps {#streaming-steps}
+## Streaming Steps 流式步骤 {#streaming-steps}
 
 除了返回单个值的普通 steps，你还可以使用 [`@g.stream`][pydantic_graph.graph_builder.GraphBuilder.stream] 装饰器创建 streaming steps，让它们随时间 yield 多个值：
 

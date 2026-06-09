@@ -2,7 +2,7 @@
 
 Pydantic AI 使用依赖注入系统，向智能体的 [system prompts](agent.md#system-prompts)、[工具](tools.md)和[输出校验器](output.md#output-validator-functions)提供数据和服务。
 
-与 Pydantic AI 的设计理念一致，我们的依赖系统尽量使用 Python 开发中的既有最佳实践，而不是发明晦涩的“魔法”。这应该能让依赖具备类型安全、易理解、更易测试，并最终更易部署到生产环境。
+与 Pydantic AI 的设计理念一致，我们的依赖系统尽量使用 Python 开发中的既有最佳实践，而不是发明晦涩的"魔法"。这应该能让依赖具备类型安全、易理解、更易测试，并最终更易部署到生产环境。
 
 ## 定义依赖
 
@@ -47,7 +47,7 @@ async def main():
 2. 将 dataclass 类型传给 [`Agent` 构造函数][pydantic_ai.agent.Agent.__init__]的 `deps_type` 参数。**注意**：这里传入的是类型，不是实例；这个参数在运行时实际上不会被使用，它存在的目的是让我们能对智能体进行完整类型检查。
 3. 运行智能体时，将 dataclass 的实例传给 `deps` 参数。
 
-_（这个示例是完整的，可以“原样”运行；你需要添加 `asyncio.run(main())` 来运行 `main`。）_
+_（这个示例是完整的，可以"原样"运行；你需要添加 `asyncio.run(main())` 来运行 `main`。）_
 
 ## 访问依赖
 
@@ -96,7 +96,7 @@ async def main():
 3. 通过 [`.deps`][pydantic_ai.tools.RunContext.deps] 属性访问依赖。
 4. 通过 [`.deps`][pydantic_ai.tools.RunContext.deps] 属性访问依赖。
 
-_（这个示例是完整的，可以“原样”运行；你需要添加 `asyncio.run(main())` 来运行 `main`。）_
+_（这个示例是完整的，可以"原样"运行；你需要添加 `asyncio.run(main())` 来运行 `main`。）_
 
 除了 [`.deps`][pydantic_ai.tools.RunContext.deps] 之外，[`RunContext`][pydantic_ai.tools.RunContext] 还可以通过 [`.agent`][pydantic_ai.tools.RunContext.agent] 访问正在运行的智能体。当[工具](tools.md)、[hooks](hooks.md) 或 [capabilities](capabilities.md) 需要读取智能体属性（如 [`name`][pydantic_ai.agent.Agent.name] 或 [`output_type`][pydantic_ai.agent.Agent.output_type]）时，这很有用。
 
@@ -155,7 +155,7 @@ async def main():
 1. 这里我们使用同步的 `httpx.Client`，而不是异步的 `httpx.AsyncClient`。
 2. 为了匹配同步依赖，system prompt 函数现在是普通函数，而不是协程。
 
-_（这个示例是完整的，可以“原样”运行；你需要添加 `asyncio.run(main())` 来运行 `main`。）_
+_（这个示例是完整的，可以"原样"运行；你需要添加 `asyncio.run(main())` 来运行 `main`。）_
 
 ## 完整示例
 
@@ -223,7 +223,7 @@ async def main():
 1. 要将 `RunContext` 传给工具，请使用 [`tool`][pydantic_ai.agent.Agent.tool] 装饰器。
 2. `RunContext` 可以作为第一个参数可选地传给 [`output_validator`][pydantic_ai.agent.Agent.output_validator] 函数。
 
-_（这个示例是完整的，可以“原样”运行；你需要添加 `asyncio.run(main())` 来运行 `main`。）_
+_（这个示例是完整的，可以"原样"运行；你需要添加 `asyncio.run(main())` 来运行 `main`。）_
 
 ## 覆盖依赖
 
@@ -275,7 +275,7 @@ async def application_code(prompt: str) -> str:  # (3)!
 3. 调用智能体的应用代码；在真实应用中，这可能是一个 API endpoint。
 4. 从应用代码内部调用智能体；在真实应用中，这个调用可能位于很深的调用栈中。注意，当 deps 被覆盖时，这里的 `app_deps` 不会被使用。
 
-_（这个示例是完整的，可以“原样”运行。）_
+_（这个示例是完整的，可以"原样"运行。）_
 
 ```python {title="test_joke_app.py" hl_lines="10-12" call_name="test_application_code" requires="joke_app.py"}
 from joke_app import MyDeps, application_code, joke_agent
@@ -302,6 +302,6 @@ async def test_application_code():
 
 以下示例展示如何在 Pydantic AI 中使用依赖：
 
-- [Weather Agent](examples/weather-agent.md)
-- [SQL Generation](examples/sql-gen.md)
+- [天气智能体](examples/weather-agent.md)
+- [SQL 生成](examples/sql-gen.md)
 - [RAG](examples/rag.md)

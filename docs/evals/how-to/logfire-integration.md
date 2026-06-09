@@ -48,19 +48,19 @@ report = dataset.evaluate_sync(my_task)
 
 运行 evaluation 时，Logfire 会收到：
 
-1. **Evaluation metadata**
+1. **Evaluation metadata 评估元数据**
     1. 数据集名称
     1. cases 数量
     1. evaluator 名称
 2. **每个 case 的数据**
     1. inputs 和 outputs
-    1. expected outputs
-    1. metadata
+    1. expected outputs 预期输出
+    1. metadata 元数据
     1. 执行时长
 3. **Evaluation 结果**
     1. 分数、断言和 labels
     1. reasons（如果包含）
-    1. evaluator failures
+    1. evaluator failures 评估器失败
 4. **任务执行 traces**
     1. 来自任务函数的所有 OpenTelemetry spans
     1. 工具调用（对于 Pydantic AI agents）
@@ -72,7 +72,7 @@ report = dataset.evaluate_sync(my_task)
 
 Logfire 会在 root evaluation span 上为 evaluation 结果提供一个特殊表格视图：
 
-![Logfire Evals Overview](../../img/logfire-evals-overview.png)
+![Logfire Evals 概览](../../img/logfire-evals-overview.png)
 
 该视图会显示：
 
@@ -86,13 +86,13 @@ Logfire 会在 root evaluation span 上为 evaluation 结果提供一个特殊�
 
 点击任何 case 即可查看详细 inputs 和 outputs：
 
-![Logfire Evals Case](../../img/logfire-evals-case.png)
+![Logfire Evals 用例](../../img/logfire-evals-case.png)
 
 ### 完整 Trace 视图 {#full-trace-view}
 
 查看完整执行 trace，包括 evaluation 期间生成的所有 spans：
 
-![Logfire Evals Case Trace](../../img/logfire-evals-case-trace.png)
+![Logfire Evals 用例追踪](../../img/logfire-evals-case-trace.png)
 
 这对以下场景尤其有用：
 

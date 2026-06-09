@@ -123,7 +123,7 @@ Tools 和 event stream handlers 不会被 DBOS 自动包装。你可以决定如
 
 DBOS 使用 [`pickle`](https://docs.python.org/3/library/pickle.html) 将 workflow inputs/outputs 和 step outputs checkpoint 到数据库中。这意味着你需要确保提供给 [`DBOSAgent.run()`][pydantic_ai.durable_exec.dbos.DBOSAgent.run] 或 [`DBOSAgent.run_sync()`][pydantic_ai.durable_exec.dbos.DBOSAgent.run_sync] 的[依赖](../dependencies.md)对象，以及 tool outputs 都可以用 pickle 序列化。你也可能需要让 inputs 和 outputs 保持较小（小于约 2 MB）。PostgreSQL 和 SQLite 每个字段最多支持 1 GB，但大对象可能影响性能。
 
-### Streaming {#streaming}
+### Streaming 流式传输 {#streaming}
 
 由于 DBOS 无法直接将 output stream 到 workflow 或 step 调用位置，因此在 DBOS workflow 内运行时不支持 [`Agent.run_stream()`][pydantic_ai.agent.Agent.run_stream] 和 [`Agent.run_stream_events()`][pydantic_ai.agent.Agent.run_stream_events]。
 

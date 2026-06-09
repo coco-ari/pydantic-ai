@@ -2,11 +2,11 @@
 
 Pydantic AI 支持与各种第三方工具库集成，让你可以在智能体中利用现有工具生态。第三方工具也可以作为[能力](capabilities.md#third-party-capabilities)使用，完整生态请参见[可扩展性](extensibility.md)。
 
-## MCP Tools {#mcp-tools}
+## MCP Tools 工具 {#mcp-tools}
 
 如何将 MCP server 作为 [toolsets](toolsets.md) 与 Pydantic AI 一起使用，请参见 [MCP Client](./mcp/client.md) 文档。
 
-## LangChain Tools {#langchain-tools}
+## LangChain Tools 工具 {#langchain-tools}
 
 如果你想在 Pydantic AI 中使用 LangChain [社区工具库](https://python.langchain.com/docs/integrations/tools/)中的工具，可以使用 [`tool_from_langchain`][pydantic_ai.ext.langchain.tool_from_langchain] 便捷方法。注意，在这种情况下 Pydantic AI 不会校验参数，模型需要提供匹配 LangChain 工具指定 schema 的参数，而 LangChain 工具负责在参数无效时抛出错误。
 
@@ -50,7 +50,7 @@ agent = Agent('openai:gpt-5.2', toolsets=[toolset])
 # ...
 ```
 
-## ACI.dev Tools {#aci-tools}
+## ACI.dev Tools 工具 {#aci-tools}
 
 !!! warning "在 1.x 中已弃用，将在 2.0 中移除"
     `pydantic_ai.ext.aci`（`tool_from_aci` 和 `ACIToolset`）已弃用，并将在 2.0 中移除（见 [#5467](https://github.com/pydantic/pydantic-ai/pull/5467)）。请使用 [`Tool.from_schema`][pydantic_ai.tools.Tool.from_schema] 基于 `aci.ACI().functions.get_definition(...)` 自行包装 ACI.dev 工具，或直接调用上游 `aci-sdk` 集成。

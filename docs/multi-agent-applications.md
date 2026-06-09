@@ -10,7 +10,7 @@
 
 当然，你可以在单个应用中组合多种策略。
 
-## Agent delegation {#agent-delegation}
+## Agent delegation 智能体委托 {#agent-delegation}
 
 "Agent delegation" 指的是一个 agent 将工作委派给另一个 agent，并在被委派 agent（也就是从 tool 内调用的 agent）完成后重新接管控制的场景。
 如果你想把控制完全交给另一个 agent，而不返回到第一个 agent，可以使用[输出函数](output.md#output-functions)。
@@ -172,7 +172,7 @@ graph TD
   joke_selection_agent --> END
 ```
 
-## Programmatic agent hand-off {#programmatic-agent-hand-off}
+## Programmatic agent hand-off 程序化智能体交接 {#programmatic-agent-hand-off}
 
 "Programmatic agent hand-off" 指的是连续调用多个 agents 的场景，由应用代码和/或人在环路负责决定下一步调用哪个 agent。
 
@@ -319,11 +319,11 @@ graph TB
   seat_preference_agent --> END
 ```
 
-## Pydantic Graphs
+## Pydantic Graphs 图 {#pydantic-graphs}
 
 关于何时以及如何使用 graphs，请参阅 [graph](graph.md) 文档。
 
-## Deep Agents {#deep-agents}
+## Deep Agents 深度智能体 {#deep-agents}
 
 Deep agents 是自主 agents，它们结合多种架构模式和能力，以可靠处理复杂的多步骤任务。这些模式可以用 Pydantic AI 的内置功能和（第三方）toolsets 实现：
 
@@ -377,4 +377,4 @@ Pydantic AI 的 instrumentation 基于 [OpenTelemetry](https://opentelemetry.io/
 
 下面的示例演示如何在 Pydantic AI 中使用多 agent 模式：
 
-- [Flight booking](examples/flight-booking.md)
+- [航班预订](examples/flight-booking.md)

@@ -1,4 +1,4 @@
-# Code Mode
+# Code Mode 代码模式 {#code-mode}
 
 Code mode 是 [**Pydantic AI Harness**](overview.md) 中的一项能力，Pydantic AI Harness 是 Pydantic AI 的官方能力库。完整文档位于 [harness 仓库](https://github.com/pydantic/pydantic-ai-harness)，本页只是简短介绍。
 

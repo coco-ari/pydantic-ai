@@ -2,7 +2,7 @@
 
 Pydantic AI 模型也可以在 MCP servers 中使用。
 
-## MCP server {#mcp-server}
+## MCP server 服务器 {#mcp-server}
 
 下面是一个简单示例，展示如何在 [Python MCP server](https://github.com/modelcontextprotocol/python-sdk) 的工具调用中使用 Pydantic AI：
 
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     asyncio.run(client())
 ```
 
-## MCP Sampling {#mcp-sampling}
+## MCP Sampling 采样 {#mcp-sampling}
 
 !!! info "什么是 MCP Sampling？"
     MCP sampling 是什么，以及使用 Pydantic AI 作为 MCP client 时如何支持它，请参见 [MCP client 文档](./client.md#mcp-sampling)。

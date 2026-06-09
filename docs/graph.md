@@ -32,7 +32,7 @@ pip/uv-add pydantic-graph
 
 `pydantic-graph` 由几个关键组件组成：
 
-### GraphRunContext
+### GraphRunContext 上下文 {#graphruncontext}
 
 [`GraphRunContext`][pydantic_graph.basenode.GraphRunContext] 是 graph run 的上下文，类似于 Pydantic AI 的 [`RunContext`][pydantic_ai.tools.RunContext]。它保存 graph 的 state 和 dependencies，并在节点运行时传给节点。
 
@@ -44,7 +44,7 @@ pip/uv-add pydantic-graph
 
 `End` 对它所在 graph 的返回类型 [`RunEndT`][pydantic_graph.basenode.RunEndT] 是泛型的。
 
-### Nodes
+### Nodes 节点 {#nodes}
 
 [`BaseNode`][pydantic_graph.basenode.BaseNode] 的子类定义 graph 中要执行的节点。
 
@@ -110,7 +110,7 @@ class MyNode(BaseNode[MyState, None, int]):  # (1)!
 1. 我们除了 state 之外，还用返回类型（这里是 `int`）参数化节点。因为泛型参数只能按位置传入，所以必须把 `None` 作为第二个参数来表示 deps。
 2. `run` 方法的返回类型现在是 `AnotherNode` 和 `End[int]` 的 union，这允许节点在 `foo` 能被 5 整除时结束运行。
 
-### Graph
+### Graph 图 {#graph}
 
 [`Graph`][pydantic_graph.graph_builder.Graph] 是由 [`GraphBuilder`][pydantic_graph.graph_builder.GraphBuilder] 产生的可执行 graph。builder 是从 [step functions](graph/builder/steps.md)、[`BaseNode`](#nodes) 类和连接它们的边组装 graph 的入口点。
 
@@ -204,7 +204,7 @@ stateDiagram-v2
   Increment --> DivisibleBy5
 ```
 
-## Stateful Graphs {#stateful-graphs}
+## Stateful Graphs 有状态图 {#stateful-graphs}
 
 `pydantic-graph` 中的 "state" 概念提供了一种可选方式，让节点在 graph 中运行时可以访问并修改某个对象（通常是 `dataclass` 或 Pydantic model）。如果把 Graphs 想成生产线，那么 state 就是沿生产线传递并由每个节点在 graph 运行时逐步构建的引擎。
 
