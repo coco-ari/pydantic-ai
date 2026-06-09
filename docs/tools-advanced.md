@@ -157,8 +157,8 @@ print(result.output)
 
 `prepare` method 可以通过任意工具注册机制的 `prepare` kwarg 注册：
 
-- [`@agent.tool`][pydantic_ai.agent.Agent.tool] decorator
-- [`@agent.tool_plain`][pydantic_ai.agent.Agent.tool_plain] decorator
+- [`@agent.tool`][pydantic_ai.agent.Agent.tool] 装饰器
+- [`@agent.tool_plain`][pydantic_ai.agent.Agent.tool_plain] 装饰器
 - [`Tool`][pydantic_ai.tools.Tool] dataclass
 
 `prepare` method 应为 [`ToolPrepareFunc`][pydantic_ai.tools.ToolPrepareFunc] 类型：一个接受 [`RunContext`][pydantic_ai.tools.RunContext] 和预构建 [`ToolDefinition`][pydantic_ai.tools.ToolDefinition] 的函数。它应返回原 `ToolDefinition`（可修改或不修改）、返回新的 `ToolDefinition`，或返回 `None` 表示该步骤不注册此工具。
@@ -344,7 +344,7 @@ _（这个示例是完整的，可以"原样"运行）_
 
 如果同时使用 per-tool `prepare` 和 agent-wide `prepare_tools`，会先对每个工具应用 per-tool `prepare`，然后用得到的 tool definitions list 调用 `prepare_tools`。
 
-## Tool Choice {#tool-choice}
+## Tool Choice 工具选择 {#tool-choice}
 
 [`ModelSettings`][pydantic_ai.settings.ModelSettings] 中的 `tool_choice` 设置控制模型在请求期间可以使用哪些工具。它适合用于禁用工具、强制使用工具，或限制可用工具。
 
@@ -436,9 +436,9 @@ def get_weather(city: str) -> str:
 
 所有 providers 都支持 `'auto'` 和 `'none'`。其他选项的关键差异如下：
 
-| Provider | `'required'` | 特定工具 | Notes |
+| Provider | `'required'` | 特定工具 | 说明 |
 | --- | :---: | :---: | --- |
-| OpenAI | ✓ | ✓ | Full support |
+| OpenAI | ✓ | ✓ | 完整支持 |
 | Anthropic | ⚠️ | ⚠️ | thinking enabled 时不支持 |
 | Google | ✓ | ✓ | |
 | Bedrock | ✓ | Single only | 多个工具会 fallback 到 'any' mode |
@@ -693,7 +693,7 @@ def mortgage_calculator(principal: float, rate: float, years: int) -> str:
 
 可用 strategy values：
 
-| `strategy` | Algorithm | Behavior |
+| `strategy` | 算法 | 行为 |
 | --- | --- | --- |
 | `None`（默认） | provider 原生 algorithm（可用时），否则 local keyword matching | Anthropic 在 Sonnet 4.5+/Opus 4.5+/Haiku 4.5+ 上使用 native BM25；OpenAI 在 GPT-5.4+ 上使用 server-executed `tool_search`；其他地方使用 local keyword matching。 |
 | `'keywords'` | Local keyword-overlap | keyword algorithm 在我们这一侧运行，但 wire shape 会适配：支持时使用 client-executed native（Anthropic、OpenAI），以保持 prompt cache 温热；其他地方使用普通 `search_tools` function tool。 |

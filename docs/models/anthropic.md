@@ -42,7 +42,7 @@ agent = Agent(model)
 ...
 ```
 
-!!! note "Claude Opus 4.7 / 4.8 migration"
+!!! note "Claude Opus 4.7 / 4.8 迁移"
     Anthropic 的 [Claude Opus migration guide](https://platform.claude.com/docs/en/about-claude/models/migration-guide) 建议从 Opus 4.7 和 4.8 请求中移除 `temperature`、`top_p` 和 `top_k`。Pydantic AI 会针对 `claude-opus-4-7` 和 `claude-opus-4-8` 自动丢弃这些 keys，包括 `extra_body` overrides。
 
     同一指南还建议从 Opus 4.6 迁移时重新评估 `max_tokens` 和任何 token 计数假设，因为 Opus 4.7 引入了更新后的 tokenization（延续到 4.8）。如果你依赖 `count_tokens()` 或 `count_tokens_before_request`，请根据新模型验证你的阈值。
@@ -133,7 +133,7 @@ agent = Agent(model)
 ...
 ```
 
-!!! note "Bedrock vs BedrockConverseModel"
+!!! note "Bedrock 与 BedrockConverseModel"
     此方法使用 Anthropic 的 SDK 和 AWS Bedrock 凭据。如需直接使用 AWS SDK (boto3) 的替代方案，请参阅 [`BedrockConverseModel`](bedrock.md)。
 
 !!! note "旧版 `AsyncAnthropicBedrock` client 上的工具搜索"
@@ -212,11 +212,11 @@ Task budgets 可以与 [`anthropic_effort`][pydantic_ai.models.anthropic.Anthrop
 !!! warning
     `task_budget.remaining` 与 [`AnthropicCompaction`][pydantic_ai.models.anthropic.AnthropicCompaction] 互斥：Anthropic 会拒绝将两者组合的请求，因为 server-side compaction 会自行跟踪预算。当配置了这种组合时，Pydantic AI 会在发送请求前引发 [`UserError`][pydantic_ai.exceptions.UserError]。请选择其一：使用 `remaining` 进行 client-side budget tracking，或使用 [`AnthropicCompaction`][pydantic_ai.models.anthropic.AnthropicCompaction] 进行 server-side compaction。
 
-## Prompt Caching {#prompt-caching}
+## Prompt Caching 提示缓存 {#prompt-caching}
 
 Anthropic 支持 [prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching)，可通过缓存部分 prompts 来降低成本。Pydantic AI 支持 automatic caching、per-block message caching 和 explicit cache breakpoints：
 
-### Automatic Caching {#automatic-caching}
+### Automatic Caching 自动缓存 {#automatic-caching}
 
 启用 prompt caching 的最简单方式是使用 [`AnthropicModelSettings.anthropic_cache`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_cache]。这会使用 Anthropic 的 [automatic caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching#automatic-caching)，传入顶层 `cache_control` 参数，让服务器自动对每个请求中最后一个可缓存 block 应用 cache breakpoint：
 
@@ -246,7 +246,7 @@ print(f'Cache read: {result2.usage.cache_read_tokens}')
 !!! note "Bedrock 和 Vertex"
     Bedrock 和 Vertex [尚不支持 automatic caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching#automatic-caching)。在这些平台上，`anthropic_cache` 会回退为在最后一条 user message 上进行 per-block caching，从而为多轮对话提供相同收益。
 
-### Per-block Message Caching {#per-block-message-caching}
+### Per-block Message Caching 分块消息缓存 {#per-block-message-caching}
 
 作为 `anthropic_cache` 的替代方案，[`AnthropicModelSettings.anthropic_cache_messages`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_cache_messages] 会把 per-block `cache_control` 添加到最后一条 message 的最后一个 content block，而不是使用 Anthropic 的顶层 automatic caching 参数。对于接受 Anthropic message format 但不支持顶层 automatic caching 的 Anthropic-compatible gateways 和 proxies（例如 MiniMax、OpenRouter 或 LiteLLM），请使用此方式：
 
@@ -489,7 +489,7 @@ print(f'Cache read tokens: {usage.cache_read_tokens}')
 - 当超出限制时，message 中多余的 `CachePoint` markers 会按从旧到新的顺序移除
 - 这确保 critical caching（instructions/tools）得以保留，同时仍能受益于 message-level caching
 
-## Fast mode {#fast-mode}
+## Fast mode 快速模式 {#fast-mode}
 
 Fast mode 提供更高的每秒输出 tokens，当前支持 **Claude Opus 4.6**、**Claude Opus 4.7** 和 **Claude Opus 4.8**。它是一个 research preview。将 [`anthropic_speed`][pydantic_ai.models.anthropic.AnthropicModelSettings.anthropic_speed] 设置为 `'fast'` 即可启用；Pydantic AI 会自动添加所需的 `fast-mode-2026-02-01` beta。在不支持的模型上，`anthropic_speed='fast'` 会被忽略并发出 `UserWarning`。关于价格、速率限制和最新支持模型列表，请参阅 [Anthropic fast mode docs](https://platform.claude.com/docs/en/build-with-claude/fast-mode)。
 
@@ -504,13 +504,13 @@ agent = Agent(
 ...
 ```
 
-!!! note "Prompt cache interaction"
+!!! note "Prompt cache 交互"
     在 `'fast'` 和 `'standard'` 之间切换会使 prompt cache 失效。不同 speed 的请求不会共享 cached prefixes，因此请为 cache-sensitive conversation 选择一种 speed。
 
 !!! note "Bedrock、Vertex 和 Foundry"
     Fast mode 仅适用于直接的 Anthropic API。Bedrock、Vertex 和 Foundry clients 不支持 `speed` 参数，因此在这些 clients 上 `anthropic_speed='fast'` 会被忽略并发出 `UserWarning`。
 
-## Message Compaction {#message-compaction}
+## Message Compaction 消息压缩 {#message-compaction}
 
 Anthropic 支持 [automatic context compaction](https://docs.anthropic.com/en/docs/build-with-claude/compaction)，用于管理长对话。当 input tokens 超过配置阈值时，API 会自动生成摘要，用其替换较旧 messages，同时保留上下文。
 

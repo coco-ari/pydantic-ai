@@ -130,7 +130,7 @@ async def main():
 
 _（这个示例是完整的，可以"原样"运行；你需要添加 `asyncio.run(main())` 来运行 `main`）_
 
-### MCP "stdio" Server {#mcp-stdio-server}
+### MCP "stdio" Server 标准输入输出服务端 {#mcp-stdio-server}
 
 MCP 还提供 [stdio transport](https://spec.modelcontextprotocol.io/specification/2024-11-05/basic/transports/#stdio)，其中 server 作为 subprocess 运行，并通过 `stdin` 和 `stdout` 与 client 通信。在这种情况下，你会使用 [`MCPServerStdio`][pydantic_ai.mcp.MCPServerStdio] 类。
 
@@ -212,8 +212,8 @@ async def main():
 
 使用 [`load_mcp_servers()`][pydantic_ai.mcp.load_mcp_servers] 加载此配置时：
 
-- `${VAR}` references 会被替换为对应的环境变量值。
-- `${VAR:-default}` references 会在环境变量已设置时使用其值，否则使用默认值。
+- `${VAR}` 引用会被替换为对应的环境变量值。
+- `${VAR:-default}` 引用会在环境变量已设置时使用其值，否则使用默认值。
 
 !!! warning
     如果使用 `${VAR}` 语法引用的环境变量未定义，会引发 `ValueError`。请使用 `${VAR:-default}` 语法提供 fallback 值。
@@ -336,7 +336,7 @@ calculator_server = MCPServerSSE(
 agent = Agent('openai:gpt-5.2', toolsets=[weather_server, calculator_server])
 ```
 
-## Server instructions {#server-instructions}
+## Server instructions 服务器指令 {#server-instructions}
 
 MCP servers 可以在初始化期间提供 instructions，用于说明如何最好地与 server 的工具交互。这些 instructions 会在连接建立后通过 [`instructions`][pydantic_ai.mcp.MCPServer.instructions] 属性访问；创建 server 时设置 `include_instructions=True` 可以将它们自动注入 agent 的 instructions。
 
@@ -527,7 +527,7 @@ server = MCPServerSSE(
 )
 ```
 
-## MCP Sampling {#mcp-sampling}
+## MCP Sampling 采样 {#mcp-sampling}
 
 !!! info "什么是 MCP Sampling？"
     在 MCP 中，[sampling](https://modelcontextprotocol.io/docs/concepts/sampling) 是一种机制，MCP server 可以通过 MCP client 发起 LLM calls；实际效果是通过正在使用的 transport，把对 LLM 的请求经由 client 代理出去。
@@ -566,7 +566,7 @@ Pydantic AI 同时支持作为 client 和 server 进行 sampling。有关如何�
 
 假设我们有一个希望使用 sampling 的 MCP server（在此例中按工具参数生成 SVG）。
 
-??? example "Sampling MCP server"
+??? example "Sampling MCP server 示例"
 
     ```python {title="generate_svg.py"}
     import re
@@ -635,7 +635,7 @@ server = MCPServerStdio(
 )
 ```
 
-## Elicitation {#elicitation}
+## Elicitation 信息征询 {#elicitation}
 
 在 MCP 中，[elicitation](https://modelcontextprotocol.io/docs/concepts/elicitation) 允许 server 在 session 期间，从 client 请求缺失或额外上下文所需的[结构化输入](https://modelcontextprotocol.io/specification/2025-06-18/client/elicitation#supported-schema-types)。
 
@@ -647,12 +647,12 @@ Elicitation 引入了一种新的 protocol message 类型，称为 [`ElicitReque
 
 一个典型交互如下：
 
-- User 向 MCP server 发起请求（例如 "Book a table at that Italian place"）
+- 用户向 MCP server 发起请求（例如 "Book a table at that Italian place"）
 - Server 发现需要更多信息（例如 "Which Italian place?"、"What date and time?"）
 - Server 向 client 发送 `ElicitRequest`，请求缺失信息。
-- Client 收到请求，并将其展示给 user（例如通过 terminal prompt、GUI dialog 或 web interface）。
-- User 提供请求的信息，或 `decline` / `cancel` 该请求。
-- Client 将包含 user 响应的 `ElicitResult` 发回 server。
+- Client 收到请求，并将其展示给用户（例如通过 terminal prompt、GUI dialog 或 web interface）。
+- 用户提供请求的信息，或 `decline` / `cancel` 该请求。
+- Client 将包含用户响应的 `ElicitResult` 发回 server。
 - 拿到结构化数据后，server 可以继续处理原始请求。
 
 这可以带来更交互式、更友好的体验，尤其适用于多阶段 workflows。Server 不必要求一开始就提供所有信息，而是可以在需要时询问，让交互感觉更自然。

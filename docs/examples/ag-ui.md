@@ -1,4 +1,4 @@
-# Agent User Interaction (AG-UI) {#agent-user-interaction-ag-ui}
+# Agent User Interaction (AG-UI) 智能体用户交互 {#agent-user-interaction-ag-ui}
 
 这个示例展示如何将 Pydantic AI 智能体与 [AG-UI Dojo](https://github.com/ag-ui-protocol/ag-ui/tree/main/apps/dojo) 示例应用一起使用。
 
@@ -7,7 +7,7 @@
 演示内容：
 
 - [AG-UI](../ui/ag-ui.md)
-- [Tools](../tools.md)
+- [工具](../tools.md)
 
 ## 前置条件 {#prerequisites}
 
@@ -53,7 +53,7 @@ python/uv-run -m pydantic_ai_examples.ag_ui
 
 ## 功能示例 {#feature-examples}
 
-### Agentic Chat {#agentic-chat}
+### Agentic Chat 智能体聊天 {#agentic-chat}
 
 这里演示一个基本智能体交互，包括 Pydantic AI server 端工具和 AG-UI client 端工具。
 
@@ -84,11 +84,11 @@ Perform the following steps, waiting for the response of each step before contin
 4. Report how long the background set took by diffing the two times
 ```
 
-#### Agentic Chat - 代码 {#agentic-chat-code}
+#### Agentic Chat 代码 {#agentic-chat-code}
 
 ```snippet {path="/examples/pydantic_ai_examples/ag_ui/api/agentic_chat.py"}```
 
-### Agentic Generative UI {#agentic-generative-ui}
+### Agentic Generative UI 智能体生成式 UI {#agentic-generative-ui}
 
 这里演示一个长时间运行的任务，其中智能体会向前端发送更新，让用户知道正在发生什么。
 
@@ -100,11 +100,11 @@ Perform the following steps, waiting for the response of each step before contin
 Create a plan for breakfast and execute it
 ```
 
-#### Agentic Generative UI - 代码 {#agentic-generative-ui-code}
+#### Agentic Generative UI 代码 {#agentic-generative-ui-code}
 
 ```snippet {path="/examples/pydantic_ai_examples/ag_ui/api/agentic_generative_ui.py"}```
 
-### Human in the Loop {#human-in-the-loop}
+### Human in the Loop 人在回路中 {#human-in-the-loop}
 
 这里演示一个简单的 human-in-the-loop 工作流：智能体提出计划，用户可以用复选框批准。
 
@@ -118,11 +118,11 @@ Create a plan for breakfast and execute it
 Generate a list of steps for cleaning a car for me to review
 ```
 
-#### Human in the Loop - 代码 {#human-in-the-loop-code}
+#### Human in the Loop 代码 {#human-in-the-loop-code}
 
 ```snippet {path="/examples/pydantic_ai_examples/ag_ui/api/human_in_the_loop.py"}```
 
-### Predictive State Updates {#predictive-state-updates}
+### Predictive State Updates 预测式状态更新 {#predictive-state-updates}
 
 这里演示如何使用 predictive state updates 功能，根据智能体响应更新 UI 状态，包括通过用户确认进行交互。
 
@@ -149,11 +149,11 @@ Bruce was a good dog,
 Help me complete my story about bruce the dog, is should be no longer than a sentence.
 ```
 
-#### Predictive State Updates - 代码 {#predictive-state-updates-code}
+#### Predictive State Updates 代码 {#predictive-state-updates-code}
 
 ```snippet {path="/examples/pydantic_ai_examples/ag_ui/api/predictive_state_updates.py"}```
 
-### Shared State {#shared-state}
+### Shared State 共享状态 {#shared-state}
 
 这里演示如何使用 UI 和智能体之间的共享状态。
 
@@ -170,11 +170,11 @@ Help me complete my story about bruce the dog, is should be no longer than a sen
 1. 自定义食谱的基本设置
 2. 点击 `Improve with AI`
 
-#### Shared State - 代码 {#shared-state-code}
+#### Shared State 代码 {#shared-state-code}
 
 ```snippet {path="/examples/pydantic_ai_examples/ag_ui/api/shared_state.py"}```
 
-### Tool Based Generative UI {#tool-based-generative-ui}
+### Tool Based Generative UI 基于工具的生成式 UI {#tool-based-generative-ui}
 
 这里演示如何为带用户确认的工具输出使用自定义渲染。
 
@@ -190,6 +190,6 @@ Help me complete my story about bruce the dog, is should be no longer than a sen
 Generate a haiku about formula 1
 ```
 
-#### Tool Based Generative UI - 代码 {#tool-based-generative-ui-code}
+#### Tool Based Generative UI 代码 {#tool-based-generative-ui-code}
 
 ```snippet {path="/examples/pydantic_ai_examples/ag_ui/api/tool_based_generative_ui.py"}```

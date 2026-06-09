@@ -65,7 +65,7 @@ The first known use of "hello, world" was in a 1974 textbook about the C program
 
 可用 providers 和模型示例：
 
-| **Provider** | **API Format**  | **示例模型**                        |
+| **提供商** | **API 格式**  | **示例模型**                        |
 | --- |-----------------|------------------------------------------|
 | OpenAI | `openai`        | `gateway/openai:gpt-5.2`                 |
 | Anthropic | `anthropic`     | `gateway/anthropic:claude-sonnet-4-6`    |
@@ -223,7 +223,7 @@ export PYDANTIC_AI_GATEWAY_API_KEY="YOUR_GATEWAY_API_KEY"
 
 输入 `codex` 启动 Codex。之后所有请求都会通过 Pydantic AI Gateway 路由。
 
-### SDKs
+### SDKs {#sdks}
 
 #### OpenAI SDK
 

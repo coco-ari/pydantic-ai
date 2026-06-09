@@ -14,11 +14,11 @@
 
 发送到 Slack 的分析看起来会像这样：
 
-![Slack message](../img/slack-lead-qualifier-slack.png)
+![Slack 消息](../img/slack-lead-qualifier-slack.png)
 
 对应的 [Logfire](https://pydantic.dev/logfire) trace 看起来会像这样：
 
-![Logfire trace](../img/slack-lead-qualifier-logfire.png)
+![Logfire trace 追踪](../img/slack-lead-qualifier-logfire.png)
 
 这些条目都可以点击，以查看该步骤发生了什么的更多细节，包括与 LLM 的完整对话，以及 HTTP requests 和 responses。
 
@@ -26,7 +26,7 @@
 
 如果你只想看代码，而不想实际完成运行所需的各项设置，可以直接[跳到代码](#the-code)。
 
-### Slack app
+### Slack app 应用 {#slack-app}
 
 你需要有一个 Slack workspace，并具备创建 apps 所需的权限。
 
@@ -43,13 +43,13 @@
 
     这些名称在示例中是硬编码的。如果你想使用不同 channels，可以 clone 仓库并在 `examples/pydantic_ai_examples/slack_lead_qualifier/functions.py` 中修改它们。
 
-### Logfire Write Token
+### Logfire Write Token 写入令牌 {#logfire-write-token}
 
 1. 如果你还没有 Logfire 账号，请在 <https://logfire-us.pydantic.dev/> 创建一个。
 2. 创建一个新项目，例如命名为 `slack-lead-qualifier`。
 3. 生成一个新的 Write Token 并记下它，因为我们稍后需要把它存为 Modal 中的 Secret。
 
-### OpenAI API Key
+### OpenAI API Key 密钥 {#openai-api-key}
 
 1. 如果你还没有 OpenAI 账号，请在 <https://platform.openai.com/> 创建一个。
 2. 在 Settings 中创建一个新的 API Key 并记下它，因为我们稍后需要把它存为 Modal 中的 Secret。
@@ -121,7 +121,7 @@
 
 我们将从基础部分开始，然后逐步构建成完整应用。
 
-### Models
+### Models 模型 {#models}
 
 #### `Profile`
 
@@ -143,7 +143,7 @@
 
 ```snippet {path="/examples/pydantic_ai_examples/slack_lead_qualifier/models.py" fragment="analysis-intro analysis-as_slack_blocks"}```
 
-### Agent
+### Agent 智能体 {#agent}
 
 现在进入 Pydantic AI，定义负责实际分析的 agent。
 
@@ -194,7 +194,7 @@
 
 ```snippet {path="/examples/pydantic_ai_examples/slack_lead_qualifier/functions.py" fragment="imports-daily_summary constant-daily_summary_channel send_daily_summary"}```
 
-### Web app
+### Web app 应用 {#web-app}
 
 目前，这两个函数实际上还没有从任何地方被调用。
 
@@ -214,7 +214,7 @@
 
 ```snippet {path="/examples/pydantic_ai_examples/slack_lead_qualifier/app.py" fragment="process_slack_member"}```
 
-### Modal app
+### Modal app 应用 {#modal-app}
 
 现在看看 Modal 如何让部署这一切变得容易。
 

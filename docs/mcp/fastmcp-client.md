@@ -1,4 +1,4 @@
-# FastMCP Client
+# FastMCP Client 客户端 {#fastmcp-client}
 
 [FastMCP](https://gofastmcp.com/) 是一个更高层次的 MCP 框架，自称是"构建 MCP server 和 client 的快速、Pythonic 方式"。它在 MCP 规范之上支持额外能力，例如 [Tool Transformation](https://gofastmcp.com/patterns/tool-transformation)、[OAuth](https://gofastmcp.com/clients/auth/oauth) 等。
 
@@ -18,14 +18,14 @@ pip/uv-add "pydantic-ai-slim[fastmcp]"
 
 随后可以从以下来源创建 `FastMCPToolset`：
 
-- FastMCP Server：`#!python FastMCPToolset(fastmcp.FastMCP('my_server'))`
-- FastMCP Client：`#!python FastMCPToolset(fastmcp.Client(...))`
-- FastMCP Transport：`#!python FastMCPToolset(fastmcp.StdioTransport(command='python', args=['mcp_server.py']))`
-- Streamable HTTP URL：`#!python FastMCPToolset('http://localhost:8000/mcp')`
+- FastMCP Server 服务端：`#!python FastMCPToolset(fastmcp.FastMCP('my_server'))`
+- FastMCP Client 客户端：`#!python FastMCPToolset(fastmcp.Client(...))`
+- FastMCP Transport 传输：`#!python FastMCPToolset(fastmcp.StdioTransport(command='python', args=['mcp_server.py']))`
+- Streamable HTTP URL 地址：`#!python FastMCPToolset('http://localhost:8000/mcp')`
 - HTTP SSE URL：`#!python FastMCPToolset('http://localhost:8000/sse')`
-- Python Script：`#!python FastMCPToolset('my_server.py')`
-- Node.js Script：`#!python FastMCPToolset('my_server.js')`
-- JSON MCP Configuration：`#!python FastMCPToolset({'mcpServers': {'my_server': {'command': 'python', 'args': ['mcp_server.py']}}})`
+- Python Script 脚本：`#!python FastMCPToolset('my_server.py')`
+- Node.js Script 脚本：`#!python FastMCPToolset('my_server.js')`
+- JSON MCP Configuration 配置：`#!python FastMCPToolset({'mcpServers': {'my_server': {'command': 'python', 'args': ['mcp_server.py']}}})`
 
 如果你的 Pydantic AI 智能体所在代码库中已经有 [FastMCP Server](https://gofastmcp.com/servers)，可以直接从它创建 `FastMCPToolset`，从而省去智能体的一次网络往返：
 

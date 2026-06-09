@@ -24,7 +24,7 @@ FastAPI 基于 [Pydantic Validation](https://docs.pydantic.dev) 和类型提示�
 与我们的通用 OpenTelemetry 可观测性平台 [Pydantic Logfire](https://pydantic.dev/logfire) 深度[集成](logfire.md)，支持实时调试、基于评估的性能监控，以及行为、追踪和成本跟踪。如果你已经有支持 OTel 的可观测性平台，也可以[继续使用它](logfire.md#alternative-observability-backends)。
 
 4. **完全类型安全**：
-设计目标是尽可能为你的 IDE 或 AI 编码智能体提供上下文，用于自动补全和[类型检查](agent.md#static-type-checking)，把整类错误从运行时提前到编写代码时发现，带来一点 Rust 中“能编译就能运行”的体验。
+设计目标是尽可能为你的 IDE 或 AI 编码智能体提供上下文，用于自动补全和[类型检查](agent.md#static-type-checking)，把整类错误从运行时提前到编写代码时发现，带来一点 Rust 中"能编译就能运行"的体验。
 
 5. **强大的评估能力**：
 让你能够系统地测试和[评估](evals.md)所构建智能体系统的性能和准确性，并在 Pydantic Logfire 中持续监控性能变化。
@@ -47,9 +47,9 @@ FastAPI 基于 [Pydantic Validation](https://docs.pydantic.dev) 和类型提示�
 11. **图支持**：
 提供一种基于类型提示定义[图](graph.md)的强大方式，适用于标准控制流可能退化成意大利面代码的复杂应用。
 
-不过现实地说，再多列表也不如[亲自试一试](#下一步)，看看它带给你的感觉！
+不过现实地说，再多列表也不如[亲自试一试](#next-steps)，看看它带给你的感觉！
 
-**订阅我们的 newsletter _The Pydantic Stack_，获取 Pydantic AI、Logfire 和 Pydantic 的更新与教程：**
+**订阅我们的新闻通讯 _The Pydantic Stack_，获取 Pydantic AI、Logfire 和 Pydantic 的更新与教程：**
 
   <form method="POST" action="https://eu.customerioforms.com/forms/submit_action?site_id=53d2086c3c4214eaecaa&form_id=14b22611745b458&success_url=https://ai.pydantic.dev/" class="md-typeset" style="display: flex; align-items: center; gap: 0.5rem; width: 100%;">
       <input
@@ -59,14 +59,14 @@ FastAPI 基于 [Pydantic Validation](https://docs.pydantic.dev) 和类型提示�
       class="md-input md-input--stretch"
       style="flex: 1; background: var(--md-default-bg-color); color: var(--md-default-fg-color);"
       required
-      placeholder="Email"
+      placeholder="邮箱"
       data-1p-ignore
       data-lpignore="true"
       data-protonpass-ignore="true"
       data-bwignore="true"
       />
       <input type="hidden" id="source_input" name="source" value="pydantic-ai" />
-      <button type="submit" class="md-button md-button--primary">Subscribe</button>
+      <button type="submit" class="md-button md-button--primary">订阅</button>
   </form>
 
 ## Hello World 示例
@@ -92,7 +92,7 @@ The first known use of "hello, world" was in a 1974 textbook about the C program
 2. 使用智能体的关键字参数注册静态[指令](agent.md#instructions)。
 3. 同步[运行智能体](agent.md#running-agents)，开始与 LLM 对话。
 
-_（这个示例是完整的；假设你已经[安装了 `pydantic_ai` 包](install.md)，它可以“原样”运行。）_
+_（这个示例是完整的；假设你已经[安装了 `pydantic_ai` 包](install.md)，它可以"原样"运行。）_
 
 这次交互会非常短：Pydantic AI 会把指令和用户提示发送给 LLM，模型会返回一段文本响应。
 
@@ -244,7 +244,7 @@ support_agent = Agent(
 这足以让你看到如下智能体运行视图：
 
 /// public-trace | https://logfire-eu.pydantic.dev/public-trace/a2957caa-b7b7-4883-a529-777742649004?spanId=31aade41ab896144
-    title: 'Logfire instrumentation for the bank agent'
+    title: '银行智能体的 Logfire 插桩'
 ///
 
 参见[监控和性能](logfire.md)了解更多信息。
@@ -262,7 +262,7 @@ Pydantic AI 文档以 [llms.txt](https://llmstxt.org/) 格式提供。
 截至目前，这些文件尚不会被 IDE 或编码智能体自动利用，但如果你提供链接或全文，它们会使用。
 
 
-## 下一步
+## 下一步 {#next-steps}
 
 要亲自尝试 Pydantic AI，请先[安装它](install.md)，然后按照[示例中的说明](examples/setup.md)操作。
 
