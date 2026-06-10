@@ -17,8 +17,8 @@
 ## 当前阶段
 
 - 阶段：`4. 工具与依赖注入`
-- 当前主题：先补 `.tool_plain` demo 所需 Python 语法，再写并运行最小工具 demo。
-- 下一步：学习函数定义、类型注解、装饰器和 `dict` 最小语法，然后创建 `.tool_plain` demo。
+- 当前主题：已完成 `deps`/`ctx` 最小 demo，理解本地依赖如何进入工具。
+- 下一步：读最小源码链路：`run_sync(..., deps=...)` -> `RunContext.deps` -> `.tool` 执行。
 
 ## 已读核心文件
 
@@ -46,6 +46,8 @@
 | 2026-06-10 | `TestModel` 与 graph node 区分 | `pydantic_ai_slim/pydantic_ai/models/test.py`, `pydantic_ai_slim/pydantic_ai/_agent_graph.py` | 用户能说明 `TestModel` 不是 graph node，而是被 `ModelRequestNode` 调用的模型实现 | 画出阶段 3 的 5 步总流程 |
 | 2026-06-10 | 普通 function tool 消息链条 | `pydantic_ai_slim/pydantic_ai/_agent_graph.py`, `pydantic_ai_slim/pydantic_ai/messages.py` | 用户能说明 `ToolCallPart` 是大模型发给 agent，`ToolReturnPart` 是 agent 发回大模型 | 进入阶段 4：工具与依赖注入 |
 | 2026-06-10 | `.tool_plain` 注册工具 | `pydantic_ai_slim/pydantic_ai/agent/__init__.py`, `pydantic_ai_slim/pydantic_ai/toolsets/function.py`, `pydantic_ai_slim/pydantic_ai/tools.py` | 用户能说明 `.tool_plain` 只是注册工具，不会执行工具函数 | 理解工具如何变成 `ToolDefinition` 并发送给模型 |
+| 2026-06-10 | `.tool_plain` 最小 demo | `.codex-learning/pydantic-ai/examples/tool_plain_demo.py`, `pydantic_ai_slim/pydantic_ai/models/test.py`, `pydantic_ai_slim/pydantic_ai/agent/__init__.py` | 已创建并运行 demo，输出 `{"weather_lookup":"a: sunny"}`；用户能总结 `.tool_plain` 注册工具，`agent.run_sync()` 启动运行，`TestModel` 生成参数 `"a"` 后由 agent 调用 `get_weather`；并能判断模型返回 `ToolCallPart` 时使用工具说明书里的名字 `weather_lookup` | 学习 `deps` 和 `ctx` |
+| 2026-06-10 | `deps` 与 `ctx` 最小 demo | `.codex-learning/pydantic-ai/examples/tool_deps_demo.py` | 已创建并运行 demo，输出 `{"get_weather":"a: sunny, unit=C"}`；用户能说明 `deps` 是 agent 本地运行时传入，需要 `ctx.deps` 时使用 `.tool` | 读最小源码链路：`run_sync(..., deps=...)` -> `RunContext.deps` -> 工具执行 |
 
 ## 新会话启动协议
 
