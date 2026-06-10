@@ -1179,8 +1179,8 @@ class CallToolsNode(AgentNode[DepsT, NodeRunEndT]):
                     elif isinstance(part, _messages.FilePart):
                         files.append(part.content)
                     elif isinstance(part, _messages.NativeToolCallPart):
-                        # Text parts before a built-in tool call are essentially thoughts,
-                        # not part of the final result output, so we reset the accumulated text
+                        # 内置工具调用之前的文本部分本质上是思考内容，
+                        # 不属于最终结果输出，所以这里重置已累积的文本
                         text = ''
                         yield _messages.BuiltinToolCallEvent(part)  # pyright: ignore[reportDeprecated]
                     elif isinstance(part, _messages.NativeToolReturnPart):
