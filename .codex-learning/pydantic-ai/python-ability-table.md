@@ -12,7 +12,7 @@
 | --- | --- | --- | --- |
 | 变量与赋值 | learning | 用户说明 Python 基础较弱，暂按需要补课 | 2026-06-09 |
 | 基础类型：`str`、`int`、`bool`、`None` | learning | 读 `Agent(..., instructions='...')` 会用到 | 2026-06-09 |
-| 容器：`list`、`dict`、`tuple`、`set` | not_started | 读 messages、settings、tool schema 会用到 | 2026-06-09 |
+| 容器：`list`、`dict`、`tuple`、`set` | learning | 已用 `ModelRequest.parts` 和 `ModelResponse.parts` 理解 `list`/`Sequence` 是多个消息片段的容器 | 2026-06-10 |
 | 条件判断：`if` / `elif` / `else` | not_started | 读运行分支会用到 | 2026-06-09 |
 | 循环：`for` / `while` | learning | 用户能解释 `while not isinstance(node, End)` 会循环执行节点直到结束 | 2026-06-09 |
 | 函数定义与参数 | learning | 读 tool、instructions 装饰器会用到 | 2026-06-09 |
@@ -24,9 +24,9 @@
 | 知识点 | 状态 | 证据/备注 | 最近更新 |
 | --- | --- | --- | --- |
 | 类与实例 | known | 用户能说明 `OpenAIProvider` 和 `OpenAIChatModel` 是类，用来创建 provider 和 model 对象 | 2026-06-09 |
-| 方法与属性 | learning | 用户能解释 `self._model` 是 agent 内部保存模型的属性，继续通过 `run_sync()` 巩固 | 2026-06-09 |
-| 对象组合 | learning | 已接触 `Agent` 持有 model、model 持有 provider 的关系；理解不需要一次到位 | 2026-06-09 |
-| 执行图与节点 | learning | 用户能把 graph 和任务节点联系起来；已校正 graph 是节点与流转规则，node 是单个任务节点 | 2026-06-09 |
+| 方法与属性 | learning | 用户能解释 `self._model`，并开始理解 node 实例持有的 `request`、`model_response` 等属性作为下一步执行的输入 | 2026-06-10 |
+| 对象组合 | known | 用户已理解 `Agent` 持有 model、model 持有 provider，能区分 `ModelRequest`/`ModelResponse`，并能说明 `TestModel` 不是 graph node 而是被 `ModelRequestNode` 调用 | 2026-06-10 |
+| 执行图与节点 | known | 用户能说明 `CallToolsNode` 根据模型响应决定执行工具后返回 `ModelRequestNode`，或在无需工具时返回 `End` | 2026-06-10 |
 | 继承 | not_started | 读 `AbstractAgent`、model/provider 基类会用到 | 2026-06-09 |
 | 抽象基类 / 协议 | not_started | 读 `abstract.py` 和 provider 接口会用到 | 2026-06-09 |
 | `dataclass` | not_started | docs 示例和内部状态对象会用到 | 2026-06-09 |

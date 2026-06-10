@@ -16,9 +16,9 @@
 
 ## 当前阶段
 
-- 阶段：`0. 建立地图 + 最小示例`
-- 当前主题：理解 `iter()` 创建 `AgentRun`，`run()` 驱动 `AgentRun`
-- 下一步：进入 `_agent_graph.py`，认识 `UserPromptNode`、`ModelRequestNode`、`CallToolsNode` 三个核心节点。
+- 阶段：`4. 工具与依赖注入`
+- 当前主题：先补 `.tool_plain` demo 所需 Python 语法，再写并运行最小工具 demo。
+- 下一步：学习函数定义、类型注解、装饰器和 `dict` 最小语法，然后创建 `.tool_plain` demo。
 
 ## 已读核心文件
 
@@ -39,6 +39,13 @@
 | 2026-06-09 | `run_sync()` 与事件循环 | `pydantic_ai_slim/pydantic_ai/agent/abstract.py`, `pydantic_ai_slim/pydantic_ai/_utils.py` | 用户理解 `_utils` 是导入模块，`get_event_loop()` 返回 event loop 对象，event loop 可以执行异步 agent 任务；暂不要求理解事件循环底层实现 | 阅读 `run()` 如何创建 Agent graph |
 | 2026-06-09 | `run()` 驱动 graph node | `pydantic_ai_slim/pydantic_ai/agent/abstract.py` | 用户能说明 node 是任务节点，`while` 循环执行直到 `End`，`agent_run.next(node)` 返回下一个任务节点 | 阅读 `Agent.iter()` 创建 `AgentRun` |
 | 2026-06-09 | `iter()` 与 `run()` 职责 | `pydantic_ai_slim/pydantic_ai/agent/__init__.py`, `pydantic_ai_slim/pydantic_ai/run.py` | 用户理解 `iter()` 负责创建运行，`run()` 负责执行运行；校正为 `iter()` 创建 `AgentRun` 而不是创建 `Agent` | 阅读 `_agent_graph.py` 核心节点 |
+| 2026-06-10 | `_agent_graph.py` 三个核心节点 | `pydantic_ai_slim/pydantic_ai/_agent_graph.py`, `pydantic_ai_slim/pydantic_ai/agent/abstract.py`, `pydantic_ai_slim/pydantic_ai/run.py` | 用户能说明 `CallToolsNode` 会根据模型响应决定执行工具后回到 `ModelRequestNode`，或直接返回 `End` | 阅读 `messages.py` 中请求、响应和 parts |
+| 2026-06-10 | `ModelRequest` 与 `ModelResponse` | `pydantic_ai_slim/pydantic_ai/messages.py` | 用户能说明 `ModelRequest` 是 agent 发给 LLM，`ModelResponse` 是 LLM 发给 agent | 继续阅读常见 message parts |
+| 2026-06-10 | message parts | `pydantic_ai_slim/pydantic_ai/messages.py`, `pydantic_ai_slim/pydantic_ai/_agent_graph.py` | 用户能说明模型返回 `ToolCallPart` 时会进入 `CallToolsNode` 执行本地工具 | 阅读 `models/test.py`，用测试模型串起完整运行 |
+| 2026-06-10 | 核心 node 的入参与返回 | `pydantic_ai_slim/pydantic_ai/_agent_graph.py`, `pydantic_ai_slim/pydantic_ai/models/test.py` | 用户能总结 `UserPromptNode` 产出 `ModelRequestNode`，`ModelRequestNode` 调 model 得到 `ModelResponse` 并交给 `CallToolsNode`，`CallToolsNode` 根据响应返回 `End` 或新的 `ModelRequestNode` | 画出阶段 3 的 5 步总流程 |
+| 2026-06-10 | `TestModel` 与 graph node 区分 | `pydantic_ai_slim/pydantic_ai/models/test.py`, `pydantic_ai_slim/pydantic_ai/_agent_graph.py` | 用户能说明 `TestModel` 不是 graph node，而是被 `ModelRequestNode` 调用的模型实现 | 画出阶段 3 的 5 步总流程 |
+| 2026-06-10 | 普通 function tool 消息链条 | `pydantic_ai_slim/pydantic_ai/_agent_graph.py`, `pydantic_ai_slim/pydantic_ai/messages.py` | 用户能说明 `ToolCallPart` 是大模型发给 agent，`ToolReturnPart` 是 agent 发回大模型 | 进入阶段 4：工具与依赖注入 |
+| 2026-06-10 | `.tool_plain` 注册工具 | `pydantic_ai_slim/pydantic_ai/agent/__init__.py`, `pydantic_ai_slim/pydantic_ai/toolsets/function.py`, `pydantic_ai_slim/pydantic_ai/tools.py` | 用户能说明 `.tool_plain` 只是注册工具，不会执行工具函数 | 理解工具如何变成 `ToolDefinition` 并发送给模型 |
 
 ## 新会话启动协议
 
