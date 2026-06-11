@@ -1,17 +1,28 @@
-# Pydantic AI 源码学习路线
+# Pydantic AI 语法优先学习路线
 
 ## 学习原则
 
-- 先文档，再入口文件，再核心流程，最后深入 provider、tool、streaming 和 graph。
-- 每一节先补 Python 前置知识，再读源码。
-- 每次只读少量文件，读完做一个小练习。
-- 讲解时优先链接真实文件，不凭记忆描述。
+- 先学一个最小 Python 语法点，再连接一个最小 Pydantic AI 行为。
+- 每轮默认只讲一个语法点，一个 5-15 行代码块，一个 checkpoint。
+- 源码阅读不是默认入口；只在语法 checkpoint 通过后作为验证材料。
+- 旧的源码阅读顺序只保留为长期地图，不作为下一步任务列表。
+
+## 当前微课队列
+
+围绕阶段 4 的 `ctx.deps.unit`，按这个顺序拆开：
+
+1. 对象属性访问：`obj.attr`
+2. `dataclass` 创建保存数据的对象
+3. 关键字参数：`deps=...`
+4. 类型注解基础：`name: str`、`-> str`
+5. 泛型外观：`RunContext[WeatherDeps]` 先只理解“上下文里装的是 WeatherDeps”
+6. Pydantic AI 连接：`run_sync(..., deps=...)` 如何让工具里能读到 `ctx.deps`
 
 ## 阶段 0：建立地图
 
 目标：知道项目是什么、有哪些包、最小示例如何运行。
 
-阅读顺序：
+长期参考材料：
 
 1. `docs/index.md`
 2. `docs/install.md`
@@ -52,7 +63,7 @@
 
 目标：理解用户代码 `from pydantic_ai import Agent` 如何到达真正的类。
 
-阅读顺序：
+长期参考材料：
 
 1. `pydantic_ai_slim/pydantic_ai/__init__.py`
 2. `pydantic_ai_slim/pydantic_ai/agent/__init__.py`
@@ -75,7 +86,7 @@
 
 目标：理解 `agent.run_sync('hello')` 到模型响应的大致链路。
 
-阅读顺序：
+长期参考材料：
 
 1. `docs/agent.md` 的 "Running Agents"
 2. `pydantic_ai_slim/pydantic_ai/run.py`
@@ -106,7 +117,7 @@
 
 目标：理解 `@agent.tool`、`RunContext` 和 `deps`。
 
-阅读顺序：
+长期参考材料：
 
 1. `docs/tools.md`
 2. `docs/dependencies.md`
@@ -122,7 +133,7 @@
 
 目标：理解 `output_type`、Pydantic 校验、历史消息复用。
 
-阅读顺序：
+长期参考材料：
 
 1. `docs/output.md`
 2. `docs/message-history.md`
@@ -138,7 +149,7 @@
 
 目标：理解模型无关是怎么实现的。
 
-阅读顺序：
+长期参考材料：
 
 1. `docs/models/overview.md`
 2. `pydantic_ai_slim/pydantic_ai/models/__init__.py`
@@ -154,7 +165,7 @@
 
 目标：理解更高级的运行方式。
 
-阅读顺序：
+长期参考材料：
 
 1. `docs/capabilities.md`
 2. `docs/deferred-tools.md`
